@@ -23,7 +23,7 @@ export default function Sidebar() {
     <div className="p-4 h-full w-full max-w-80">
       <div
         className={`${
-          user?.user?.role === "vendor" ? "bg-black-800" : "bg-primary2-600"
+          user?.role === "vendor" ? "bg-black-800" : "bg-primary2-600"
         } h-full pl-4 py-4 rounded-md flex flex-col gap-4`}
       >
         {sidebarItems.map((item) => {
@@ -33,7 +33,7 @@ export default function Sidebar() {
             <Link
               key={item.name}
               to={item.path}
-              onClick={() => setActiveTab(item.name)} // Set active tab on click
+              onClick={() => setActiveTab(item.name)}
               className="flex items-center gap-3"
             >
               <div className={`p-2 rounded-md ${isActive ? "bg-white" : ""}`}>

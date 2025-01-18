@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import sidebarItems from "../utils/sidebarItems";
-import useAuth from "../store/useAuth";
 import useActiveTab from "../store/useActiveTab";
 
 export default function Sidebar() {
   const location = useLocation();
-  const { user } = useAuth();
   const { activeTab, setActiveTab } = useActiveTab();
 
   // Update active tab in Zustand on location change or click
@@ -22,9 +20,7 @@ export default function Sidebar() {
   return (
     <div className="p-4 h-full w-full max-w-80">
       <div
-        className={`${
-          user?.role === "vendor" ? "bg-black-800" : "bg-primary2-600"
-        } h-full pl-4 py-4 rounded-md flex flex-col gap-4`}
+        className={`bg-black-800 h-full pl-4 py-4 rounded-md flex flex-col gap-4`}
       >
         {sidebarItems.map((item) => {
           const isActive = activeTab === item.name;

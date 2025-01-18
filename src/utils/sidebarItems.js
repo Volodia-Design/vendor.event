@@ -1,45 +1,58 @@
-import DashboardIcon from "../Images/SidebarIcons/Home.svg";
-import DashboardIconActive from "../Images/SidebarIcons/HomeActive.svg";
-import HistoryIcon from "../Images/SidebarIcons/History.svg";
-import HistoryIconActive from "../Images/SidebarIcons/HistoryActive.svg";
-import TimelineIcon from "../Images/SidebarIcons/Timeline.svg";
-import TimelineIconActive from "../Images/SidebarIcons/TimelineActive.svg";
-import SettingsIcon from "../Images/SidebarIcons/Settings.svg";
-import SettingsIconActive from "../Images/SidebarIcons/SettingsActive.svg";
-import GalleryIcon from "../Images/SidebarIcons/Gallery.svg";
-import GalleryIconActive from "../Images/SidebarIcons/GalleryActive.svg";
-
 const sidebarItems = [
     {
         name: "Dashboard",
         path: "/",
-        icon: DashboardIcon,
-        activeIcon: DashboardIconActive
+        icon: "/Images/SidebarIcons/Home.svg",
+        activeIcon: "/Images/SidebarIcons/HomeActive.svg"
     },
     {
-        name: "History",
-        path: "/history",
-        icon: HistoryIcon,
-        activeIcon: HistoryIconActive
+        name: "Services",
+        path: "/services",
+        icon: "/Images/SidebarIcons/Services.svg",
+        activeIcon: "/Images/SidebarIcons/ServicesActive.svg"
     },
     {
-        name: "Timeline & Milestones",
-        path: "/timeline",
-        icon: TimelineIcon,
-        activeIcon: TimelineIconActive
+        name: "Schedule",
+        path: "/schedule",
+        icon: "/Images/SidebarIcons/Schedule.svg",
+        activeIcon: "/Images/SidebarIcons/ScheduleActive.svg"
+    },
+    {
+        name: "Products",
+        path: "/products",
+        icon: "/Images/SidebarIcons/Products.svg",
+        activeIcon: "/Images/SidebarIcons/ProductsActive.svg"
+    },
+    {
+        name: "Portfolio",
+        path: "/portfolio",
+        icon: "/Images/SidebarIcons/Portfolio.svg",
+        activeIcon: "/Images/SidebarIcons/PortfolioActive.svg"
+    },
+    {
+        name: "About Us",
+        path: "/about-us",
+        icon: "/Images/SidebarIcons/AboutUs.svg",
+        activeIcon: "/Images/SidebarIcons/AboutUsActive.svg"
+    },
+    {
+        name: "People",
+        path: "/people",
+        icon: "/Images/SidebarIcons/People.svg",
+        activeIcon: "/Images/SidebarIcons/PeopleActive.svg"
+    },
+    {
+        name: "Location",
+        path: "/location",
+        icon: "/Images/SidebarIcons/Location.svg",
+        activeIcon: "/Images/SidebarIcons/LocationActive.svg"
     },
     {
         name: "Settings",
         path: "/settings",
-        icon: SettingsIcon,
-        activeIcon: SettingsIconActive
+        icon: "/Images/SidebarIcons/Settings.svg",
+        activeIcon: "/Images/SidebarIcons/SettingsActive.svg"
     },
-    {
-        name: "Gallery",
-        path: "/gallery",
-        icon: GalleryIcon,
-        activeIcon: GalleryIconActive
-    }
 ];
 
 export default sidebarItems;

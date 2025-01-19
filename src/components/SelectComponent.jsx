@@ -6,7 +6,6 @@ import {
   SelectItem,
 } from "../components/ui/select";
 
-// Custom Select Component
 export function SelectComponent({
   id,
   label,
@@ -16,23 +15,28 @@ export function SelectComponent({
   className,
   placeholder,
 }) {
+  // Add default value handling
+  const handleValueChange = (newValue) => {
+    if (onChange && newValue) {
+      onChange(newValue);
+    }
+  };
+
   return (
     <div className={`${className}`}>
       {label && (
-        <label htmlFor={id} className={`text-text4Medium text-white`}>
+        <label htmlFor={id} className="text-text4Medium text-black-400">
           {label}
         </label>
       )}
 
       <Select
         id={id}
-        value={value}
-        onValueChange={onChange}
+        value={value || ""} // Ensure value is never undefined
+        onValueChange={handleValueChange}
         className="rounded-lg bg-white"
       >
-        <SelectTrigger
-          className={`inputSelectStyle`}
-        >
+        <SelectTrigger className="inputSelectStyle">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 
@@ -40,7 +44,7 @@ export function SelectComponent({
           {options?.map((option) => (
             <SelectItem
               key={option.id}
-              value={option.id}
+              value={option.id.toString()} // Convert id to string
               className="focus:bg-gray-100 focus:text-black cursor-pointer hover:bg-gray-100"
             >
               {option.name}

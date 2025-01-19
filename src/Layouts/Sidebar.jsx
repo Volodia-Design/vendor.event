@@ -7,7 +7,6 @@ export default function Sidebar() {
   const location = useLocation();
   const { activeTab, setActiveTab } = useActiveTab();
 
-  // Update active tab in Zustand on location change or click
   useEffect(() => {
     const currentTab = sidebarItems.find((item) => item.path === location.pathname);
     if (currentTab) {
@@ -15,7 +14,6 @@ export default function Sidebar() {
     }
   }, [location.pathname, setActiveTab]);
 
-  console.log("🚀 ~ Sidebar ~ activeTab:", activeTab);
 
   return (
     <div className="p-4 h-full w-full max-w-80">

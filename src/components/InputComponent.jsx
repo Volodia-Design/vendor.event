@@ -13,7 +13,7 @@ export function InputComponent({
   return (
     <div className={`${className || ""}`}>
       {label && (
-        <label htmlFor={id} className="text-text4Medium text-white">
+        <label htmlFor={id} className="text-text4Medium text-black-400">
           {label}
         </label>
       )}

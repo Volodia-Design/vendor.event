@@ -1,7 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./node_modules/@shadcn/ui/dist/**/*.{js,ts,jsx,tsx}",
+  ],
+    theme: {
     fontSize: {
       h1: ['64px', { fontWeight: '700' }],
       h2: ['48px', { fontWeight: '700' }],

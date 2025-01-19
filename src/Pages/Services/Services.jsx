@@ -4,6 +4,8 @@ import { SelectComponent } from "../../components/SelectComponent";
 import { Pagination } from "swiper/modules";
 import { useState } from "react";
 import { InputComponent } from "../../components/InputComponent";
+import { Info } from "lucide-react";
+import { Tooltip } from "react-tooltip";
 
 export default function Services() {
   const [serviceData, setServiceData] = useState({
@@ -160,12 +162,24 @@ export default function Services() {
     }));
   };
 
-  const handleCreateService = () => {
-    setIsModalOpen(true); // Open the modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setServiceData({
+      location: "",
+      service: "",
+      priceRange: "",
+      mainSpecification: "",
+      mainSpecificationPrice: "",
+      specifications: [],
+    });
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false); // Close the modal
+  const handleEdit = (service) => {
+    console.log("🚀 ~ handleEdit ~ service:", service)
+  }
+  const saveData = (e) => {
+    e.preventDefault(); // Corrected the typo here
+    console.log("🚀 ~ saveData ~ serviceData:", serviceData);
   };
 
   return (
@@ -176,7 +190,7 @@ export default function Services() {
           <Button
             text="Create a Service"
             buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2"
-            onClick={handleCreateService}
+            onClick={() => setIsModalOpen(true)}
           />
         </div>
         {/* Swiper Component */}
@@ -204,13 +218,15 @@ export default function Services() {
                         console.log(`Selected value for ${select.id}:`, value)
                       }
                     />
-                    <div className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center">
+                    <div
+                      className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
+                      onClick={() => handleEdit(select)}
+                    >
                       <img
                         src="/Images/ComponentIcons/Edit.svg"
                         alt="edit"
                         width={24}
                         height={24}
-                        className="cursor-pointer"
                       />
                     </div>
                   </div>
@@ -252,7 +268,7 @@ export default function Services() {
             </button>
 
             {/* Modal header */}
-            <p className="uppercase text-h4 text-primary2-500 mb-6 pr-8">
+            <p className="uppercase text-h4 text-primary2-500 mb-6 pr-8 text-center">
               Create a Service
             </p>
 
@@ -269,7 +285,6 @@ export default function Services() {
                   handleDataChange(undefined, "location", value)
                 }
               />
-
               <div className="flex items-center gap-4">
                 <SelectComponent
                   id="service"
@@ -293,12 +308,27 @@ export default function Services() {
                   }
                 />
               </div>
-
               {/* Main Specification Section */}
               <div className="flex items-center gap-4">
                 <InputComponent
                   id="mainSpecification"
-                  label="Specification"
+                  label={
+                    <div className="flex items-center gap-2">
+                      <span>Specification *</span>
+                      <Info
+                        data-tooltip-id="mainSpecificationTooltip"
+                        className="w-5 h-5 text-secondary-800 cursor-pointer"
+                      />
+                      <Tooltip
+                        id="mainSpecificationTooltip"
+                        place="top"
+                        effect="solid"
+                      >
+                        Use Specifications if your service contains various
+                        sub-services{" "}
+                      </Tooltip>
+                    </div>
+                  }
                   placeholder="Write a specification"
                   className="w-full"
                   value={serviceData.mainSpecification}
@@ -332,7 +362,6 @@ export default function Services() {
                   </div>
                 </div>
               </div>
-
               {/* Dynamic Specifications Section */}
               {serviceData.specifications.map((spec, index) => (
                 <div key={index} className="flex items-center gap-4">
@@ -369,6 +398,18 @@ export default function Services() {
                   </div>
                 </div>
               ))}
+              <div className="w-full flex gap-3 items-center justify-end mt-2">
+                <Button
+                  text="Cancel"
+                  onClick={handleCloseModal}
+                  buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
+                />
+                <Button
+                  text="Create"
+                  onClick={(e) => saveData(e)}
+                  buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
+                />
+              </div>
             </form>
           </div>
         </div>

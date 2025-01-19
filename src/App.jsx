@@ -11,15 +11,12 @@ import Location from "./Pages/Location/Location";
 import Settings from "./Pages/Settings/Settings";
 import "swiper/css";
 import "swiper/css/pagination";
-import useModal from "./store/useModal";
-import ModalComponent from "./components/ModalComponent";
+import 'react-tooltip/dist/react-tooltip.css';
 
 function App() {
-  const { isOpen, content, closeModal } = useModal();
 
   return (
     <Router>
-            <ModalComponent isOpen={isOpen} content={content} onClose={closeModal} />
       <Routes>
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />

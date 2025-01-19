@@ -36,7 +36,7 @@ export function SelectComponent({
         onValueChange={handleValueChange}
         className="rounded-lg bg-white"
       >
-        <SelectTrigger className="inputSelectStyle">
+        <SelectTrigger className="inputSelectStyle mt-1">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 

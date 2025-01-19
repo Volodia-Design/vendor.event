@@ -12,9 +12,16 @@ export function InputComponent({
 }) {
   return (
     <div className={`${className || ""}`}>
-      {label && (
-        <label htmlFor={id} className="text-text4Medium text-black-400">
-          {label}
+     {label && (
+        <label
+          htmlFor={id}
+          className="text-text4Medium text-black-400 flex items-center"
+        >
+          {typeof label === "string" ? (
+            label
+          ) : (
+            label 
+          )}
         </label>
       )}
       <div className="relative">
@@ -25,7 +32,7 @@ export function InputComponent({
         )}
         <Input
           id={id}
-          className={`inputSelectStyle focus:outline-none placeholder-black ${
+          className={`mt-1 inputSelectStyle focus:outline-none placeholder-black ${
             icon ? "pl-8" : "px-3"
           } ${inputClassName || ""}`}
           value={value}

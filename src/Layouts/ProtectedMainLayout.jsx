@@ -14,11 +14,11 @@ function ProtectedMainLayout() {
   }
 
   return (
-    <div className="flex gap-3 w-full h-screen">
+    <div className="flex w-full h-screen">
       <Sidebar />
-      <div className="px-1 py-3 mx-3 w-full flex flex-col items-center gap-3 overflow-auto">
+      <div className="p-4 w-full flex flex-col items-center overflow-auto">
         <Header />
-        <div className="mt-8 w-[97%]">
+        <div className="mt-8 w-full">
           <Outlet />
         </div>
       </div>

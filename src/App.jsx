@@ -9,6 +9,8 @@ import AboutUs from "./Pages/AboutUs/AboutUs";
 import People from "./Pages/People/People";
 import Location from "./Pages/Location/Location";
 import Settings from "./Pages/Settings/Settings";
+import "swiper/css";
+import "swiper/css/pagination";
 
 function App() {
   return (

@@ -1,0 +1,37 @@
+import PropTypes from "prop-types";
+
+export default function Button({
+  text,
+  imgSrc,
+  imgAlt,
+  onClick,
+  buttonStyles,
+  textStyles,
+  imgStyles,
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center justify-center gap-2 p-2 rounded-lg ${buttonStyles}`}
+    >
+      {imgSrc && (
+        <img
+          src={imgSrc}
+          alt={imgAlt || "Button image"}
+          className={`w-6 h-6 ${imgStyles}`}
+        />
+      )}
+      {text && <span className={textStyles}>{text}</span>}
+    </button>
+  );
+}
+
+Button.propTypes = {
+  text: PropTypes.string,
+  imgSrc: PropTypes.string,
+  imgAlt: PropTypes.string,
+  onClick: PropTypes.func,
+  buttonStyles: PropTypes.string,
+  textStyles: PropTypes.string,
+  imgStyles: PropTypes.string,
+};

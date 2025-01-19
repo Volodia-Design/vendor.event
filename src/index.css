@@ -2,8 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+
 html,body {
     margin: 0;
     padding: 0;
     background-color: #F2F2F2;
 }
+.inputSelectStyle {
+    outline: none !important;
+    box-shadow: none !important;
+    ring: 0 !important;
+    border: 1.5px solid #949494;
+    color: black;
+    border-radius: 8px !important;
+  }
+  .inputSelectStyle::placeholder {
+    color: black; /* Ensures the placeholder text is black */
+    opacity: 1;   /* Adjusts transparency, if needed */
+  }
+  .placeholder-black::placeholder {
+    color: black !important;
+  }
+  .inputSelectStyle:hover {
+    background-color: #f4faff !important;
+  }
+  .timePickerNoIcon::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+    color: black;
+  }
+  .timePicker {
+    outline: none !important;
+    box-shadow: none !important;
+    ring: 0 !important;
+    color: #949494;
+  }

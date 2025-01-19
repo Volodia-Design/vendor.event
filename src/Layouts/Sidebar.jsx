@@ -20,7 +20,7 @@ export default function Sidebar() {
   return (
     <div className="p-4 h-full w-full max-w-80">
       <div
-        className={`bg-primary2-600 h-full pl-4 py-4 rounded-md flex flex-col gap-4`}
+        className={`bg-primary2-900 h-full pl-4 py-4 rounded-md flex flex-col gap-4`}
       >
         {sidebarItems.map((item) => {
           const isActive = activeTab === item.name;

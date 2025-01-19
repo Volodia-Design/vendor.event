@@ -6,6 +6,7 @@ import { useState } from "react";
 import { InputComponent } from "../../components/InputComponent";
 import { Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
+import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 
 export default function Services() {
   const [serviceData, setServiceData] = useState({
@@ -175,8 +176,8 @@ export default function Services() {
   };
 
   const handleEdit = (service) => {
-    console.log("🚀 ~ handleEdit ~ service:", service)
-  }
+    console.log("🚀 ~ handleEdit ~ service:", service);
+  };
   const saveData = (e) => {
     e.preventDefault(); // Corrected the typo here
     console.log("🚀 ~ saveData ~ serviceData:", serviceData);
@@ -274,13 +275,13 @@ export default function Services() {
 
             {/* Form content */}
             <form className="w-full flex flex-col gap-2">
-              <SelectComponent
+              <MultiSelectComponent
                 id="location"
                 label="Location *"
                 options={locations}
                 placeholder="Select Location"
                 className="w-full"
-                value={serviceData.location || ""}
+                value={serviceData.location}
                 onChange={(value) =>
                   handleDataChange(undefined, "location", value)
                 }

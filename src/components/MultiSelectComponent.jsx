@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react"; // Add ChevronDown icon
 import { cn } from "../utils";
 
 export function MultiSelectComponent({
@@ -53,7 +53,7 @@ export function MultiSelectComponent({
 
       <div className="relative">
         <div
-          className="mt-1 border rounded-lg p-2 min-h-[40px] flex items-center flex-wrap gap-1 cursor-pointer"
+          className="mt-1 border rounded-lg p-2 min-h-[40px] flex items-center flex-wrap gap-1 cursor-pointer inputSelectStyle"
           onClick={() => setIsOpen(!isOpen)}
         >
           {selectedOptions.length > 0 ? (
@@ -72,8 +72,17 @@ export function MultiSelectComponent({
               </span>
             ))
           ) : (
-            <span className="text-gray-400">{placeholder}</span>
+            <span className="text-black-800">{placeholder}</span>
           )}
+          {/* Add ChevronDown icon */}
+          <img
+            src="/Images/ComponentIcons/SelectArrow.svg"
+            alt="arrow"
+            className={cn(
+              "ml-auto transition-transform w-4 h-4",
+              isOpen ? "rotate-180" : ""
+            )}
+          />
         </div>
 
         {isOpen && (

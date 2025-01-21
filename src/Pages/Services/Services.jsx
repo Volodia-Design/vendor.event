@@ -7,6 +7,7 @@ import { InputComponent } from "../../components/InputComponent";
 import { Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
+import api from "../../utils/api";
 
 export default function Services() {
   const [serviceData, setServiceData] = useState({
@@ -218,40 +219,51 @@ export default function Services() {
 
   const saveData = (e) => {
     e.preventDefault();
-
     let newErrors = {
       location: "",
       service_type_id: "",
       service_specifications: [],
     };
+  
     if (!serviceData.location || serviceData.location.trim() === "") {
       newErrors.location = "Location is required.";
     }
-    if (
-      !serviceData.service_type_id ||
-      serviceData.service_type_id.trim() === ""
-    ) {
+  
+    if (!serviceData.service_type_id || serviceData.service_type_id.trim() === "") {
       newErrors.service_type_id = "Service type is required.";
     }
-    serviceData.service_specifications.forEach((spec, index) => {
+  
+    const updatedServiceSpecifications = serviceData.service_specifications.map((spec, index) => {
+      let specErrors = {};
+  
       if (!spec.name || spec.name.trim() === "") {
-        newErrors.service_specifications[index] =
-          newErrors.service_specifications[index] || {};
-        newErrors.service_specifications[index].name =
-          "Specification is required.";
+        specErrors.name = "Specification is required.";
       }
+  
       if (!spec.price || spec.price.trim() === "") {
-        newErrors.service_specifications[index] =
-          newErrors.service_specifications[index] || {};
-        newErrors.service_specifications[index].price = "Price is required.";
+        specErrors.price = "Price is required.";
       }
+  
+      return { ...spec, errors: specErrors };
     });
-    if (Object.values(newErrors).some((error) => error !== "")) {
+  
+    newErrors.service_specifications = updatedServiceSpecifications;
+    if (Object.values(newErrors).some((error) => error !== "" && !Array.isArray(error))) {
+      console.log("🚀 ~ saveData ~ newErrors:", newErrors);
       setErrors(newErrors);
       return;
     }
-    console.log("🚀 ~ saveData ~ serviceData:", serviceData);
+  
+    api.post("/vendor-service", serviceData)
+      .then((response) => {
+        console.log("🚀 ~ saveData ~ response:", response);
+        handleCloseModal();
+      })
+      .catch((error) => {
+        console.error("Error saving data:", error);
+      });
   };
+  
 
   return (
     <div className="w-full flex flex-col items-center gap-3">

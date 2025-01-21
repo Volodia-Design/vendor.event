@@ -12,14 +12,14 @@ export default function Products() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productData, setProductData] = useState({
-    image: "",
-    productName: "",
+    file: "",
+    name: "",
     stock: "",
     price: "",
-    type: "",
+    service_type_id: "",
     location: "",
-    event: "",
-    shortDescription: "",
+    event_types: "",
+    description: "",
   });
 
   const locations = [
@@ -47,24 +47,24 @@ export default function Products() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setProductData({
-      image: "",
-      productName: "",
+      file: "",
+      name: "",
       stock: "",
       price: "",
-      type: "",
+      service_type_id: "",
       location: "",
-      event: "",
-      shortDescription: "",
+      event_types: "",
+      description: "",
     });
     setErrors({
-      image: "",
-      productName: "",
+      file: "",
+      name: "",
       stock: "",
       price: "",
-      type: "",
+      service_type_id: "",
       location: "",
-      event: "",
-      shortDescription: "",
+      event_types: "",
+      description: "",
     });
   };
 
@@ -77,37 +77,37 @@ export default function Products() {
 
   const handleEventChange = (selectedIds) => {
     const eventString = selectedIds.join(", ");
-    handleDataChange("event", eventString);
+    handleDataChange("event_types", eventString);
   };
 
   const [errors, setErrors] = useState({
-    image: "",
-    productName: "",
+    file: "",
+    name: "",
     stock: "",
     price: "",
-    type: "",
+    service_type_id: "",
     location: "",
-    event: "",
-    shortDescription: "",
+    event_types: "",
+    description: "",
   });
 
   const saveData = (e) => {
     e.preventDefault();
     let newErrors = {
-      image: "",
-      productName: "",
+      file: "",
+      name: "",
       stock: "",
       price: "",
-      type: "",
+      service_type_id: "",
       location: "",
-      event: "",
-      shortDescription: "",
+      event_types: "",
+      description: "",
     };
-    if (!productData.image || productData.image.trim() === "") {
-      newErrors.image = "Image is required.";
+    if (!productData.file || productData.file.trim() === "") {
+      newErrors.file = "Image is required.";
     }
-    if (!productData.productName || productData.productName.trim() === "") {
-      newErrors.productName = "Product name is required.";
+    if (!productData.name || productData.name.trim() === "") {
+      newErrors.name = "Product name is required.";
     }
     if (!productData.stock || productData.stock.trim() === "") {
       newErrors.stock = "Stock is required.";
@@ -115,20 +115,20 @@ export default function Products() {
     if (!productData.price || productData.price.trim() === "") {
       newErrors.price = "Price is required.";
     }
-    if (!productData.type || productData.type.trim() === "") {
-      newErrors.type = "Type is required.";
+    if (!productData.service_type_id || productData.service_type_id.trim() === "") {
+      newErrors.service_type_id = "Type is required.";
     }
     if (!productData.location || productData.location.trim() === "") {
       newErrors.location = "Location is required.";
     }
-    if (!productData.event || productData.event.trim() === "") {
-      newErrors.event = "Event is required.";
+    if (!productData.event_types || productData.event_types.trim() === "") {
+      newErrors.event_types = "Event is required.";
     }
     if (
-      !productData.shortDescription ||
-      productData.shortDescription.trim() === ""
+      !productData.description ||
+      productData.description.trim() === ""
     ) {
-      newErrors.shortDescription = "Short description is required.";
+      newErrors.description = "Short description is required.";
     }
     setErrors(newErrors);
     console.log("🚀 ~ saveData ~ productData:", productData);
@@ -137,7 +137,7 @@ export default function Products() {
   const data = [
     {
       id: 1,
-      productName: "Carrot Cake",
+      name: "Carrot Cake",
       details:
         "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
       stock: "50",
@@ -145,7 +145,7 @@ export default function Products() {
     },
     {
       id: 2,
-      productName: "Carrot Cake",
+      name: "Carrot Cake",
       details:
         "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
       stock: "14",
@@ -153,7 +153,7 @@ export default function Products() {
     },
     {
       id: 3,
-      productName: "Carrot Cake",
+      name: "Carrot Cake",
       details:
         "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
       stock: "35",
@@ -189,7 +189,7 @@ export default function Products() {
   const renderRows = () => {
     return data.map((item) => (
       <tr key={item.id} className="border hover:bg-primary2-50/50">
-        <td className="p-4 text-text4 text-black-300">{item.productName}</td>
+        <td className="p-4 text-text4 text-black-300">{item.name}</td>
         <td className="p-4 text-black-300 max-w-md truncate text-text5">
           {item.details}
         </td>
@@ -332,19 +332,19 @@ export default function Products() {
             <form className="mt-4 flex flex-col gap-4">
               {/* Image Upload */}
               <ImageUpload
-                setImage={(imageUrl) => handleDataChange("image", imageUrl)}
-                error={errors.image}
+                setImage={(imageUrl) => handleDataChange("file", imageUrl)}
+                error={errors.file}
               />
 
               {/* Product Name */}
               <InputComponent
-                id="productName"
+                id="name"
                 label="Product Name *"
                 placeholder="Write a name of product"
                 className="w-full"
-                value={productData.productName}
-                onChange={(value) => handleDataChange("productName", value)}
-                error={errors.productName}
+                value={productData.name}
+                onChange={(value) => handleDataChange("name", value)}
+                error={errors.name}
               />
 
               {/* Stock and Price */}
@@ -372,14 +372,14 @@ export default function Products() {
               {/* Select Type and Location */}
               <div className="flex items-center gap-4">
                 <SelectComponent
-                  id="type"
+                  id="service_type_id"
                   label="Type *"
                   placeholder="Select a Type"
                   className="w-full"
                   options={types}
-                  value={productData.type}
-                  onChange={(value) => handleDataChange("type", value)}
-                  error={errors.type}
+                  value={productData.service_type_id}
+                  onChange={(value) => handleDataChange("service_type_id", value)}
+                  error={errors.service_type_id}
                 />
                 <SelectComponent
                   id="location"
@@ -395,27 +395,27 @@ export default function Products() {
 
               {/* Event Multi Select */}
               <MultiSelectComponent
-                id="event"
+                id="event_types"
                 label="Event"
                 options={events}
                 placeholder="Select an Event"
                 className="w-full"
-                value={productData.event.split(", ").filter((id) => id !== "")}
+                value={productData.event_types.split(", ").filter((id) => id !== "")}
                 onChange={handleEventChange}
-                error={errors.event}
+                error={errors.event_types}
               />
 
               {/* Short Description */}
               <InputComponent
-                id="shortDescription"
+                id="description"
                 label="Short Description"
                 placeholder="Write a short description"
                 className="w-full"
-                value={productData.shortDescription}
+                value={productData.description}
                 onChange={(value) =>
-                  handleDataChange("shortDescription", value)
+                  handleDataChange("description", value)
                 }
-                error={errors.shortDescription}
+                error={errors.description}
               />
 
               {/* Modal Actions */}

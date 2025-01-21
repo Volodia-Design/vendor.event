@@ -15,8 +15,8 @@ export function SelectComponent({
   className,
   placeholder,
   withoutLabelMargin,
+  error,
 }) {
-  // Add default value handling
   const handleValueChange = (newValue) => {
     if (onChange && newValue) {
       onChange(newValue);
@@ -53,6 +53,9 @@ export function SelectComponent({
           ))}
         </SelectContent>
       </Select>
+      {error && (
+        <p className="text-red-500 text-text4Medium">{error}</p>
+      )}
     </div>
   );
 }

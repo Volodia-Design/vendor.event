@@ -137,7 +137,7 @@ export default function Services() {
         const newSpecifications = [...prevData.service_specifications];
         newSpecifications[index] = {
           ...newSpecifications[index],
-          [field]: value.toString(), // Ensure value is string
+          [field]: value.toString(),
         };
         return {
           ...prevData,
@@ -172,24 +172,23 @@ export default function Services() {
   };
 
   const calculatePriceRange = (specifications) => {
-    console.log("🚀 ~ calculatePriceRange ~ specifications:", specifications)
     if (!specifications || specifications.length === 0) {
       return "0";
     }
-    
+
     if (specifications.length === 1) {
       return specifications[0].price ? `${specifications[0].price}$` : "0";
     }
-  
+
     const validPrices = specifications
-      .map(spec => Number(spec.price))
-      .filter(price => !isNaN(price) && price > 0);
-  
+      .map((spec) => Number(spec.price))
+      .filter((price) => !isNaN(price) && price > 0);
+
     if (validPrices.length === 0) return "0";
-    
+
     const minPrice = Math.min(...validPrices);
     const maxPrice = Math.max(...validPrices);
-    
+
     return `${minPrice}$ - ${maxPrice}$`;
   };
 
@@ -200,13 +199,57 @@ export default function Services() {
       service_type_id: "",
       service_specifications: [{ name: "", price: "" }],
     });
+    setErrors({
+      location: "",
+      service_type_id: "",
+      service_specifications: [],
+    });
   };
 
   const handleEdit = (service) => {
     console.log("🚀 ~ handleEdit ~ service:", service);
   };
+
+  const [errors, setErrors] = useState({
+    location: "",
+    service_type_id: "",
+    service_specifications: [],
+  });
+
   const saveData = (e) => {
-    e.preventDefault(); // Corrected the typo here
+    e.preventDefault();
+
+    let newErrors = {
+      location: "",
+      service_type_id: "",
+      service_specifications: [],
+    };
+    if (!serviceData.location || serviceData.location.trim() === "") {
+      newErrors.location = "Location is required.";
+    }
+    if (
+      !serviceData.service_type_id ||
+      serviceData.service_type_id.trim() === ""
+    ) {
+      newErrors.service_type_id = "Service type is required.";
+    }
+    serviceData.service_specifications.forEach((spec, index) => {
+      if (!spec.name || spec.name.trim() === "") {
+        newErrors.service_specifications[index] =
+          newErrors.service_specifications[index] || {};
+        newErrors.service_specifications[index].name =
+          "Specification is required.";
+      }
+      if (!spec.price || spec.price.trim() === "") {
+        newErrors.service_specifications[index] =
+          newErrors.service_specifications[index] || {};
+        newErrors.service_specifications[index].price = "Price is required.";
+      }
+    });
+    if (Object.values(newErrors).some((error) => error !== "")) {
+      setErrors(newErrors);
+      return;
+    }
     console.log("🚀 ~ saveData ~ serviceData:", serviceData);
   };
 
@@ -312,28 +355,36 @@ export default function Services() {
                   .split(", ")
                   .filter((id) => id !== "")}
                 onChange={handleLocationChange}
+                error={errors.location}
               />
-             <div className="flex items-center gap-4">
-             <SelectComponent
-                id="service_type_id"
-                options={services}
-                label="Select a Service *"
-                placeholder="Select Type"
-                className="w-full"
-                value={serviceData.service_type_id}
-                onChange={(value) =>
-                  handleDataChange(undefined, "service_type_id", value)
-                }
-              />
-               <div className="w-72">
-                    <label>Price Range *</label>
-                    <div
-                      className="flex items-center justify-start pl-3 w-full h-10 rounded-lg cursor-pointer inputSelectStyle"
-                    >
-      {calculatePriceRange(serviceData.service_specifications)}
-      </div>
+              <div className="flex items-center gap-4">
+                <SelectComponent
+                  id="service_type_id"
+                  options={services}
+                  label="Select a Service *"
+                  placeholder="Select Type"
+                  className="w-full"
+                  value={serviceData.service_type_id}
+                  onChange={(value) =>
+                    handleDataChange(undefined, "service_type_id", value)
+                  }
+                  error={errors.service_type_id}
+                />
+                <div className="w-72">
+                  <label className="text-text4Medium text-black-400">
+                    Price Range *
+                  </label>
+                  <div className="flex items-center justify-start pl-3 w-full h-10 rounded-lg cursor-pointer inputSelectStyle">
+                    {calculatePriceRange(serviceData.service_specifications)}
                   </div>
-             </div>
+                  {errors.service_type_id && (
+                  <p className="text-red-500 text-text4Medium invisible">
+                 a
+                  </p>
+                )}
+                </div>
+               
+              </div>
 
               {/* Main Service Specification */}
               <div className="flex items-center gap-4">
@@ -360,6 +411,7 @@ export default function Services() {
                   className="w-full"
                   value={serviceData.service_specifications[0]?.name || ""}
                   onChange={(value) => handleDataChange(0, "name", value)}
+                  error={errors.service_specifications?.[0]?.name}
                 />
                 <div className="w-72 flex items-center gap-2">
                   <InputComponent
@@ -372,6 +424,7 @@ export default function Services() {
                       handleDataChange(0, "price", Number(value))
                     }
                     isPrice={true}
+                    error={errors.service_specifications?.[0]?.price}
                   />
                   <div>
                     <label className="invisible">a</label>
@@ -399,6 +452,7 @@ export default function Services() {
                       onChange={(value) =>
                         handleDataChange(index + 1, "name", value)
                       }
+                      error={errors.service_specifications?.[index + 1]?.name}
                     />
                     <div className="w-72 flex items-center gap-2">
                       <InputComponent
@@ -410,8 +464,10 @@ export default function Services() {
                         onChange={(value) =>
                           handleDataChange(index + 1, "price", Number(value))
                         }
-                    isPrice={true}
-
+                        isPrice={true}
+                        error={
+                          errors.service_specifications?.[index + 1]?.price
+                        }
                       />
                       <div>
                         <label className="invisible">a</label>

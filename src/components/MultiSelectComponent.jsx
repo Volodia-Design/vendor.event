@@ -10,6 +10,7 @@ export function MultiSelectComponent({
   options,
   className,
   placeholder,
+  error,
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const dropdownRef = React.useRef(null);
@@ -106,6 +107,10 @@ export function MultiSelectComponent({
           </div>
         )}
       </div>
+
+      {error && (
+        <p className="text-red-500 text-4Medium">{error}</p>
+      )}
     </div>
   );
 }

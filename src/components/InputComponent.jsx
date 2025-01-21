@@ -11,6 +11,7 @@ export function InputComponent({
   onChange,
   type,
   isPrice = false,
+  error,
   ...props
 }) {
   const [displayValue, setDisplayValue] = useState('');
@@ -79,6 +80,9 @@ export function InputComponent({
           {...props}
         />
       </div>
+      {error && (
+        <p className="text-red-500 text-text4Medium">{error}</p>
+      )}
     </div>
   );
 }

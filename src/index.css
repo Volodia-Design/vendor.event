@@ -40,3 +40,61 @@ html,body {
     ring: 0 !important;
     color: #949494;
   }
+  .search-container {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #949494;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 300px;
+    height: 40px;
+  }
+  
+  .search-input {
+    flex: 1;
+    border: none;
+    padding: 0 10px;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .search-button {
+    background-color: #4299e1; /* Blue background */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 12px;
+    cursor: pointer;
+  }
+  
+  .search-button:hover {
+    background-color: #3182ce; /* Slightly darker blue on hover */
+  }
+  
+  .search-icon {
+    width: 20px;
+    height: 20px;
+  }
+  /* Custom scrollbar style */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #03356f;
+  border-radius: 8px;
+  border: 2px solid #03356f;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #194a81;
+  transform: scale(1.1);
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}

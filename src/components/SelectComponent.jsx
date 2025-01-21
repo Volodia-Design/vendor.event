@@ -16,6 +16,7 @@ export function SelectComponent({
   placeholder,
   withoutLabelMargin,
   error,
+  placeholderColor 
 }) {
   const handleValueChange = (newValue) => {
     if (onChange && newValue) {
@@ -37,8 +38,18 @@ export function SelectComponent({
         onValueChange={handleValueChange}
         className="rounded-lg bg-white"
       >
-        <SelectTrigger className={`inputSelectStyle ${withoutLabelMargin ? "mt-0" : "mt-1"}`}>
-          <SelectValue placeholder={placeholder} />
+        <SelectTrigger
+          className={`inputSelectStyle ${
+            withoutLabelMargin ? "mt-0" : "mt-1"
+          }`}
+        >
+          <span
+            className={`${
+              value ? "text-black" : placeholderColor // Apply placeholder color only when no value is selected
+            }`}
+          >
+            <SelectValue placeholder={placeholder} />
+          </span>
         </SelectTrigger>
 
         <SelectContent className="bg-white border-none">
@@ -53,9 +64,7 @@ export function SelectComponent({
           ))}
         </SelectContent>
       </Select>
-      {error && (
-        <p className="text-red-500 text-text4Medium">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-text4Medium">{error}</p>}
     </div>
   );
 }

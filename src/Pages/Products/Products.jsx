@@ -189,13 +189,13 @@ export default function Products() {
   const renderRows = () => {
     return data.map((item) => (
       <tr key={item.id} className="border hover:bg-primary2-50/50">
-        <td className="p-4 text-gray-700">{item.productName}</td>
-        <td className="p-4 text-gray-700 text-sm max-w-md truncate">
+        <td className="p-4 text-text4 text-black-300">{item.productName}</td>
+        <td className="p-4 text-black-300 max-w-md truncate text-text5">
           {item.details}
         </td>
-        <td className="p-4 text-gray-700">{item.stock}</td>
-        <td className="p-4 text-gray-700">USD {item.price}</td>
-        <td className="p-4 text-gray-700">Bakery</td>
+        <td className="p-4 text-text4 text-black-300">{item.stock}</td>
+        <td className="p-4 text-text4 text-black-300">USD {item.price}</td>
+        <td className="p-4 text-text4 text-black-300">Bakery</td>
         <td className="p-4 flex items-center justify-center">
           <img
             src="/Images/ComponentIcons/EditColored.svg"
@@ -276,6 +276,7 @@ export default function Products() {
             id="locationSearch"
             options={locations}
             placeholder="All Locations"
+            placeholderColor="text-black-200"
             className="w-48"
             value={""}
             onChange={() => {}}

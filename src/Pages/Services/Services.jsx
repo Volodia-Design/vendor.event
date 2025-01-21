@@ -2,14 +2,56 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Button from "../../components/Button";
 import { SelectComponent } from "../../components/SelectComponent";
 import { Pagination } from "swiper/modules";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputComponent } from "../../components/InputComponent";
 import { Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import api from "../../utils/api";
+import useServiceTypes from "../../store/data/useServiceTypes";
+import useLoading from "../../store/useLoading";
 
 export default function Services() {
+  const { setIsLoading } = useLoading();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { serviceTypes } = useServiceTypes();
+  const [services, setServices] = useState([]);
+  const [isEditMode, setIsEditMode] = useState({
+    id: null,
+    data: null,
+  })
+  const locations = [
+    { id: 1, name: "New York" },
+    { id: 2, name: "London" },
+    { id: 3, name: "Paris" },
+    { id: 4, name: "Tokyo" },
+    { id: 5, name: "Sydney" },
+  ];
+
+  const getServices = () => {
+    setIsLoading(true);
+    api
+      .get("/vendor-service")
+      .then((response) => {
+        const transformedData = response.data.map((service) => ({
+          ...service,
+          service_type_id: String(service.service_type_id),
+          service_specifications: service.service_specifications.map((spec) => ({
+            ...spec,
+            price: String(spec.price),
+          })),
+        }));
+        setServices(transformedData);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  
+
   const [serviceData, setServiceData] = useState({
     location: "",
     service_type_id: "",
@@ -21,110 +63,21 @@ export default function Services() {
     ],
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const locations = [
-    { id: 1, name: "New York" },
-    { id: 2, name: "London" },
-    { id: 3, name: "Paris" },
-    { id: 4, name: "Tokyo" },
-    { id: 5, name: "Sydney" },
-  ];
-
-  const services = [
-    { id: 1, name: "Photography" },
-    { id: 2, name: "Videography" },
-    { id: 3, name: "Wedding Photography" },
-    { id: 4, name: "Wedding Videography" },
-    { id: 5, name: "Product Photography" },
-  ];
-
-  const selects = [
-    {
-      id: 1,
-      options: [
-        { id: 1, name: "Photography 100$-1500$" },
-        { id: 2, name: "Photography 1500$-2500$" },
-        { id: 3, name: "Photography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 2,
-      options: [
-        { id: 1, name: "Videography 100$-1500$" },
-        { id: 2, name: "Videography 1500$-2500$" },
-        { id: 3, name: "Videography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 3,
-      options: [
-        { id: 1, name: "Photography 100$-1500$" },
-        { id: 2, name: "Photography 1500$-2500$" },
-        { id: 3, name: "Photography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 4,
-      options: [
-        { id: 1, name: "Videography 100$-1500$" },
-        { id: 2, name: "Videography 1500$-2500$" },
-        { id: 3, name: "Videography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 5,
-      options: [
-        { id: 1, name: "Photography 100$-1500$" },
-        { id: 2, name: "Photography 1500$-2500$" },
-        { id: 3, name: "Photography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 6,
-      options: [
-        { id: 1, name: "Videography 100$-1500$" },
-        { id: 2, name: "Videography 1500$-2500$" },
-        { id: 3, name: "Videography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 7,
-      options: [
-        { id: 1, name: "Photography 100$-1500$" },
-        { id: 2, name: "Photography 1500$-2500$" },
-        { id: 3, name: "Photography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 8,
-      options: [
-        { id: 1, name: "Videography 100$-1500$" },
-        { id: 2, name: "Videography 1500$-2500$" },
-        { id: 3, name: "Videography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 9,
-      options: [
-        { id: 1, name: "Photography 100$-1500$" },
-        { id: 2, name: "Photography 1500$-2500$" },
-        { id: 3, name: "Photography 2500$-3500$" },
-      ],
-    },
-    {
-      id: 10,
-      options: [
-        { id: 1, name: "Videography 100$-1500$" },
-        { id: 2, name: "Videography 1500$-2500$" },
-        { id: 3, name: "Videography 2500$-3500$" },
-      ],
-    },
-  ];
+  const formatServiceSpecifications = (service) => {
+    return service.service_specifications.map((spec) => ({
+      id: `${spec.name}-${spec.price}`,
+      name: (
+        <div className="flex items-center gap-8 justify-between w-full">
+          <span>{spec.name}</span>
+          <span>{spec.price}$</span>
+        </div>
+      ),
+    }));
+  };
 
   const chunkedSelects = [];
-  for (let i = 0; i < selects.length; i += 6) {
-    chunkedSelects.push(selects.slice(i, i + 6));
+  for (let i = 0; i < services.length; i += 6) {
+    chunkedSelects.push(services.slice(i, i + 6));
   }
 
   const handleDataChange = (index, field, value) => {
@@ -208,9 +161,18 @@ export default function Services() {
   };
 
   const handleEdit = (service) => {
-    console.log("🚀 ~ handleEdit ~ service:", service);
+    setIsEditMode({
+      id: service.id,
+      data: service
+    })
+    setIsModalOpen(true);
+    setServiceData({
+      location: service.location,
+      service_type_id: service.service_type_id.toString(),
+      service_specifications: service.service_specifications,
+    });
   };
-
+console.log("serviceData", serviceData)
   const [errors, setErrors] = useState({
     location: "",
     service_type_id: "",
@@ -219,51 +181,72 @@ export default function Services() {
 
   const saveData = (e) => {
     e.preventDefault();
+    setIsLoading(true);
     let newErrors = {
       location: "",
       service_type_id: "",
       service_specifications: [],
     };
-  
+
     if (!serviceData.location || serviceData.location.trim() === "") {
       newErrors.location = "Location is required.";
     }
-  
-    if (!serviceData.service_type_id || serviceData.service_type_id.trim() === "") {
+
+    if (
+      !serviceData.service_type_id ||
+      serviceData.service_type_id.trim() === ""
+    ) {
       newErrors.service_type_id = "Service type is required.";
     }
-  
-    const updatedServiceSpecifications = serviceData.service_specifications.map((spec, index) => {
-      let specErrors = {};
-  
-      if (!spec.name || spec.name.trim() === "") {
-        specErrors.name = "Specification is required.";
+
+    const updatedServiceSpecifications = serviceData.service_specifications.map(
+      (spec, index) => {
+        let specErrors = {};
+
+        if (!spec.name || spec.name.trim() === "") {
+          specErrors.name = "Specification is required.";
+        }
+
+        if (!spec.price || spec.price.trim() === "") {
+          specErrors.price = "Price is required.";
+        }
+
+        return { ...spec, errors: specErrors };
       }
-  
-      if (!spec.price || spec.price.trim() === "") {
-        specErrors.price = "Price is required.";
-      }
-  
-      return { ...spec, errors: specErrors };
-    });
-  
+    );
+
     newErrors.service_specifications = updatedServiceSpecifications;
-    if (Object.values(newErrors).some((error) => error !== "" && !Array.isArray(error))) {
+    if (
+      Object.values(newErrors).some(
+        (error) => error !== "" && !Array.isArray(error)
+      )
+    ) {
       console.log("🚀 ~ saveData ~ newErrors:", newErrors);
       setErrors(newErrors);
       return;
     }
+
+    let apiCall = isEditMode.id 
+    ? api.put(`/vendor-service/${isEditMode.id}`, serviceData) 
+    : api.post("/vendor-service", serviceData);
   
-    api.post("/vendor-service", serviceData)
-      .then((response) => {
-        console.log("🚀 ~ saveData ~ response:", response);
-        handleCloseModal();
-      })
-      .catch((error) => {
-        console.error("Error saving data:", error);
-      });
+  apiCall
+    .then(() => {
+      getServices();
+      handleCloseModal();
+    })
+    .catch((error) => {
+      console.error("Error saving data:", error);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
+  
   };
-  
+
+  useEffect(() => {
+    getServices();
+  }, []);
 
   return (
     <div className="w-full flex flex-col items-center gap-3">
@@ -294,7 +277,7 @@ export default function Services() {
                   >
                     <SelectComponent
                       id={`select-${select.id}`}
-                      options={select.options}
+                      options={formatServiceSpecifications(select)} 
                       placeholder="Select a Service"
                       className="w-full"
                       onChange={(value) =>
@@ -352,7 +335,7 @@ export default function Services() {
 
             {/* Modal header */}
             <p className="uppercase text-h4 text-primary2-500 mb-6 pr-8 text-center">
-              Create a Service
+              {isEditMode.id ? "Edit a Service" : "Create a Service"}
             </p>
 
             {/* Form content */}
@@ -372,7 +355,7 @@ export default function Services() {
               <div className="flex items-center gap-4">
                 <SelectComponent
                   id="service_type_id"
-                  options={services}
+                  options={serviceTypes}
                   label="Select a Service *"
                   placeholder="Select Type"
                   className="w-full"
@@ -390,12 +373,9 @@ export default function Services() {
                     {calculatePriceRange(serviceData.service_specifications)}
                   </div>
                   {errors.service_type_id && (
-                  <p className="text-red-500 text-text4Medium invisible">
-                 a
-                  </p>
-                )}
+                    <p className="text-red-500 text-text4Medium invisible">a</p>
+                  )}
                 </div>
-               
               </div>
 
               {/* Main Service Specification */}
@@ -501,7 +481,7 @@ export default function Services() {
                   buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
                 />
                 <Button
-                  text="Create"
+                  text={isEditMode?.id ? "Save" : "Create"}
                   onClick={(e) => saveData(e)}
                   buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
                 />

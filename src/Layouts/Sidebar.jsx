@@ -8,7 +8,16 @@ export default function Sidebar() {
   const { activeTab, setActiveTab } = useActiveTab();
 
   useEffect(() => {
-    const currentTab = sidebarItems.find((item) => item.path === location.pathname);
+    const currentTab = sidebarItems.find((item) => {
+      if (item.path === location.pathname) {
+        return true;
+      }
+      if (item.path.startsWith("/products") && location.pathname.startsWith("/products")) {
+        return true;
+      }
+      return false;
+    });
+
     if (currentTab) {
       setActiveTab(currentTab.name);
     }

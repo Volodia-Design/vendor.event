@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, ChevronDown } from "lucide-react"; // Add ChevronDown icon
+import { Check } from "lucide-react"; 
 import { cn } from "../utils";
 
 export function MultiSelectComponent({
@@ -74,7 +74,6 @@ export function MultiSelectComponent({
           ) : (
             <span className="text-black-800">{placeholder}</span>
           )}
-          {/* Add ChevronDown icon */}
           <img
             src="/Images/ComponentIcons/SelectArrow.svg"
             alt="arrow"

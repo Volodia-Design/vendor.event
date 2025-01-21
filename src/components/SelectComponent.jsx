@@ -14,6 +14,7 @@ export function SelectComponent({
   options,
   className,
   placeholder,
+  withoutLabelMargin,
 }) {
   // Add default value handling
   const handleValueChange = (newValue) => {
@@ -36,7 +37,7 @@ export function SelectComponent({
         onValueChange={handleValueChange}
         className="rounded-lg bg-white"
       >
-        <SelectTrigger className="inputSelectStyle mt-1">
+        <SelectTrigger className={`inputSelectStyle ${withoutLabelMargin ? "mt-0" : "mt-1"}`}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 

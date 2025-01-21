@@ -11,13 +11,14 @@ import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 export default function Services() {
   const [serviceData, setServiceData] = useState({
     location: "",
-    service: "",
-    priceRange: "",
-    mainSpecification: "",
-    mainSpecificationPrice: "",
-    specifications: [],
+    service_type_id: "",
+    service_specifications: [
+      {
+        name: "",
+        price: "",
+      },
+    ],
   });
-  console.log("🚀 ~ Services ~ serviceData:", serviceData);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -127,20 +128,20 @@ export default function Services() {
 
   const handleDataChange = (index, field, value) => {
     setServiceData((prevData) => {
-      // If the field being updated is not in the specifications section
-      if (index === undefined) {
-        // For main specification and main specification price
+      if (field === "location" || field === "service_type_id") {
         return {
           ...prevData,
           [field]: value,
         };
       } else {
-        // For specifications (array of specifications)
-        const newSpecifications = [...prevData.specifications];
-        newSpecifications[index][field] = value;
+        const newSpecifications = [...prevData.service_specifications];
+        newSpecifications[index] = {
+          ...newSpecifications[index],
+          [field]: value.toString(), // Ensure value is string
+        };
         return {
           ...prevData,
-          specifications: newSpecifications,
+          service_specifications: newSpecifications,
         };
       }
     });
@@ -149,9 +150,9 @@ export default function Services() {
   const handleAddSpecification = () => {
     setServiceData((prevData) => ({
       ...prevData,
-      specifications: [
-        ...prevData.specifications,
-        { specification: "", price: "" },
+      service_specifications: [
+        ...prevData.service_specifications,
+        { name: "", price: "" },
       ],
     }));
   };
@@ -159,19 +160,45 @@ export default function Services() {
   const handleRemoveSpecification = (index) => {
     setServiceData((prevData) => ({
       ...prevData,
-      specifications: prevData.specifications.filter((_, i) => i !== index),
+      service_specifications: prevData.service_specifications.filter(
+        (_, i) => i !== index
+      ),
     }));
+  };
+
+  const handleLocationChange = (selectedIds) => {
+    const locationString = selectedIds.join(", ");
+    handleDataChange(undefined, "location", locationString);
+  };
+
+  const calculatePriceRange = (specifications) => {
+    console.log("🚀 ~ calculatePriceRange ~ specifications:", specifications)
+    if (!specifications || specifications.length === 0) {
+      return "0";
+    }
+    
+    if (specifications.length === 1) {
+      return specifications[0].price ? `${specifications[0].price}$` : "0";
+    }
+  
+    const validPrices = specifications
+      .map(spec => Number(spec.price))
+      .filter(price => !isNaN(price) && price > 0);
+  
+    if (validPrices.length === 0) return "0";
+    
+    const minPrice = Math.min(...validPrices);
+    const maxPrice = Math.max(...validPrices);
+    
+    return `${minPrice}$ - ${maxPrice}$`;
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setServiceData({
       location: "",
-      service: "",
-      priceRange: "",
-      mainSpecification: "",
-      mainSpecificationPrice: "",
-      specifications: [],
+      service_type_id: "",
+      service_specifications: [{ name: "", price: "" }],
     });
   };
 
@@ -185,7 +212,7 @@ export default function Services() {
 
   return (
     <div className="w-full flex flex-col items-center gap-3">
-      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg">
+      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg px-8">
         <div className="flex items-center justify-between w-full">
           <p className="text-text3 uppercase">My Services</p>
           <Button
@@ -281,76 +308,70 @@ export default function Services() {
                 options={locations}
                 placeholder="Select Location"
                 className="w-full"
-                value={serviceData.location}
+                value={serviceData.location
+                  .split(", ")
+                  .filter((id) => id !== "")}
+                onChange={handleLocationChange}
+              />
+             <div className="flex items-center gap-4">
+             <SelectComponent
+                id="service_type_id"
+                options={services}
+                label="Select a Service *"
+                placeholder="Select Type"
+                className="w-full"
+                value={serviceData.service_type_id}
                 onChange={(value) =>
-                  handleDataChange(undefined, "location", value)
+                  handleDataChange(undefined, "service_type_id", value)
                 }
               />
-              <div className="flex items-center gap-4">
-                <SelectComponent
-                  id="service"
-                  options={services}
-                  label="Select a Service *"
-                  placeholder="Select Type"
-                  className="w-full"
-                  value={serviceData.service}
-                  onChange={(value) =>
-                    handleDataChange(undefined, "service", value)
-                  }
-                />
-                <InputComponent
-                  id="priceRange"
-                  label="Price Range *"
-                  placeholder="Enter Price Range"
-                  className="w-72"
-                  value={serviceData.priceRange}
-                  onChange={(value) =>
-                    handleDataChange(undefined, "priceRange", value)
-                  }
-                />
-              </div>
-              {/* Main Specification Section */}
+               <div className="w-72">
+                    <label>Price Range *</label>
+                    <div
+                      className="flex items-center justify-start pl-3 w-full h-10 rounded-lg cursor-pointer inputSelectStyle"
+                    >
+      {calculatePriceRange(serviceData.service_specifications)}
+      </div>
+                  </div>
+             </div>
+
+              {/* Main Service Specification */}
               <div className="flex items-center gap-4">
                 <InputComponent
-                  id="mainSpecification"
+                  id="specification-0"
                   label={
                     <div className="flex items-center gap-2">
                       <span>Specification *</span>
                       <Info
-                        data-tooltip-id="mainSpecificationTooltip"
+                        data-tooltip-id="specificationTooltip"
                         className="w-5 h-5 text-secondary-800 cursor-pointer"
                       />
                       <Tooltip
-                        id="mainSpecificationTooltip"
+                        id="specificationTooltip"
                         place="top"
                         effect="solid"
                       >
                         Use Specifications if your service contains various
-                        sub-services{" "}
+                        sub-services
                       </Tooltip>
                     </div>
                   }
                   placeholder="Write a specification"
                   className="w-full"
-                  value={serviceData.mainSpecification}
-                  onChange={(value) =>
-                    handleDataChange(undefined, "mainSpecification", value)
-                  }
+                  value={serviceData.service_specifications[0]?.name || ""}
+                  onChange={(value) => handleDataChange(0, "name", value)}
                 />
                 <div className="w-72 flex items-center gap-2">
                   <InputComponent
-                    id="mainSpecificationPrice"
+                    id="specificationPrice-0"
                     label="Price *"
                     placeholder="Write Price"
                     className="w-full"
-                    value={serviceData.mainSpecificationPrice}
+                    value={serviceData.service_specifications[0]?.price || ""}
                     onChange={(value) =>
-                      handleDataChange(
-                        undefined,
-                        "mainSpecificationPrice",
-                        value
-                      )
+                      handleDataChange(0, "price", Number(value))
                     }
+                    isPrice={true}
                   />
                   <div>
                     <label className="invisible">a</label>
@@ -363,42 +384,48 @@ export default function Services() {
                   </div>
                 </div>
               </div>
-              {/* Dynamic Specifications Section */}
-              {serviceData.specifications.map((spec, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <InputComponent
-                    id={`specification-${index}`}
-                    label="Specification"
-                    placeholder="Write a specification"
-                    className="w-full"
-                    value={spec.specification}
-                    onChange={(value) =>
-                      handleDataChange(index, "specification", value)
-                    }
-                  />
-                  <div className="w-72 flex items-center gap-2">
+
+              {/* Additional Specifications */}
+              {serviceData.service_specifications
+                .slice(1)
+                .map((spec, index) => (
+                  <div key={index + 1} className="flex items-center gap-4">
                     <InputComponent
-                      id={`specificationPrice-${index}`}
-                      label="Price *"
-                      placeholder="Write Price"
+                      id={`specification-${index + 1}`}
+                      label="Specification"
+                      placeholder="Write a specification"
                       className="w-full"
-                      value={spec.price}
+                      value={spec.name}
                       onChange={(value) =>
-                        handleDataChange(index, "price", value)
+                        handleDataChange(index + 1, "name", value)
                       }
                     />
-                    <div>
-                      <label className="invisible">a</label>
-                      <div
-                        onClick={() => handleRemoveSpecification(index)}
-                        className="flex items-center justify-center w-10 h-10 bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
-                      >
-                        <span className="text-h4 text-white">-</span>
+                    <div className="w-72 flex items-center gap-2">
+                      <InputComponent
+                        id={`specificationPrice-${index + 1}`}
+                        label="Price *"
+                        placeholder="Write Price"
+                        className="w-full"
+                        value={spec.price}
+                        onChange={(value) =>
+                          handleDataChange(index + 1, "price", Number(value))
+                        }
+                    isPrice={true}
+
+                      />
+                      <div>
+                        <label className="invisible">a</label>
+                        <div
+                          onClick={() => handleRemoveSpecification(index + 1)}
+                          className="flex items-center justify-center w-10 h-10 bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
+                        >
+                          <span className="text-h4 text-white">-</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+
               <div className="w-full flex gap-3 items-center justify-end mt-2">
                 <Button
                   text="Cancel"

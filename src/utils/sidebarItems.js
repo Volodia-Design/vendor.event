@@ -19,7 +19,7 @@ const sidebarItems = [
     },
     {
         name: "Products",
-        path: "/products",
+        path: "/products/product-store",
         icon: "/Images/SidebarIcons/Products.svg",
         activeIcon: "/Images/SidebarIcons/ProductsActive.svg"
     },

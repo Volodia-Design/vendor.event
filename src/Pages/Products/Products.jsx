@@ -164,12 +164,24 @@ export default function Products() {
   const renderCols = () => {
     return (
       <tr className="bg-primary2-50 border border-primary2-50">
-        <th className="text-left p-4 text-text4Medium text-primary2-500">Product</th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">Details</th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">Stock</th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">Price</th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">Type</th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">Actions</th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">
+          Product
+        </th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">
+          Details
+        </th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">
+          Stock
+        </th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">
+          Price
+        </th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">
+          Type
+        </th>
+        <th className="text-center p-4 text-text4Medium text-primary2-500">
+          Actions
+        </th>
       </tr>
     );
   };
@@ -184,13 +196,13 @@ export default function Products() {
         <td className="p-4 text-gray-700">{item.stock}</td>
         <td className="p-4 text-gray-700">USD {item.price}</td>
         <td className="p-4 text-gray-700">Bakery</td>
-        <td className="p-4">
-         <img
-          src="/Images/ComponentIcons/EditColored.svg"
-          alt="Edit"
-          className="w-6 h-6 cursor-pointer"
-          onClick={()=>handleEdit(item)}
-        />
+        <td className="p-4 flex items-center justify-center">
+          <img
+            src="/Images/ComponentIcons/EditColored.svg"
+            alt="Edit"
+            className="w-6 h-6 cursor-pointer"
+            onClick={() => handleEdit(item)}
+          />
         </td>
       </tr>
     ));
@@ -198,7 +210,7 @@ export default function Products() {
 
   const handleEdit = (item) => {
     console.log("Edit clicked", item);
-  }
+  };
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">
       {/* Navigation */}
@@ -277,7 +289,9 @@ export default function Products() {
       </div>
       {/* Table */}
       <div className="mt-6">
-        <TableComponent renderCols={renderCols} renderRows={renderRows} />
+        {location.pathname === "/products/product-store" && (
+          <TableComponent renderCols={renderCols} renderRows={renderRows} />
+        )}
       </div>
       {isModalOpen && (
         <div

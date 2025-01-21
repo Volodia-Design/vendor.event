@@ -98,3 +98,12 @@ html,body {
   background: #f1f1f1;
   border-radius: 10px;
 }
+table tr:last-child td:first-child {
+  border: 1px solid #b7b7b7;
+  border-bottom-left-radius: 8px;
+}
+  
+table tr:last-child td:last-child {
+  border: 1px solid #b7b7b7;
+  border-bottom-right-radius: 8px;
+}

@@ -5,6 +5,7 @@ import { useState } from "react";
 import ImageUpload from "../../components/ImageUpload";
 import { InputComponent } from "../../components/InputComponent";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
+import TableComponent from "../../components/TableComponent";
 
 export default function Products() {
   const location = useLocation();
@@ -20,7 +21,6 @@ export default function Products() {
     event: "",
     shortDescription: "",
   });
-  console.log("🚀 ~ Products ~ productData:", productData);
 
   const locations = [
     { id: 1, name: "New York" },
@@ -90,7 +90,6 @@ export default function Products() {
     event: "",
     shortDescription: "",
   });
-  console.log("🚀 ~ Products ~ errors:", errors);
 
   const saveData = (e) => {
     e.preventDefault();
@@ -133,6 +132,78 @@ export default function Products() {
     }
     setErrors(newErrors);
     console.log("🚀 ~ saveData ~ productData:", productData);
+  };
+
+  const data = [
+    {
+      id: 1,
+      productName: "Carrot Cake",
+      details:
+        "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
+      stock: "50",
+      price: "1235",
+    },
+    {
+      id: 2,
+      productName: "Carrot Cake",
+      details:
+        "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
+      stock: "14",
+      price: "130",
+    },
+    {
+      id: 3,
+      productName: "Carrot Cake",
+      details:
+        "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
+      stock: "35",
+      price: "400",
+    },
+  ];
+
+  const renderCols = () => {
+    return (
+      <tr className="bg-primary2-50 border-b">
+        <th className="text-left p-4 text-text4Medium text-primary2-500">Product</th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">Details</th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">Stock</th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">Price</th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">Type</th>
+        <th className="text-left p-4 text-text4Medium text-primary2-500">Actions</th>
+      </tr>
+    );
+  };
+
+  const renderRows = () => {
+    return data.map((item) => (
+      <tr key={item.id} className="border-b hover:bg-primary2-50/50">
+        <td className="p-4 text-gray-700">{item.productName}</td>
+        <td className="p-4 text-gray-700 text-sm max-w-md truncate">
+          {item.details}
+        </td>
+        <td className="p-4 text-gray-700">{item.stock}</td>
+        <td className="p-4 text-gray-700">USD {item.price}</td>
+        <td className="p-4 text-gray-700">Bakery</td>
+        <td className="p-4">
+          <button className="text-yellow-500 hover:text-yellow-600">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              ></path>
+            </svg>
+          </button>
+        </td>
+      </tr>
+    ));
   };
 
   return (
@@ -211,8 +282,10 @@ export default function Products() {
           />
         </div>
       </div>
-
       {/* Table */}
+      <div className="mt-6">
+        <TableComponent renderCols={renderCols} renderRows={renderRows} />
+      </div>
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black-900/50 backdrop-blur-sm flex justify-center items-center z-50 transition-opacity duration-300"

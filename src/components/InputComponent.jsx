@@ -14,6 +14,7 @@ export function InputComponent({
   error,
   placeholderColorGray,
   isPhoneNumber,
+  onlyDigits = false,
   ...props
 }) {
   const [displayValue, setDisplayValue] = useState('');
@@ -26,8 +27,12 @@ export function InputComponent({
       setDisplayValue(isFocused ? stringValue.replace('$', '') : stringValue ? `${stringValue}$` : '');
     } else if (isPhoneNumber) {
       const stringValue = String(value || '');
-      const digitsOnly = stringValue.replace(/\D/g, ''); // Remove all non-digit characters
+      const digitsOnly = stringValue.replace(/\D/g, '');
       setDisplayValue(digitsOnly ? `+${digitsOnly}` : '');
+    } else if(onlyDigits){
+      const stringValue = String(value || '');
+      const digitsOnly = stringValue.replace(/\D/g, '');
+      setDisplayValue(digitsOnly);
     } else {
       setDisplayValue(String(value || ''));
     }

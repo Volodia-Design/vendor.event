@@ -1,19 +1,15 @@
 import { useState } from "react";
 
 const ImageUpload = ({ setImage, error }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImagePreview, setSelectedImagePreview] = useState(null);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      setImage(imageUrl); 
+      setSelectedImagePreview(imageUrl); // Preview URL for display
+      setImage(file); // Set the binary file
     }
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
   };
 
   const handleDrop = (event) => {
@@ -21,28 +17,28 @@ const ImageUpload = ({ setImage, error }) => {
     const file = event.dataTransfer.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      setImage(imageUrl); 
+      setSelectedImagePreview(imageUrl);
+      setImage(file); // Set the binary file
     }
   };
 
   const handleRemoveImage = () => {
-    setSelectedImage(null);
-    setImage(""); 
+    setSelectedImagePreview(null);
+    setImage(null); // Reset the file
     document.getElementById("fileInput").value = "";
   };
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-2 border border-primary2-100 rounded-lg">
       <div
-        onDragOver={handleDragOver}
+        onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className={`flex flex-col items-center justify-center gap-4 p-12 rounded-lg cursor-pointer relative ${selectedImage ? "" : "bg-primary2-50"}`}
+        className={`flex flex-col items-center justify-center gap-4 p-12 rounded-lg cursor-pointer relative ${selectedImagePreview ? "" : "bg-primary2-50"}`}
       >
-        {selectedImage ? (
+        {selectedImagePreview ? (
           <div style={{ position: "relative", marginTop: "10px" }}>
             <img
-              src={selectedImage}
+              src={selectedImagePreview}
               alt="Selected Preview"
               style={{
                 width: "100%",

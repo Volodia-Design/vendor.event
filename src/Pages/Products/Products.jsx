@@ -1,24 +1,60 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { SelectComponent } from "../../components/SelectComponent";
 import Button from "../../components/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ImageUpload from "../../components/ImageUpload";
 import { InputComponent } from "../../components/InputComponent";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import TableComponent from "../../components/TableComponent";
+import useLoading from "../../store/useLoading";
+import api from "../../utils/api";
+import useServiceTypes from "../../store/data/useServiceTypes";
+import useEventTypes from "../../store/data/useEventTypes";
 
 export default function Products() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { setIsLoading } = useLoading();
+  const { serviceTypes } = useServiceTypes();
+  const { eventTypes } = useEventTypes();
+  const [isEditMode, setIsEditMode] = useState({
+    id: null,
+    data: null,
+  });
+  const [allProducts, setAllProducts] = useState([]);
+
+  const getProductData = () => {
+    setIsLoading(true);
+    api
+      .get("/vendor-product")
+      .then((response) => {
+        const transformedData = response.data.map((product) => ({
+          ...product,
+          event_types: product.event_types.map((eventType) => ({
+            ...eventType,
+            id: eventType.id.toString(),
+          })),
+        }));
+
+        setAllProducts(transformedData);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   const [productData, setProductData] = useState({
-    file: "",
+    image: "",
     name: "",
     stock: "",
     price: "",
     service_type_id: "",
     location: "",
-    event_types: "",
+    event_types: [],
     description: "",
   });
 
@@ -30,24 +66,10 @@ export default function Products() {
     { id: 5, name: "Sydney" },
   ];
 
-  const types = [
-    { id: 1, name: "Photography" },
-    { id: 2, name: "Videography" },
-    { id: 3, name: "Wedding Photography" },
-    { id: 4, name: "Wedding Videography" },
-    { id: 5, name: "Product Photography" },
-  ];
-
-  const events = [
-    { id: 1, name: "Wedding" },
-    { id: 2, name: "Product" },
-    { id: 3, name: "Event" },
-  ];
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setProductData({
-      file: "",
+      image: "",
       name: "",
       stock: "",
       price: "",
@@ -57,7 +79,7 @@ export default function Products() {
       description: "",
     });
     setErrors({
-      file: "",
+      image: "",
       name: "",
       stock: "",
       price: "",
@@ -76,12 +98,11 @@ export default function Products() {
   };
 
   const handleEventChange = (selectedIds) => {
-    const eventString = selectedIds.join(", ");
-    handleDataChange("event_types", eventString);
+    handleDataChange("event_types", selectedIds);
   };
 
   const [errors, setErrors] = useState({
-    file: "",
+    image: "",
     name: "",
     stock: "",
     price: "",
@@ -94,7 +115,7 @@ export default function Products() {
   const saveData = (e) => {
     e.preventDefault();
     let newErrors = {
-      file: "",
+      image: "",
       name: "",
       stock: "",
       price: "",
@@ -103,9 +124,14 @@ export default function Products() {
       event_types: "",
       description: "",
     };
-    if (!productData.file || productData.file.trim() === "") {
-      newErrors.file = "Image is required.";
+
+    if (
+      !productData.image ||
+      (typeof productData.image === "string" && productData.image.trim() === "")
+    ) {
+      newErrors.image = "Image is required.";
     }
+
     if (!productData.name || productData.name.trim() === "") {
       newErrors.name = "Product name is required.";
     }
@@ -115,51 +141,67 @@ export default function Products() {
     if (!productData.price || productData.price.trim() === "") {
       newErrors.price = "Price is required.";
     }
-    if (!productData.service_type_id || productData.service_type_id.trim() === "") {
+    if (
+      !productData.service_type_id ||
+      productData.service_type_id.trim() === ""
+    ) {
       newErrors.service_type_id = "Type is required.";
     }
     if (!productData.location || productData.location.trim() === "") {
       newErrors.location = "Location is required.";
     }
-    if (!productData.event_types || productData.event_types.trim() === "") {
-      newErrors.event_types = "Event is required.";
+    if (!productData.event_types.length) {
+      newErrors.event_types = "At least one event type is required.";
     }
-    if (
-      !productData.description ||
-      productData.description.trim() === ""
-    ) {
+    if (!productData.description || productData.description.trim() === "") {
       newErrors.description = "Short description is required.";
     }
     setErrors(newErrors);
-    console.log("🚀 ~ saveData ~ productData:", productData);
-  };
 
-  const data = [
-    {
-      id: 1,
-      name: "Carrot Cake",
-      details:
-        "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
-      stock: "50",
-      price: "1235",
-    },
-    {
-      id: 2,
-      name: "Carrot Cake",
-      details:
-        "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
-      stock: "14",
-      price: "130",
-    },
-    {
-      id: 3,
-      name: "Carrot Cake",
-      details:
-        "Carrots, flour, sugar, butter, eggs, vanilla extract, baking powder, baking soda, cinnamon, nutmeg, salt, walnuts",
-      stock: "35",
-      price: "400",
-    },
-  ];
+    if (Object.values(newErrors).some((error) => error)) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("file", productData.image);
+    formDataToSend.append("name", productData.name);
+    formDataToSend.append("stock", productData.stock);
+    formDataToSend.append("price", productData.price);
+    formDataToSend.append("service_type_id", productData.service_type_id);
+    formDataToSend.append("location", productData.location);
+    formDataToSend.append(
+      "event_types",
+      JSON.stringify(productData.event_types)
+    ); // Convert array to JSON
+    formDataToSend.append("description", productData.description);
+
+    let apiCall = isEditMode.id
+      ? api.put(`/vendor-product/${isEditMode.id}`, formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+      : api.post("/vendor-product", formDataToSend, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+    apiCall
+      .then(() => {
+        getProductData();
+        handleCloseModal();
+      })
+      .catch((error) => {
+        console.error("Error saving data:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const renderCols = () => {
     return (
@@ -187,15 +229,17 @@ export default function Products() {
   };
 
   const renderRows = () => {
-    return data.map((item) => (
+    return allProducts.map((item) => (
       <tr key={item.id} className="border hover:bg-primary2-50/50">
         <td className="p-4 text-text4 text-black-300">{item.name}</td>
         <td className="p-4 text-black-300 max-w-md truncate text-text5">
-          {item.details}
+          {item.description}
         </td>
         <td className="p-4 text-text4 text-black-300">{item.stock}</td>
         <td className="p-4 text-text4 text-black-300">USD {item.price}</td>
-        <td className="p-4 text-text4 text-black-300">Bakery</td>
+        <td className="p-4 text-text4 text-black-300">
+          {serviceTypes.find((type) => type.id === item.service_type_id)?.name}
+        </td>
         <td className="p-4 flex items-center justify-center">
           <img
             src="/Images/ComponentIcons/EditColored.svg"
@@ -209,8 +253,27 @@ export default function Products() {
   };
 
   const handleEdit = (item) => {
-    console.log("Edit clicked", item);
+    console.log("🚀 ~ handleEdit ~ item:", item);
+    setIsEditMode({
+      id: item.id,
+      data: item,
+    });
+    setIsModalOpen(true);
+    setProductData({
+      name: item.name,
+      stock: item.stock,
+      price: item.price,
+      service_type_id: item.service_type_id.toString(),
+      location: item.location,
+      event_types: item.event_types,
+      description: item.description,
+    });
   };
+
+  useEffect(() => {
+    getProductData();
+  }, []);
+
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">
       {/* Navigation */}
@@ -332,8 +395,8 @@ export default function Products() {
             <form className="mt-4 flex flex-col gap-4">
               {/* Image Upload */}
               <ImageUpload
-                setImage={(imageUrl) => handleDataChange("file", imageUrl)}
-                error={errors.file}
+                setImage={(imageUrl) => handleDataChange("image", imageUrl)}
+                error={errors.image}
               />
 
               {/* Product Name */}
@@ -357,6 +420,7 @@ export default function Products() {
                   value={productData.stock}
                   onChange={(value) => handleDataChange("stock", value)}
                   error={errors.stock}
+                  onlyDigits={true}
                 />
                 <InputComponent
                   id="price"
@@ -376,9 +440,11 @@ export default function Products() {
                   label="Type *"
                   placeholder="Select a Type"
                   className="w-full"
-                  options={types}
+                  options={serviceTypes}
                   value={productData.service_type_id}
-                  onChange={(value) => handleDataChange("service_type_id", value)}
+                  onChange={(value) =>
+                    handleDataChange("service_type_id", value)
+                  }
                   error={errors.service_type_id}
                 />
                 <SelectComponent
@@ -397,10 +463,10 @@ export default function Products() {
               <MultiSelectComponent
                 id="event_types"
                 label="Event"
-                options={events}
+                options={eventTypes}
                 placeholder="Select an Event"
                 className="w-full"
-                value={productData.event_types.split(", ").filter((id) => id !== "")}
+                value={productData.event_types}
                 onChange={handleEventChange}
                 error={errors.event_types}
               />
@@ -412,9 +478,7 @@ export default function Products() {
                 placeholder="Write a short description"
                 className="w-full"
                 value={productData.description}
-                onChange={(value) =>
-                  handleDataChange("description", value)
-                }
+                onChange={(value) => handleDataChange("description", value)}
                 error={errors.description}
               />
 

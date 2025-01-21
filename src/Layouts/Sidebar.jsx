@@ -68,7 +68,7 @@ export default function Sidebar() {
         </div>
 
         <div
-          className="mt-auto flex justify-center items-center gap-3 p-4 rounded-2xl bg-[#192634] mr-4 hover:bg-black-100/90 duration-300 ease-in-out cursor-pointer"
+          className="mt-auto flex justify-center items-center gap-3 p-4 rounded-2xl bg-[#192634] mr-4 hover:bg-black-100/40  duration-300 ease-in-out cursor-pointer"
           onClick={() => handleGoMainPage()}
         >
           <img src="/Logo.svg" alt="Logo" className="h-10" />

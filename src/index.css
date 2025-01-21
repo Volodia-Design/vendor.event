@@ -19,12 +19,11 @@ html,body {
     color: black;
     border-radius: 8px !important;
   }
-  .inputSelectStyle::placeholder {
-    color: black; /* Ensures the placeholder text is black */
-    opacity: 1;   /* Adjusts transparency, if needed */
-  }
   .placeholder-black::placeholder {
     color: black !important;
+  }
+  .placeholder-gray::placeholder {
+    color: #949494 !important;
   }
   .inputSelectStyle:hover {
     background-color: #f4faff !important;

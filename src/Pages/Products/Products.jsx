@@ -163,7 +163,7 @@ export default function Products() {
 
   const renderCols = () => {
     return (
-      <tr className="bg-primary2-50 border-b">
+      <tr className="bg-primary2-50 border border-primary2-50">
         <th className="text-left p-4 text-text4Medium text-primary2-500">Product</th>
         <th className="text-left p-4 text-text4Medium text-primary2-500">Details</th>
         <th className="text-left p-4 text-text4Medium text-primary2-500">Stock</th>
@@ -176,7 +176,7 @@ export default function Products() {
 
   const renderRows = () => {
     return data.map((item) => (
-      <tr key={item.id} className="border-b hover:bg-primary2-50/50">
+      <tr key={item.id} className="border hover:bg-primary2-50/50">
         <td className="p-4 text-gray-700">{item.productName}</td>
         <td className="p-4 text-gray-700 text-sm max-w-md truncate">
           {item.details}
@@ -185,27 +185,20 @@ export default function Products() {
         <td className="p-4 text-gray-700">USD {item.price}</td>
         <td className="p-4 text-gray-700">Bakery</td>
         <td className="p-4">
-          <button className="text-yellow-500 hover:text-yellow-600">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-              ></path>
-            </svg>
-          </button>
+         <img
+          src="/Images/ComponentIcons/EditColored.svg"
+          alt="Edit"
+          className="w-6 h-6 cursor-pointer"
+          onClick={()=>handleEdit(item)}
+        />
         </td>
       </tr>
     ));
   };
 
+  const handleEdit = (item) => {
+    console.log("Edit clicked", item);
+  }
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">
       {/* Navigation */}

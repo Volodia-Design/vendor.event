@@ -2,9 +2,11 @@ import { useState } from "react";
 import api from "../../utils/api";
 import { InputComponent } from "../../components/InputComponent";
 import Button from "../../components/Button";
+import ImageUpload from "../../components/ImageUpload";
 
 export default function Settings() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false); // Added state for image modal
   const [formData, setFormData] = useState({
     position: "",
     fullName: "",
@@ -17,6 +19,7 @@ export default function Settings() {
   const [errors, setErrors] = useState({});
   const [modalErrors, setModalErrors] = useState({});
   const [modalData, setModalData] = useState({
+    oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
@@ -25,6 +28,10 @@ export default function Settings() {
     setIsModalOpen(false);
     setModalErrors({});
     setModalData({ newPassword: "", confirmPassword: "" });
+  };
+
+  const handleImageModalClose = () => {
+    setIsImageModalOpen(false);
   };
 
   const handleInputChange = (e) => {
@@ -53,12 +60,9 @@ export default function Settings() {
     setFormData({ ...formData, socialLinks: updatedLinks });
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageURL = URL.createObjectURL(file);
-      setFormData({ ...formData, profileImage: imageURL });
-    }
+  const handleImageUpload = (imageURL) => {
+    setFormData({ ...formData, profileImage: imageURL });
+    handleImageModalClose(); // Close image modal after upload
   };
 
   const handleModalChange = (e) => {
@@ -89,13 +93,15 @@ export default function Settings() {
     if (!formData.fullAddress || formData.fullAddress.trim() === "") {
       newErrors.fullAddress = "Full address is required.";
     }
-    const socialLinkErrors = formData.socialLinks.map((link, index) => {
-      if (link.link.trim() === "") {
-        return `Social link #${index + 1} is required.`;
-      }
-      return null;
-    }).filter(error => error !== null); 
-  
+    const socialLinkErrors = formData.socialLinks
+      .map((link, index) => {
+        if (link.link.trim() === "") {
+          return `Social link #${index + 1} is required.`;
+        }
+        return null;
+      })
+      .filter((error) => error !== null);
+
     if (socialLinkErrors.length > 0) {
       newErrors.socialLinks = socialLinkErrors;
     }
@@ -115,16 +121,18 @@ export default function Settings() {
       });
   };
 
-  const handleModalSubmit = () => {
+  const handleModalSubmit = (e) => {
+    e.preventDefault();
     let newErrors = {};
+
+    if (!modalData.oldPassword || modalData.oldPassword.trim() === "") {
+      newErrors.oldPassword = "Old password is required.";
+    }
 
     if (!modalData.newPassword || modalData.newPassword.trim() === "") {
       newErrors.newPassword = "New password is required.";
     }
-    if (
-      !modalData.confirmPassword ||
-      modalData.confirmPassword.trim() === ""
-    ) {
+    if (!modalData.confirmPassword || modalData.confirmPassword.trim() === "") {
       newErrors.confirmPassword = "Confirm password is required.";
     }
     if (modalData.newPassword !== modalData.confirmPassword) {
@@ -137,7 +145,7 @@ export default function Settings() {
     }
 
     api
-      .post("/change-password", { newPassword })
+      .post("/change-password")
       .then(() => {
         console.log("Password changed successfully");
         handleCloseModal();
@@ -169,6 +177,7 @@ export default function Settings() {
             <label
               htmlFor="profileImage"
               className="absolute bottom-1 right-1 bg-secondary-500 text-white p-1 rounded cursor-pointer"
+              onClick={() => setIsImageModalOpen(true)} // Open the image modal on click
             >
               <img
                 src="/Images/ComponentIcons/EditWhite.svg"
@@ -176,16 +185,8 @@ export default function Settings() {
                 className="w-4 h-4"
               />
             </label>
-            <input
-              type="file"
-              id="profileImage"
-              className="hidden"
-              onChange={handleImageUpload}
-              accept="image/*"
-            />
           </div>
         </div>
-
         <InputComponent
           id="position"
           label="Position *"
@@ -282,6 +283,7 @@ export default function Settings() {
             )}
           </div>
         ))}
+
         <div
           className="text-secondary-700 flex items-center justify-start text-text4 cursor-pointer"
           onClick={() => setIsModalOpen(true)}
@@ -334,44 +336,107 @@ export default function Settings() {
             </p>
 
             {/* Password Inputs */}
-            <InputComponent
-              id="newPassword"
-              label="New Password *"
-              value={modalData.newPassword}
-              onChange={(value) =>
-                handleModalChange({ target: { name: "newPassword", value } })
-              }
-              type="password"
-              className="w-full"
-              placeholder="Enter New Password"
-              placeholderColorGray={true}
-              error={modalErrors.newPassword}
-            />
-
-            <InputComponent
-              id="confirmPassword"
-              label="Confirm Password *"
-              value={modalData.confirmPassword}
-              onChange={(value) =>
-                handleModalChange({
-                  target: { name: "confirmPassword", value },
-                })
-              }
-              type="password"
-              className="w-full"
-              placeholder="Confirm New Password"
-              placeholderColorGray={true}
-              error={modalErrors.confirmPassword}
-            />
-
-            {/* Submit Button */}
-            <div className="flex items-center justify-end mt-6">
-              <Button
-                text="Save"
-                onClick={handleModalSubmit}
-                buttonStyles="bg-primary2-500 hover:bg-primary2-400 text-white px-6"
+            <form className="w-full flex flex-col gap-2">
+              <InputComponent
+                id="oldPassword"
+                label="Old Password *"
+                value={modalData.oldPassword}
+                onChange={(value) =>
+                  handleModalChange({ target: { name: "oldPassword", value } })
+                }
+                type="password"
+                className="w-full"
+                placeholder="Write your old password"
+                placeholderColorGray={true}
+                error={modalErrors.oldPassword}
               />
-            </div>
+
+              <InputComponent
+                id="newPassword"
+                label="New Password *"
+                value={modalData.newPassword}
+                onChange={(value) =>
+                  handleModalChange({ target: { name: "newPassword", value } })
+                }
+                type="password"
+                className="w-full"
+                placeholder="Write new password"
+                placeholderColorGray={true}
+                error={modalErrors.newPassword}
+              />
+              <span className="text-text4 text-gray-400 -mt-2">
+                * Your password must contain 8 characters include at least one
+                capital letter, at least one small letter, at least one special
+                symbol.
+              </span>
+
+              <InputComponent
+                id="confirmPassword"
+                label="Confirm New Password *"
+                value={modalData.confirmPassword}
+                onChange={(value) =>
+                  handleModalChange({
+                    target: { name: "confirmPassword", value },
+                  })
+                }
+                type="password"
+                className="w-full"
+                placeholder="Repeat new password"
+                placeholderColorGray={true}
+                error={modalErrors.confirmPassword}
+              />
+
+              {/* Submit Button */}
+              <div className="flex items-center justify-end mt-6 gap-3">
+              <Button
+                  text="Cancel"
+                  onClick={handleCloseModal}
+                  buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
+                />
+                <Button
+                  text="Create"
+                  onClick={(e) => handleModalSubmit(e)}
+                  buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Image Upload Modal */}
+      {isImageModalOpen && (
+        <div
+          className="fixed inset-0 bg-black-900/50 backdrop-blur-sm flex justify-center items-center z-50 transition-opacity duration-300"
+          onClick={handleImageModalClose}
+        >
+          <div
+            className="bg-white p-6 px-12 rounded-lg w-[640px] relative animate-fadeIn shadow-lg max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={handleImageModalClose}
+              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            <p className="uppercase text-h4 text-primary2-500 mb-6 text-center">
+              Upload Profile Image
+            </p>
+            <ImageUpload setImage={handleImageUpload} error={null} />
           </div>
         </div>
       )}

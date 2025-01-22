@@ -172,7 +172,7 @@ export default function Services() {
       service_specifications: service.service_specifications,
     });
   };
-console.log("serviceData", serviceData)
+
   const [errors, setErrors] = useState({
     location: "",
     service_type_id: "",
@@ -221,7 +221,6 @@ console.log("serviceData", serviceData)
         (error) => error !== "" && !Array.isArray(error)
       )
     ) {
-      console.log("🚀 ~ saveData ~ newErrors:", newErrors);
       setErrors(newErrors);
       return;
     }

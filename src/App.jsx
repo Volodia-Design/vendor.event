@@ -11,16 +11,13 @@ import Location from "./Pages/Location/Location";
 import Settings from "./Pages/Settings/Settings";
 import "swiper/css";
 import "swiper/css/pagination";
-import 'react-tooltip/dist/react-tooltip.css';
-import useLoading from "./store/useLoading";
+import "react-tooltip/dist/react-tooltip.css";
 import Loader from "./components/Loader";
 
 function App() {
-  const { isLoading } = useLoading();
-
   return (
     <Router>
-      {isLoading && <Loader />}
+      <Loader />
       <Routes>
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />

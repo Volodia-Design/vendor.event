@@ -25,26 +25,18 @@ export default function Products() {
   const [allProducts, setAllProducts] = useState([]);
 
   const getProductData = () => {
-    setIsLoading(true);
-    api
-      .get("/vendor-product")
-      .then((response) => {
-        const transformedData = response.data.map((product) => ({
-          ...product,
-          event_types: product.event_types.map((eventType) => ({
-            ...eventType,
-            id: eventType.id.toString(),
-          })),
-        }));
-
-        setAllProducts(transformedData);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    // setIsLoading(true);
+    // api
+    //   .get("/vendor-product")
+    //   .then((response) => {
+    //     setAllProducts(response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   })
+    //   .finally(() => {
+    //     setIsLoading(false);
+    //   });
   };
 
   const [productData, setProductData] = useState({

@@ -1,21 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import { InputComponent } from "../../components/InputComponent";
 import Button from "../../components/Button";
 import ImageUpload from "../../components/ImageUpload";
+import useLoading from "../../store/useLoading";
 
 export default function Settings() {
+  const { setIsLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false); // Added state for image modal
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [temporaryImage, setTemporaryImage] = useState(null);
+
+  const getUserData = () => {
+    setIsLoading(true);
+    api
+      .get("/auth/self")
+      .then((res) => {
+        setFormData({
+          position: "",
+          fullName: res.data.data.fullName,
+          email: res.data.data.email,
+          phone: res.data.data.phone,
+          fullAddress: res.data.data.fullAddress,
+          socialLinks: [{ link: "" }],
+          profileImage: "",
+          profileImagePreview: null,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
+  };
   const [formData, setFormData] = useState({
     position: "",
     fullName: "",
     email: "",
-    phoneNumber: "+",
+    phone: "+",
     fullAddress: "",
     socialLinks: [{ link: "" }],
     profileImage: null,
   });
+
+  console.log("🚀 ~ Settings ~ formData:", formData);
+
   const [errors, setErrors] = useState({});
   const [modalErrors, setModalErrors] = useState({});
   const [modalData, setModalData] = useState({
@@ -26,12 +56,28 @@ export default function Settings() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setIsImageModalOpen(false);
     setModalErrors({});
     setModalData({ newPassword: "", confirmPassword: "" });
   };
 
   const handleImageModalClose = () => {
+    if (temporaryImage) {
+      URL.revokeObjectURL(temporaryImage);
+    }
+    setTemporaryImage(null);
     setIsImageModalOpen(false);
+  };
+
+  const saveImageToFormData = () => {
+    if (temporaryImage) {
+      setFormData({
+        ...formData,
+        profileImage: temporaryImage,
+        profileImagePreview: URL.createObjectURL(temporaryImage),
+      });
+    }
+    handleImageModalClose();
   };
 
   const handleInputChange = (e) => {
@@ -60,11 +106,6 @@ export default function Settings() {
     setFormData({ ...formData, socialLinks: updatedLinks });
   };
 
-  const handleImageUpload = (imageURL) => {
-    setFormData({ ...formData, profileImage: imageURL });
-    handleImageModalClose(); // Close image modal after upload
-  };
-
   const handleModalChange = (e) => {
     const { name, value } = e.target;
     setModalData({ ...modalData, [name]: value });
@@ -84,11 +125,11 @@ export default function Settings() {
       newErrors.email = "Email is required.";
     }
     if (
-      !formData.phoneNumber ||
-      formData.phoneNumber.trim() === "" ||
-      formData.phoneNumber === "+"
+      !formData.phone ||
+      formData.phone.trim() === "" ||
+      formData.phone === "+"
     ) {
-      newErrors.phoneNumber = "Phone number is required.";
+      newErrors.phone = "Phone number is required.";
     }
     if (!formData.fullAddress || formData.fullAddress.trim() === "") {
       newErrors.fullAddress = "Full address is required.";
@@ -111,13 +152,29 @@ export default function Settings() {
       return;
     }
 
+    const formDataToSend = new FormData();
+
+    // formDataToSend.append("position", formData.position);
+    formDataToSend.append("fullName", formData.fullName);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("phone", formData.phone);
+    // formDataToSend.append("fullAddress", formData.fullAddress);
+    // formDataToSend.append("socialLinks", JSON.stringify(formData.socialLinks));
+    if (formData.profileImage) {
+      formDataToSend.append("file", formData.profileImage);
+    }
+    setIsLoading(true);
     api
-      .post("/settings", formData)
-      .then((response) => {
-        console.log("Settings updated successfully", response);
+      .put("/auth/self", formDataToSend)
+      .then(() => {
+        setErrors({});
+        setModalErrors({});
       })
       .catch((error) => {
         console.error("Error updating settings", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -143,17 +200,24 @@ export default function Settings() {
       setModalErrors(newErrors);
       return;
     }
-
+    setIsLoading(true);
     api
-      .post("/change-password")
+      .put("/auth/self", modalData.confirmPassword)
       .then(() => {
         console.log("Password changed successfully");
         handleCloseModal();
       })
       .catch((error) => {
         console.error("Error changing password", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
+
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg flex flex-col items-center gap-6">
@@ -163,9 +227,9 @@ export default function Settings() {
       >
         <div className="flex flex-col items-center gap-2">
           <div className="relative w-24 h-24 rounded-full">
-            {formData.profileImage ? (
+            {formData.profileImagePreview ? (
               <img
-                src={formData.profileImage}
+                src={formData.profileImagePreview}
                 alt="Profile"
                 className="w-full h-full object-cover rounded-full"
               />
@@ -228,17 +292,17 @@ export default function Settings() {
         />
 
         <InputComponent
-          id="phoneNumber"
+          id="phone"
           label="Phone Number"
-          value={formData.phoneNumber}
+          value={formData.phone}
           onChange={(value) =>
-            handleInputChange({ target: { name: "phoneNumber", value } })
+            handleInputChange({ target: { name: "phone", value } })
           }
           className="w-full"
           placeholderColorGray={true}
           placeholder="Write Your Phone Number"
           isPhoneNumber
-          error={errors.phoneNumber}
+          error={errors.phone}
         />
 
         <InputComponent
@@ -388,13 +452,13 @@ export default function Settings() {
 
               {/* Submit Button */}
               <div className="flex items-center justify-end mt-6 gap-3">
-              <Button
+                <Button
                   text="Cancel"
                   onClick={handleCloseModal}
                   buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
                 />
                 <Button
-                  text="Create"
+                  text="Save"
                   onClick={(e) => handleModalSubmit(e)}
                   buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
                 />
@@ -436,7 +500,24 @@ export default function Settings() {
             <p className="uppercase text-h4 text-primary2-500 mb-6 text-center">
               Upload Profile Image
             </p>
-            <ImageUpload setImage={handleImageUpload} error={null} />
+            <ImageUpload
+              setImage={(file) => setTemporaryImage(file)}
+              error={null}
+              image={temporaryImage}
+              editMode={true}
+            />
+            <div className="flex items-center justify-end mt-6 gap-3">
+              <Button
+                text="Cancel"
+                onClick={handleImageModalClose}
+                buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
+              />
+              <Button
+                text="Save"
+                onClick={saveImageToFormData}
+                buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
+              />
+            </div>
           </div>
         </div>
       )}

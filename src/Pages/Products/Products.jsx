@@ -25,18 +25,18 @@ export default function Products() {
   const [allProducts, setAllProducts] = useState([]);
 
   const getProductData = () => {
-    // setIsLoading(true);
-    // api
-    //   .get("/vendor-product")
-    //   .then((response) => {
-    //     setAllProducts(response.data);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+    setIsLoading(true);
+    api
+      .get("/vendor-product")
+      .then((response) => {
+        setAllProducts(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const [productData, setProductData] = useState({
@@ -245,7 +245,6 @@ export default function Products() {
   };
 
   const handleEdit = (item) => {
-    console.log("🚀 ~ handleEdit ~ item:", item);
     setIsEditMode({
       id: item.id,
       data: item,
@@ -257,8 +256,9 @@ export default function Products() {
       price: item.price,
       service_type_id: item.service_type_id.toString(),
       location: item.location,
-      event_types: item.event_types,
+      event_types: item.event_types.map(event => event.id.toString()), 
       description: item.description,
+      image: `${api.defaults.baseURL}image/${item.image}`,
     });
   };
 
@@ -381,15 +381,18 @@ export default function Products() {
 
             {/* Modal header */}
             <p className="uppercase text-h4 text-primary2-500 mb-6 text-center">
-              Create a Product
+              {isEditMode ? "Edit a Product" : "Create a Product"}
             </p>
 
             <form className="mt-4 flex flex-col gap-4">
               {/* Image Upload */}
               <ImageUpload
-                setImage={(imageUrl) => handleDataChange("image", imageUrl)}
-                error={errors.image}
-              />
+  setImage={(file) => setProductData((prev) => ({ ...prev, image: file }))}
+  image={productData.image}
+  editMode={!!isEditMode} // Pass `editMode` dynamically
+  error={errors.image}
+/>
+
 
               {/* Product Name */}
               <InputComponent
@@ -482,7 +485,7 @@ export default function Products() {
                   buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
                 />
                 <Button
-                  text="Create"
+                  text={isEditMode ? "Save" : "Create"}
                   onClick={(e) => saveData(e)}
                   buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
                 />

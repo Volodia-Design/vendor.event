@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const ImageUpload = ({ setImage, error }) => {
+const ImageUpload = ({ setImage, error, image, editMode = false }) => {
   const [selectedImagePreview, setSelectedImagePreview] = useState(null);
+
+  useEffect(() => {
+    // Update preview when `image` or `editMode` changes
+    if (editMode && typeof image === "string") {
+      setSelectedImagePreview(image);
+    }
+  }, [image, editMode]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -33,7 +40,9 @@ const ImageUpload = ({ setImage, error }) => {
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className={`flex flex-col items-center justify-center gap-4 p-12 rounded-lg cursor-pointer relative ${selectedImagePreview ? "" : "bg-primary2-50"}`}
+        className={`flex flex-col items-center justify-center gap-4 p-12 rounded-lg cursor-pointer relative ${
+          selectedImagePreview ? "" : "bg-primary2-50"
+        }`}
       >
         {selectedImagePreview ? (
           <div style={{ position: "relative", marginTop: "10px" }}>

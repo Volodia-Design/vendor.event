@@ -27,8 +27,9 @@ export default function Sidebar() {
   }, [location.pathname, setActiveTab]);
 
   const handleGoMainPage = () => {
-    console.log("🚀 ~ handleGoMainPage ~ handleGoMainPage:", handleGoMainPage);
+    window.location.href = "https://eml-gishyans-projects.vercel.app/";
   };
+  
 
   return (
     <div className="p-4 h-full w-full max-w-80">

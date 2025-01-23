@@ -1,33 +1,35 @@
+
+
+// api.js
 import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 api.interceptors.request.use(
   async (config) => {
-    // const token = localStorage.getItem('authToken'); 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTczNzYxMTQ1OSwiZXhwIjoxNzQwMjAzNDU5fQ.iOkYrdejTt5kpo4gGXVLwHjQJiwxpFAbHE6s4pzpcEg";
+    const token = localStorage.getItem("authToken");
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`; 
+      config.headers["Authorization"] = `Bearer ${token}`;
     } else {
-      console.error('No token found');
+      console.error("No token found");
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
-  (response) => {
-    return response; 
-  },
+  (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.error('Token is invalid or expired');
-      return Promise.reject(new Error('Token is invalid or expired'));
+      console.error("Token is invalid or expired");
+      localStorage.removeItem("authToken");
+      // window.location.href = "/login"; 
     }
     return Promise.reject(error);
   }

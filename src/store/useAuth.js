@@ -1,12 +1,24 @@
+// useAuth.js
 import { create } from "zustand";
+import api from "../utils/api";
 
 const useAuth = create((set) => ({
   isLoggedIn: false,
-  user: {
-    role: "vendor",
+  user: null,
+  login: async (token) => {
+    try {
+      localStorage.setItem("authToken", token);
+      const response = await api.get("/auth/self"); 
+      set({ isLoggedIn: true, user: response.data.data });
+    } catch (error) {
+      console.error("Failed to log in:", error);
+      set({ isLoggedIn: false, user: null });
+    }
   },
-  login: (user) => set({ isLoggedIn: true, user: user }),
-  logout: () => set({ isLoggedIn: false, user: null, email: "" }),
+  logout: () => {
+    localStorage.removeItem("authToken");
+    set({ isLoggedIn: false, user: null });
+  },
 }));
 
 export default useAuth;

@@ -11,36 +11,41 @@ export default function Settings() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [temporaryImage, setTemporaryImage] = useState(null);
 
+
   const getUserData = () => {
     setIsLoading(true);
     api
       .get("/auth/self")
       .then((res) => {
+        const { vendor, fullName, email, phone } = res.data.data;
+  
         setFormData({
-          position: "",
-          fullName: res.data.data.fullName,
-          email: res.data.data.email,
-          phone: res.data.data.phone,
-          fullAddress: res.data.data.fullAddress,
-          socialLinks: [{ link: "" }],
+          position: vendor?.position || "",
+          fullName: fullName || "",
+          email: email || "",
+          phone: phone || "",
+          fullAddress: vendor?.address || "",
+          socialLinks: vendor?.socials?.length > 0 ? vendor.socials : [{ url: "" }],
           profileImage: "",
           profileImagePreview: null,
         });
       })
       .catch((err) => {
-        console.error(err);
+        console.error("Error fetching user data:", err);
       })
       .finally(() => {
         setIsLoading(false);
-      })
+      });
   };
+
+
   const [formData, setFormData] = useState({
     position: "",
     fullName: "",
     email: "",
     phone: "+",
     fullAddress: "",
-    socialLinks: [{ link: "" }],
+    socialLinks: [{ url: "" }],
     profileImage: null,
   });
 
@@ -90,14 +95,14 @@ export default function Settings() {
 
   const handleSocialLinkChange = (index, value) => {
     const updatedLinks = [...formData.socialLinks];
-    updatedLinks[index] = { link: value };
+    updatedLinks[index] = { url: value };
     setFormData({ ...formData, socialLinks: updatedLinks });
   };
 
   const addSocialLink = () => {
     setFormData({
       ...formData,
-      socialLinks: [...formData.socialLinks, { link: "" }],
+      socialLinks: [...formData.socialLinks, { url: "" }],
     });
   };
 
@@ -115,9 +120,6 @@ export default function Settings() {
     e.preventDefault();
     let newErrors = {};
 
-    if (!formData.position || formData.position.trim() === "") {
-      newErrors.position = "Position is required.";
-    }
     if (!formData.fullName || formData.fullName.trim() === "") {
       newErrors.fullName = "Full name is required.";
     }
@@ -131,21 +133,6 @@ export default function Settings() {
     ) {
       newErrors.phone = "Phone number is required.";
     }
-    if (!formData.fullAddress || formData.fullAddress.trim() === "") {
-      newErrors.fullAddress = "Full address is required.";
-    }
-    const socialLinkErrors = formData.socialLinks
-      .map((link, index) => {
-        if (link.link.trim() === "") {
-          return `Social link #${index + 1} is required.`;
-        }
-        return null;
-      })
-      .filter((error) => error !== null);
-
-    if (socialLinkErrors.length > 0) {
-      newErrors.socialLinks = socialLinkErrors;
-    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -154,12 +141,12 @@ export default function Settings() {
 
     const formDataToSend = new FormData();
 
-    // formDataToSend.append("position", formData.position);
+    formDataToSend.append("position", formData.position);
     formDataToSend.append("fullName", formData.fullName);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("phone", formData.phone);
-    // formDataToSend.append("fullAddress", formData.fullAddress);
-    // formDataToSend.append("socialLinks", JSON.stringify(formData.socialLinks));
+    formDataToSend.append("address", formData.fullAddress);
+    formDataToSend.append("socials", JSON.stringify(formData.socialLinks));
     if (formData.profileImage) {
       formDataToSend.append("file", formData.profileImage);
     }
@@ -323,7 +310,7 @@ export default function Settings() {
             <InputComponent
               id={`socialLink-${index}`}
               label={index === 0 ? "Social Links" : undefined}
-              value={socialLink.link}
+              value={socialLink.url}
               onChange={(value) => handleSocialLinkChange(index, value)}
               className="flex-grow"
               placeholderColorGray={true}

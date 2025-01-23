@@ -33,7 +33,7 @@ export default function Services() {
     api
       .get("/vendor-service")
       .then((response) => {
-        const transformedData = response.data.map((service) => ({
+        const transformedData = response.data.data.map((service) => ({
           ...service,
           service_type_id: String(service.service_type_id),
           service_specifications: service.service_specifications.map((spec) => ({

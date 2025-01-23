@@ -8,6 +8,7 @@ export default function useSelfData() {
     const fetchServiceTypes = async () => {
       try {
         const response = await api.get("/auth/self");
+        console.log("🚀 ~ fetchServiceTypes ~ response:", response)
         setUserData(response.data.data);
       } catch (err) {
         console.error(err);

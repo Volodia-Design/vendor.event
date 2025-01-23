@@ -8,7 +8,7 @@ export default function useServiceTypes() {
     const fetchServiceTypes = async () => {
       try {
         const response = await api.get("/service-types");
-        setServiceTypes(response.data);
+        setServiceTypes(response.data.data);
       } catch (err) {
         console.error(err);
       }

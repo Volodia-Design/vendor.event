@@ -7,7 +7,7 @@ const [eventTypes, setEventTypes] = useState([])
     const fetchEventTypes = async () => {
       try {
         const response = await api.get("/event-type");
-        setEventTypes(response.data);
+        setEventTypes(response.data.data);
       } catch (err) {
         console.error(err);
       }

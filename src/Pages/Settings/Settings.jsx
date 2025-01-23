@@ -11,34 +11,6 @@ export default function Settings() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [temporaryImage, setTemporaryImage] = useState(null);
 
-
-  const getUserData = () => {
-    setIsLoading(true);
-    api
-      .get("/auth/self")
-      .then((res) => {
-        const { vendor, fullName, email, phone } = res.data.data;
-  
-        setFormData({
-          position: vendor?.position || "",
-          fullName: fullName || "",
-          email: email || "",
-          phone: phone || "",
-          fullAddress: vendor?.address || "",
-          socialLinks: vendor?.socials?.length > 0 ? vendor.socials : [{ url: "" }],
-          profileImage: "",
-          profileImagePreview: null,
-        });
-      })
-      .catch((err) => {
-        console.error("Error fetching user data:", err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-
   const [formData, setFormData] = useState({
     position: "",
     fullName: "",
@@ -48,8 +20,33 @@ export default function Settings() {
     socialLinks: [{ url: "" }],
     profileImage: null,
   });
+  const getUserData = () => {
+    setIsLoading(true);
+    api
+      .get("/auth/self")
+      .then((res) => {
+        const { vendor, fullName, email, phone, image } = res.data.data;
+      console.log("🚀 ~ .then ~ vendor:", vendor.socials)
+  
+        setFormData({
+          position: vendor?.position || "",
+          fullName: fullName || "",
+          email: email || "",
+          phone: phone || "",
+          fullAddress: vendor?.address || "",
+          socialLinks: vendor?.socials?.length > 0 ? vendor.socials : [{ url: "" }],
+          profileImage: "",
+          profileImagePreview: image ? `${api.defaults.baseURL}image/${image}` : null,
 
-  console.log("🚀 ~ Settings ~ formData:", formData);
+        });
+      })
+      .catch((err) => {
+        console.error("Error fetching user data:", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const [errors, setErrors] = useState({});
   const [modalErrors, setModalErrors] = useState({});
@@ -100,10 +97,21 @@ export default function Settings() {
   };
 
   const addSocialLink = () => {
-    setFormData({
-      ...formData,
-      socialLinks: [...formData.socialLinks, { url: "" }],
-    });
+    // Get the first social link input
+    const firstSocialLink = formData.socialLinks[0].url.trim();
+    
+    // Only add if there's a non-empty value
+    if (firstSocialLink) {
+      setFormData({
+        ...formData,
+        // Add the current input as a new social link
+        socialLinks: [
+          { url: "" },  // Reset first input to empty
+          ...formData.socialLinks.slice(0, 1),  // Keep the first input
+          { url: firstSocialLink }  // Add the current input as a new link
+        ],
+      });
+    }
   };
 
   const removeSocialLink = (index) => {
@@ -119,40 +127,47 @@ export default function Settings() {
   const handleSubmit = (e) => {
     e.preventDefault();
     let newErrors = {};
-
+  
+    // Existing validations
     if (!formData.fullName || formData.fullName.trim() === "") {
       newErrors.fullName = "Full name is required.";
     }
     if (!formData.email || formData.email.trim() === "") {
       newErrors.email = "Email is required.";
     }
-    if (
-      !formData.phone ||
-      formData.phone.trim() === "" ||
-      formData.phone === "+"
-    ) {
+    if (!formData.phone || formData.phone.trim() === "" || formData.phone === "+") {
       newErrors.phone = "Phone number is required.";
     }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
+  
+    // New validation for social links
+    const validSocialLinks = formData.socialLinks.filter(link => link.url.trim() !== "");
+    
     const formDataToSend = new FormData();
-
-    formDataToSend.append("position", formData.position);
+  
+    // User data
     formDataToSend.append("fullName", formData.fullName);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("phone", formData.phone);
-    formDataToSend.append("address", formData.fullAddress);
-    formDataToSend.append("socials", JSON.stringify(formData.socialLinks));
+    
     if (formData.profileImage) {
       formDataToSend.append("file", formData.profileImage);
     }
+  
+    const vendorData = {
+      position: formData.position,
+      address: formData.fullAddress,
+      socials: validSocialLinks, // Only send non-empty social links
+    };
+    
+    formDataToSend.append("vendor", JSON.stringify(vendorData));
+    
     setIsLoading(true);
     api
-      .put("/auth/self", formDataToSend)
+      .put("/auth/self", formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
       .then(() => {
         setErrors({});
         setModalErrors({});
@@ -305,18 +320,18 @@ export default function Settings() {
           error={errors.fullAddress}
         />
 
-        {formData.socialLinks.map((socialLink, index) => (
-          <div key={index} className="flex gap-2 items-center">
-            <InputComponent
-              id={`socialLink-${index}`}
-              label={index === 0 ? "Social Links" : undefined}
-              value={socialLink.url}
-              onChange={(value) => handleSocialLinkChange(index, value)}
-              className="flex-grow"
-              placeholderColorGray={true}
-              placeholder="Write Your Social Links"
-              error={errors.socialLinks?.[index]}
-            />
+{formData.socialLinks.map((socialLink, index) => (
+  <div key={index} className="flex gap-2 items-center">
+    <InputComponent
+      id={`socialLink-${index}`}
+      label={index === 0 ? "Social Links" : undefined}
+      value={socialLink.url}
+      onChange={(value) => handleSocialLinkChange(index, value)}
+      className="flex-grow"
+      placeholderColorGray={true}
+      placeholder="Write Your Social Links"
+      error={errors.socialLinks?.[index]}
+    />
             {index === 0 ? (
               <div
                 onClick={addSocialLink}

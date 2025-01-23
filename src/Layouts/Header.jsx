@@ -4,7 +4,6 @@ import useAuth from "../store/useAuth";
 export default function Header() {
   const { activeTab } = useActiveTab();
   const { user } = useAuth();
-  console.log("🚀 ~ Header ~ user:", user)
 
   return (
     <div className="flex items-center justify-between w-full">

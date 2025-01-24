@@ -22,6 +22,7 @@ export default function Products() {
     id: null,
     data: null,
   });
+  console.log("🚀 ~ Products ~ isEditMode:", isEditMode);
   const [allProducts, setAllProducts] = useState([]);
 
   const getProductData = () => {
@@ -170,17 +171,18 @@ export default function Products() {
     ); // Convert array to JSON
     formDataToSend.append("description", productData.description);
 
-    let apiCall = isEditMode.id
-      ? api.put(`/vendor-product/${isEditMode.id}`, formDataToSend, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-      : api.post("/vendor-product", formDataToSend, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+    let apiCall =
+      isEditMode.id !== null
+        ? api.put(`/vendor-product/${isEditMode.id}`, formDataToSend, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+        : api.post("/vendor-product", formDataToSend, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
 
     apiCall
       .then(() => {
@@ -198,22 +200,22 @@ export default function Products() {
   const renderCols = () => {
     return (
       <tr className="bg-primary2-50 border border-primary2-50">
-        <th className="text-left p-4 text-text4Medium text-primary2-500">
+        <th className="text-left p-4 text-text3Medium text-primary2-500">
           Product
         </th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">
+        <th className="text-left p-4 text-text3Medium text-primary2-500">
           Details
         </th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">
+        <th className="text-left p-4 text-text3Medium text-primary2-500">
           Stock
         </th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">
+        <th className="text-left p-4 text-text3Medium text-primary2-500">
           Price
         </th>
-        <th className="text-left p-4 text-text4Medium text-primary2-500">
+        <th className="text-left p-4 text-text3Medium text-primary2-500">
           Type
         </th>
-        <th className="text-center p-4 text-text4Medium text-primary2-500">
+        <th className="text-center p-4 text-text3Medium text-primary2-500">
           Actions
         </th>
       </tr>
@@ -223,13 +225,13 @@ export default function Products() {
   const renderRows = () => {
     return allProducts.map((item) => (
       <tr key={item.id} className="border hover:bg-primary2-50/50">
-        <td className="p-4 text-text4 text-black-300">{item.name}</td>
-        <td className="p-4 text-black-300 max-w-md truncate text-text5">
+        <td className="p-4 text-text3 text-black-300">{item.name}</td>
+        <td className="p-4 text-black-300 max-w-md truncate text-text4">
           {item.description}
         </td>
-        <td className="p-4 text-text4 text-black-300">{item.stock}</td>
-        <td className="p-4 text-text4 text-black-300">USD {item.price}</td>
-        <td className="p-4 text-text4 text-black-300">
+        <td className="p-4 text-text3 text-black-300">{item.stock}</td>
+        <td className="p-4 text-text3 text-black-300">USD {item.price}</td>
+        <td className="p-4 text-text3 text-black-300">
           {serviceTypes.find((type) => type.id === item.service_type_id)?.name}
         </td>
         <td className="p-4 flex items-center justify-center">
@@ -256,7 +258,7 @@ export default function Products() {
       price: item.price,
       service_type_id: item.service_type_id.toString(),
       location: item.location,
-      event_types: item.event_types.map(event => event.id.toString()), 
+      event_types: item.event_types.map((event) => event.id.toString()),
       description: item.description,
       image: `${api.defaults.baseURL}image/${item.image}`,
     });
@@ -271,7 +273,7 @@ export default function Products() {
       {/* Navigation */}
       <div className="w-full flex justify-start items-center gap-4 relative text-text2">
         <div
-          className={`w-28 text-center cursor-pointer transition-all duration-200 ${
+          className={`w-32 text-center cursor-pointer transition-all duration-200 ${
             location.pathname === "/products/product-store"
               ? "text-secondary-700"
               : "text-primary2-500"
@@ -281,7 +283,7 @@ export default function Products() {
           Product Store
         </div>
         <div
-          className={`w-32 text-center cursor-pointer transition-all duration-200 ${
+          className={`w-36 text-center cursor-pointer transition-all duration-200 ${
             location.pathname === "/products/order-history"
               ? "text-secondary-700"
               : "text-primary2-500"
@@ -293,15 +295,15 @@ export default function Products() {
         <div
           className={`absolute bottom-0 h-[1px] bg-secondary-700 transition-all duration-200 ${
             location.pathname === "/products/product-store"
-              ? "left-0 w-28"
-              : "left-32 w-32"
+              ? "left-0 w-32"
+              : "left-36 w-36"
           }`}
         />
       </div>
 
       {/* Main Content */}
       <div className="mt-4 flex items-center justify-between">
-        <p className="text-text3 uppercase">
+        <p className="text-text2Medium uppercase">
           {location.pathname === "/products/product-store"
             ? "Products"
             : "Order History"}
@@ -381,18 +383,19 @@ export default function Products() {
 
             {/* Modal header */}
             <p className="uppercase text-h4 text-primary2-500 mb-6 text-center">
-              {isEditMode ? "Edit a Product" : "Create a Product"}
+              {isEditMode.id !== null ? "Edit a Product" : "Create a Product"}{" "}
             </p>
 
             <form className="mt-4 flex flex-col gap-4">
               {/* Image Upload */}
               <ImageUpload
-  setImage={(file) => setProductData((prev) => ({ ...prev, image: file }))}
-  image={productData.image}
-  editMode={!!isEditMode} // Pass `editMode` dynamically
-  error={errors.image}
-/>
-
+                setImage={(file) =>
+                  setProductData((prev) => ({ ...prev, image: file }))
+                }
+                image={productData.image}
+                editMode={!!isEditMode} 
+                error={errors.image}
+              />
 
               {/* Product Name */}
               <InputComponent
@@ -433,7 +436,9 @@ export default function Products() {
                 <SelectComponent
                   id="service_type_id"
                   label="Type *"
-                  placeholder="Select a Type"
+                  placeholder={
+                    <span className="text-black-200">Select a Type</span>
+                  }
                   className="w-full"
                   options={serviceTypes}
                   value={productData.service_type_id}
@@ -445,7 +450,9 @@ export default function Products() {
                 <SelectComponent
                   id="location"
                   label="Location *"
-                  placeholder="Select a Location"
+                  placeholder={
+                    <span className="text-black-200">Select a Location</span>
+                  }
                   className="w-full"
                   options={locations}
                   value={productData.location}
@@ -485,7 +492,7 @@ export default function Products() {
                   buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
                 />
                 <Button
-                  text={isEditMode ? "Save" : "Create"}
+                  text={isEditMode.id !== null ? "Save" : "Create"}
                   onClick={(e) => saveData(e)}
                   buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
                 />

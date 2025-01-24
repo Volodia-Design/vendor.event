@@ -81,9 +81,9 @@ export function InputComponent({
         )}
         <Input
           id={id}
-          className={`mt-1 inputSelectStyle focus:outline-none  ${
+          className={`mt-1 inputSelectStyle focus:outline-none placeholder-gray  ${
             icon ? "pl-8" : "px-3"
-          } ${inputClassName || ""} ${placeholderColorGray ? "placeholder-gray" : "placeholder-black"}`}
+          } ${inputClassName || ""} `}
           value={displayValue}
           onChange={handleChange}
           onFocus={handleFocus}

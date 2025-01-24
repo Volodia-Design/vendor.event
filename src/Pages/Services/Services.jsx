@@ -16,10 +16,11 @@ export default function Services() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { serviceTypes } = useServiceTypes();
   const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState({});
   const [isEditMode, setIsEditMode] = useState({
     id: null,
     data: null,
-  })
+  });
   const locations = [
     { id: 1, name: "New York" },
     { id: 2, name: "London" },
@@ -27,6 +28,8 @@ export default function Services() {
     { id: 4, name: "Tokyo" },
     { id: 5, name: "Sydney" },
   ];
+
+
 
   const getServices = () => {
     setIsLoading(true);
@@ -36,10 +39,12 @@ export default function Services() {
         const transformedData = response.data.data.map((service) => ({
           ...service,
           service_type_id: String(service.service_type_id),
-          service_specifications: service.service_specifications.map((spec) => ({
-            ...spec,
-            price: String(spec.price),
-          })),
+          service_specifications: service.service_specifications.map(
+            (spec) => ({
+              ...spec,
+              price: String(spec.price),
+            })
+          ),
         }));
         setServices(transformedData);
       })
@@ -50,7 +55,6 @@ export default function Services() {
         setIsLoading(false);
       });
   };
-  
 
   const [serviceData, setServiceData] = useState({
     location: "",
@@ -74,6 +78,7 @@ export default function Services() {
       ),
     }));
   };
+
 
   const chunkedSelects = [];
   for (let i = 0; i < services.length; i += 6) {
@@ -127,23 +132,31 @@ export default function Services() {
 
   const calculatePriceRange = (specifications) => {
     if (!specifications || specifications.length === 0) {
-      return "0";
+      return { value: "0", textColor: "text-black-200" };
     }
 
     if (specifications.length === 1) {
-      return specifications[0].price ? `${specifications[0].price}$` : "0";
+      const price = specifications[0].price ? specifications[0].price : "0";
+      return {
+        value: `${price}$`,
+        textColor: price === "0" ? "text-black-200" : "text-black-900",
+      };
     }
 
     const validPrices = specifications
       .map((spec) => Number(spec.price))
       .filter((price) => !isNaN(price) && price > 0);
 
-    if (validPrices.length === 0) return "0";
+    if (validPrices.length === 0)
+      return { value: "0", textColor: "text-black-200" };
 
     const minPrice = Math.min(...validPrices);
     const maxPrice = Math.max(...validPrices);
 
-    return `${minPrice}$ - ${maxPrice}$`;
+    return {
+      value: `${minPrice}$ - ${maxPrice}$`,
+      textColor: "text-black-900",
+    };
   };
 
   const handleCloseModal = () => {
@@ -163,8 +176,8 @@ export default function Services() {
   const handleEdit = (service) => {
     setIsEditMode({
       id: service.id,
-      data: service
-    })
+      data: service,
+    });
     setIsModalOpen(true);
     setServiceData({
       location: service.location,
@@ -225,33 +238,44 @@ export default function Services() {
       return;
     }
 
-    let apiCall = isEditMode.id 
-    ? api.put(`/vendor-service/${isEditMode.id}`, serviceData) 
-    : api.post("/vendor-service", serviceData);
-  
-  apiCall
-    .then(() => {
-      getServices();
-      handleCloseModal();
-    })
-    .catch((error) => {
-      console.error("Error saving data:", error);
-    })
-    .finally(() => {
-      setIsLoading(false);
-    })
-  
+    let apiCall = isEditMode.id
+      ? api.put(`/vendor-service/${isEditMode.id}`, serviceData)
+      : api.post("/vendor-service", serviceData);
+
+    apiCall
+      .then(() => {
+        getServices();
+        handleCloseModal();
+      })
+      .catch((error) => {
+        console.error("Error saving data:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
     getServices();
   }, []);
 
+  useEffect(() => {
+    if (services.length > 0) {
+      const defaultSelected = services.reduce((acc, service) => {
+        const firstSpecId = formatServiceSpecifications(service)[0]?.id || '';
+        return { ...acc, [service.id]: firstSpecId };
+      }, {});
+      setSelectedServices(defaultSelected);
+    }
+  }, [services]);
+  
+  console.log("🚀 ~ Services ~ selectedServices:", selectedServices);
+
   return (
     <div className="w-full flex flex-col items-center gap-3">
       <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg px-8">
         <div className="flex items-center justify-between w-full">
-          <p className="text-text3 uppercase">My Services</p>
+          <p className="text-text2Medium uppercase">My Services</p>
           <Button
             text="Create a Service"
             buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2"
@@ -275,14 +299,19 @@ export default function Services() {
                     className="flex gap-2 items-center justify-between w-full"
                   >
                     <SelectComponent
-                      id={`select-${select.id}`}
-                      options={formatServiceSpecifications(select)} 
-                      placeholder="Select a Service"
-                      className="w-full"
-                      onChange={(value) =>
-                        console.log(`Selected value for ${select.id}:`, value)
-                      }
-                    />
+            id={`select-${select.id}`}
+            options={formatServiceSpecifications(select)}
+            placeholder="Select a Service"
+            className="w-full"
+            value={selectedServices[select.id] || ''}
+            onChange={(value) => {
+              setSelectedServices(prev => ({
+                ...prev,
+                [select.id]: value
+              }));
+              console.log(`Selected value for ${select.id}:`, value);
+            }}
+          />
                     <div
                       className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
                       onClick={() => handleEdit(select)}
@@ -356,7 +385,9 @@ export default function Services() {
                   id="service_type_id"
                   options={serviceTypes}
                   label="Select a Service *"
-                  placeholder="Select Type"
+                  placeholder={
+                    <span className="text-black-200">Select Type</span>
+                  }
                   className="w-full"
                   value={serviceData.service_type_id}
                   onChange={(value) =>
@@ -369,7 +400,17 @@ export default function Services() {
                     Price Range *
                   </label>
                   <div className="flex items-center justify-start pl-3 w-full h-10 rounded-lg cursor-pointer inputSelectStyle">
-                    {calculatePriceRange(serviceData.service_specifications)}
+                    <p
+                      className={`${
+                        calculatePriceRange(serviceData.service_specifications)
+                          .textColor
+                      }`}
+                    >
+                      {
+                        calculatePriceRange(serviceData.service_specifications)
+                          .value
+                      }
+                    </p>
                   </div>
                   {errors.service_type_id && (
                     <p className="text-red-500 text-text4Medium invisible">a</p>

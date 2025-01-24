@@ -16,7 +16,6 @@ export function SelectComponent({
   placeholder,
   withoutLabelMargin,
   error,
-  placeholderColor 
 }) {
   const handleValueChange = (newValue) => {
     if (onChange && newValue) {
@@ -34,7 +33,7 @@ export function SelectComponent({
 
       <Select
         id={id}
-        value={value || ""} // Ensure value is never undefined
+        value={value || ""} 
         onValueChange={handleValueChange}
         className="rounded-lg bg-white"
       >
@@ -43,20 +42,17 @@ export function SelectComponent({
             withoutLabelMargin ? "mt-0" : "mt-1"
           }`}
         >
-          <span
-            className={`${
-              value ? "text-black" : placeholderColor // Apply placeholder color only when no value is selected
-            }`}
-          >
-            <SelectValue placeholder={placeholder} />
-          </span>
+          <SelectValue 
+            placeholder={placeholder} 
+            className="text-black-200" 
+          />
         </SelectTrigger>
 
         <SelectContent className="bg-white border-none">
           {options?.map((option) => (
             <SelectItem
               key={option.id}
-              value={option.id.toString()} // Convert id to string
+              value={option.id.toString()} 
               className="focus:bg-gray-100 focus:text-black cursor-pointer hover:bg-gray-100"
             >
               {option.name}

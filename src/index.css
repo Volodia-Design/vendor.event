@@ -1,7 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply font-sans bg-background text-foreground;
+  }
+}
 
 html,body {
     margin: 0;
@@ -15,12 +22,12 @@ html,body {
     outline: none !important;
     box-shadow: none !important;
     ring: 0 !important;
-    border: 1.5px solid #949494;
-    color: black;
+    border: 1.5px solid #b7b7b7;
+    color: #161618;
     border-radius: 8px !important;
   }
-  .placeholder-black::placeholder {
-    color: black !important;
+  .inputSelectStyle::-webkit-input-placeholder {
+    color: #949494 !important;
   }
   .placeholder-gray::placeholder {
     color: #949494 !important;

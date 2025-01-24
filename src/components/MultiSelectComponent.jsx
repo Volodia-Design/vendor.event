@@ -73,7 +73,7 @@ export function MultiSelectComponent({
               </span>
             ))
           ) : (
-            <span className="text-black-800">{placeholder}</span>
+            <span className="text-black-200">{placeholder}</span>
           )}
           <img
             src="/Images/ComponentIcons/SelectArrow.svg"

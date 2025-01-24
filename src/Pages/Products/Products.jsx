@@ -18,6 +18,8 @@ export default function Products() {
   const { setIsLoading } = useLoading();
   const { serviceTypes } = useServiceTypes();
   const { eventTypes } = useEventTypes();
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [isEditMode, setIsEditMode] = useState({
     id: null,
     data: null,
@@ -28,7 +30,7 @@ export default function Products() {
   const getProductData = () => {
     setIsLoading(true);
     api
-      .get("/vendor-product")
+      .get(`/vendor-product?search=${searchTerm}`)
       .then((response) => {
         setAllProducts(response.data.data);
       })
@@ -39,6 +41,7 @@ export default function Products() {
         setIsLoading(false);
       });
   };
+  
 
   const [productData, setProductData] = useState({
     image: "",
@@ -282,7 +285,7 @@ export default function Products() {
 
   useEffect(() => {
     getProductData();
-  }, []);
+  }, [searchTerm]);
 
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">
@@ -326,11 +329,14 @@ export default function Products() {
         </p>
         <div className="flex items-center gap-3">
           <div className="search-container w-full">
-            <input
-              type="text"
-              placeholder="Search by product"
-              className="search-input"
-            />
+          <input
+  type="text"
+  placeholder="Search by product"
+  className="search-input"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
+
             <button className="search-button">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

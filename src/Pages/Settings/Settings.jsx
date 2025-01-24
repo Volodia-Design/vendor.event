@@ -26,18 +26,20 @@ export default function Settings() {
       .get("/auth/self")
       .then((res) => {
         const { vendor, fullName, email, phone, image } = res.data.data;
-      console.log("🚀 ~ .then ~ vendor:", vendor.socials)
-  
+        console.log("🚀 ~ .then ~ vendor:", vendor.socials);
+
         setFormData({
           position: vendor?.position || "",
           fullName: fullName || "",
           email: email || "",
           phone: phone || "",
           fullAddress: vendor?.address || "",
-          socialLinks: vendor?.socials?.length > 0 ? vendor.socials : [{ url: "" }],
+          socialLinks:
+            vendor?.socials?.length > 0 ? vendor.socials : [{ url: "" }],
           profileImage: "",
-          profileImagePreview: image ? `${api.defaults.baseURL}image/${image}` : null,
-
+          profileImagePreview: image
+            ? `${api.defaults.baseURL}image/${image}`
+            : null,
         });
       })
       .catch((err) => {
@@ -99,16 +101,16 @@ export default function Settings() {
   const addSocialLink = () => {
     // Get the first social link input
     const firstSocialLink = formData.socialLinks[0].url.trim();
-    
+
     // Only add if there's a non-empty value
     if (firstSocialLink) {
       setFormData({
         ...formData,
         // Add the current input as a new social link
         socialLinks: [
-          { url: "" },  // Reset first input to empty
-          ...formData.socialLinks.slice(0, 1),  // Keep the first input
-          { url: firstSocialLink }  // Add the current input as a new link
+          { url: "" }, // Reset first input to empty
+          ...formData.socialLinks.slice(0, 1), // Keep the first input
+          { url: firstSocialLink }, // Add the current input as a new link
         ],
       });
     }
@@ -127,7 +129,7 @@ export default function Settings() {
   const handleSubmit = (e) => {
     e.preventDefault();
     let newErrors = {};
-  
+
     // Existing validations
     if (!formData.fullName || formData.fullName.trim() === "") {
       newErrors.fullName = "Full name is required.";
@@ -135,38 +137,44 @@ export default function Settings() {
     if (!formData.email || formData.email.trim() === "") {
       newErrors.email = "Email is required.";
     }
-    if (!formData.phone || formData.phone.trim() === "" || formData.phone === "+") {
+    if (
+      !formData.phone ||
+      formData.phone.trim() === "" ||
+      formData.phone === "+"
+    ) {
       newErrors.phone = "Phone number is required.";
     }
-  
+
     // New validation for social links
-    const validSocialLinks = formData.socialLinks.filter(link => link.url.trim() !== "");
-    
+    const validSocialLinks = formData.socialLinks.filter(
+      (link) => link.url.trim() !== ""
+    );
+
     const formDataToSend = new FormData();
-  
+
     // User data
     formDataToSend.append("fullName", formData.fullName);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("phone", formData.phone);
-    
+
     if (formData.profileImage) {
       formDataToSend.append("file", formData.profileImage);
     }
-  
+
     const vendorData = {
       position: formData.position,
       address: formData.fullAddress,
-      socials: validSocialLinks, // Only send non-empty social links
+      socials: validSocialLinks,
     };
-    
+
     formDataToSend.append("vendor", JSON.stringify(vendorData));
-    
+
     setIsLoading(true);
     api
       .put("/auth/self", formDataToSend, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
       .then(() => {
         setErrors({});
@@ -202,15 +210,21 @@ export default function Settings() {
       setModalErrors(newErrors);
       return;
     }
+    const formDataToSend = new FormData();
+
+    formDataToSend.append("password", modalData.confirmPassword);
+    formDataToSend.append("phone", formData.phone);
+
     setIsLoading(true);
     api
-      .put("/auth/self", modalData.confirmPassword)
+      .put("/auth/self", formDataToSend)
       .then(() => {
         console.log("Password changed successfully");
         handleCloseModal();
       })
-      .catch((error) => {
-        console.error("Error changing password", error);
+      .catch(() => {
+        newErrors.confirmPassword = "Failed to change password.";
+        setModalErrors(newErrors);
       })
       .finally(() => {
         setIsLoading(false);
@@ -320,18 +334,18 @@ export default function Settings() {
           error={errors.fullAddress}
         />
 
-{formData.socialLinks.map((socialLink, index) => (
-  <div key={index} className="flex gap-2 items-center">
-    <InputComponent
-      id={`socialLink-${index}`}
-      label={index === 0 ? "Social Links" : undefined}
-      value={socialLink.url}
-      onChange={(value) => handleSocialLinkChange(index, value)}
-      className="flex-grow"
-      placeholderColorGray={true}
-      placeholder="Write Your Social Links"
-      error={errors.socialLinks?.[index]}
-    />
+        {formData.socialLinks.map((socialLink, index) => (
+          <div key={index} className="flex gap-2 items-center">
+            <InputComponent
+              id={`socialLink-${index}`}
+              label={index === 0 ? "Social Links" : undefined}
+              value={socialLink.url}
+              onChange={(value) => handleSocialLinkChange(index, value)}
+              className="flex-grow"
+              placeholderColorGray={true}
+              placeholder="Write Your Social Links"
+              error={errors.socialLinks?.[index]}
+            />
             {index === 0 ? (
               <div
                 onClick={addSocialLink}

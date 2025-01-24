@@ -117,52 +117,67 @@ export default function Products() {
       event_types: "",
       description: "",
     };
-
+  
     if (
       !productData.image ||
       (typeof productData.image === "string" && productData.image.trim() === "")
     ) {
       newErrors.image = "Image is required.";
     }
-
+  
     if (!productData.name || productData.name.trim() === "") {
       newErrors.name = "Product name is required.";
     }
-    if (!productData.stock || productData.stock.trim() === "") {
+  
+    if (
+      productData.stock === undefined || 
+      productData.stock === null || 
+      productData.stock === ""
+    ) {
       newErrors.stock = "Stock is required.";
     }
-    if (!productData.price || productData.price.trim() === "") {
+  
+    if (
+      productData.price === undefined || 
+      productData.price === null || 
+      productData.price === ""
+    ) {
       newErrors.price = "Price is required.";
     }
+  
     if (
-      !productData.service_type_id ||
+      !productData.service_type_id || 
       productData.service_type_id.trim() === ""
     ) {
       newErrors.service_type_id = "Type is required.";
     }
+  
     if (!productData.location || productData.location.trim() === "") {
       newErrors.location = "Location is required.";
     }
+  
     if (!productData.event_types.length) {
       newErrors.event_types = "At least one event type is required.";
     }
+  
     if (!productData.description || productData.description.trim() === "") {
       newErrors.description = "Short description is required.";
     }
+  
     setErrors(newErrors);
-
+  
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     const formDataToSend = new FormData();
-
+  
     formDataToSend.append("file", productData.image);
     formDataToSend.append("name", productData.name);
-    formDataToSend.append("stock", productData.stock);
-    formDataToSend.append("price", productData.price);
+    formDataToSend.append("stock", productData.stock); // Ensure this is numeric or string
+    formDataToSend.append("price", productData.price); // Ensure this is numeric or string
     formDataToSend.append("service_type_id", productData.service_type_id);
     formDataToSend.append("location", productData.location);
     formDataToSend.append(
@@ -170,7 +185,7 @@ export default function Products() {
       JSON.stringify(productData.event_types)
     ); // Convert array to JSON
     formDataToSend.append("description", productData.description);
-
+  
     let apiCall =
       isEditMode.id !== null
         ? api.put(`/vendor-product/${isEditMode.id}`, formDataToSend, {
@@ -183,7 +198,7 @@ export default function Products() {
               "Content-Type": "multipart/form-data",
             },
           });
-
+  
     apiCall
       .then(() => {
         getProductData();
@@ -196,6 +211,7 @@ export default function Products() {
         setIsLoading(false);
       });
   };
+  
 
   const renderCols = () => {
     return (

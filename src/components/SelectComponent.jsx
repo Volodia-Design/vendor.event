@@ -43,7 +43,9 @@ export function SelectComponent({
           }`}
         >
           <SelectValue 
-            placeholder={placeholder} 
+            placeholder={<div className="w-full">
+              {placeholder}
+            </div>} 
             className="text-black-200" 
           />
         </SelectTrigger>

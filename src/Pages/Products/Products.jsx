@@ -283,9 +283,13 @@ export default function Products() {
     });
   };
 
+  const handleSearch = () => {
+    getProductData();
+  };
+
   useEffect(() => {
     getProductData();
-  }, [searchTerm]);
+  }, []);
 
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">
@@ -337,7 +341,7 @@ export default function Products() {
   onChange={(e) => setSearchTerm(e.target.value)}
 />
 
-            <button className="search-button">
+            <button className="search-button" onClick={handleSearch}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

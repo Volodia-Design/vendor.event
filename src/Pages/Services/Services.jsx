@@ -314,7 +314,7 @@ export default function Services() {
                       <SelectComponent
                         id={`select-${service.id}`}
                         placeholder={
-                          <div className="flex justify-between lg:gap-48 gap-2 w-full">
+                          <div className="flex justify-between  w-full">
                             <span>{transformedService?.serviceName}</span>
                             <span>{transformedService?.priceRange}</span>
                           </div>

@@ -124,18 +124,20 @@ export default function Header() {
            <div className="w-full flex items-center justify-between p-4 bg-white">
         <p className="text-text1Medium text-primary2-500 uppercase">{activeTab}</p>
 
-          {user ? (
-            <div className="cursor-pointer flex items-center gap-2">
-              <img
-                src={imageUrl}
-                alt="User Profile"
-                className="w-8 h-8 rounded-full"
-              />
-              <p className="text-white">{user?.name}</p>
-            </div>
-          ) : (
-            <div className="text-white">Sign In</div>
-          )}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full border border-secondary-700 flex items-center justify-center">
+            <img
+              src="/Images/ComponentIcons/Notification.svg"
+              alt="notification"
+              className="w-6 h-6 cursor-pointer"
+            />
+          </div>
+          <img
+            src={imageUrl}
+            alt="profile"
+            className="w-10 h-10 rounded-full"
+          />
+        </div>
         </div>
       </div>
     </>

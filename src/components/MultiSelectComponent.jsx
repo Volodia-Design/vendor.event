@@ -54,14 +54,14 @@ export function MultiSelectComponent({
 
       <div className="relative">
         <div
-          className="mt-1 border rounded-lg p-2 min-h-[40px] flex items-center flex-wrap gap-1 cursor-pointer inputSelectStyle"
+          className="border rounded-lg p-2 min-h-[42px] flex items-center flex-wrap gap-1 cursor-pointer inputSelectStyle"
           onClick={() => setIsOpen(!isOpen)}
         >
           {selectedOptions.length > 0 ? (
             selectedOptions.map((option) => (
               <span
                 key={option.id}
-                className="bg-gray-100 px-2 py-1 rounded-md text-sm flex items-center gap-1"
+                className="bg-gray-100 px-2 rounded-md text-sm flex items-center gap-1"
               >
                 {option.name}
                 <button
@@ -79,7 +79,7 @@ export function MultiSelectComponent({
             src="/Images/ComponentIcons/SelectArrow.svg"
             alt="arrow"
             className={cn(
-              "ml-auto transition-transform w-4 h-4",
+              "ml-auto select-arrow transition-transform w-3 h-3",
               isOpen ? "rotate-180" : ""
             )}
           />

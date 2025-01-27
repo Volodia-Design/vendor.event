@@ -35,7 +35,7 @@ export function SelectComponent({
         id={id}
         value={value || ""} 
         onValueChange={handleValueChange}
-        className="rounded-lg bg-white"
+        className="rounded-lg bg-white h-[42px]"
       >
         <SelectTrigger
           className={`inputSelectStyle ${

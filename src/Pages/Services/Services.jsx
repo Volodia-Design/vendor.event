@@ -282,7 +282,7 @@ export default function Services() {
 
   return (
     <div className="w-full flex flex-col items-center gap-3">
-      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg px-8">
+      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg md:px-8">
         <div className="flex items-center justify-between w-full">
           <p className="text-text2Medium uppercase">My Services</p>
           <Button
@@ -314,7 +314,7 @@ export default function Services() {
                       <SelectComponent
                         id={`select-${service.id}`}
                         placeholder={
-                          <div className="flex justify-between lg:gap-48 gap-2 w-full">
+                          <div className="flex justify-between lg:gap-28 gap-2 w-full">
                             <span>{transformedService?.serviceName}</span>
                             <span>{transformedService?.priceRange}</span>
                           </div>
@@ -324,7 +324,7 @@ export default function Services() {
                             ? transformedService.specifications.map((spec) => ({
                                 id: `${spec.id}`,
                                 name: (
-                                  <div className="flex justify-between lg:gap-44 gap-2 w-full">
+                                  <div className="flex justify-between lg:gap-28 gap-2 w-full">
                                     <span>{spec.name}</span>
                                     <span>{spec.price}$</span>
                                   </div>
@@ -342,14 +342,25 @@ export default function Services() {
                         }}
                       />
                       <div
-                        className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
+                        className="bg-primary2-50 inputSelectStyle w-[42px] rounded-full flex items-center justify-center cursor-pointer"
                         onClick={() => handleEdit(service)}
                       >
                         <img
                           src="/Images/ComponentIcons/Edit.svg"
                           alt="edit"
-                          width={24}
-                          height={24}
+                          className="w-6 h-6 cursor-pointer"
+
+                        />
+                      </div>
+                      <div
+                        className="delete-button inputSelectStyle w-[42px] rounded-full flex items-center justify-center cursor-pointer"
+                        onClick={() => handleEdit(service)}
+                      >
+                        <img
+                          src="/Images/ComponentIcons/Delete.svg"
+                          alt="delete "
+                          className="w-6 h-6 cursor-pointer"
+
                         />
                       </div>
                     </div>
@@ -367,7 +378,7 @@ export default function Services() {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white p-6 rounded-lg w-[640px] relative animate-fadeIn shadow-lg"
+            className="bg-white p-8 px-12 rounded-lg w-[640px] relative animate-fadeIn shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -392,12 +403,12 @@ export default function Services() {
             </button>
 
             {/* Modal header */}
-            <p className="uppercase text-h4 text-primary2-500 mb-6 pr-8 text-center">
+            <p className="uppercase text-h3 text-primary2-500 mb-6 pr-8 text-center">
               {isEditMode.id ? "Edit a Service" : "Create a Service"}
             </p>
 
             {/* Form content */}
-            <form className="w-full flex flex-col gap-2">
+            <form className="w-full flex flex-col gap-5">
               <MultiSelectComponent
                 id="location"
                 label="Location *"
@@ -429,7 +440,7 @@ export default function Services() {
                   <label className="text-text4Medium text-black-400">
                     Price Range *
                   </label>
-                  <div className="flex items-center justify-start pl-3 w-full h-10 rounded-lg cursor-pointer inputSelectStyle">
+                  <div className="flex items-center justify-start pl-3 w-full h-[42px] rounded-lg cursor-pointer inputSelectStyle">
                     <p
                       className={`${
                         calculatePriceRange(serviceData.service_specifications)

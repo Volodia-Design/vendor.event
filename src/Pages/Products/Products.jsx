@@ -41,7 +41,6 @@ export default function Products() {
         setIsLoading(false);
       });
   };
-  
 
   const [productData, setProductData] = useState({
     image: "",
@@ -120,63 +119,63 @@ export default function Products() {
       event_types: "",
       description: "",
     };
-  
+
     if (
       !productData.image ||
       (typeof productData.image === "string" && productData.image.trim() === "")
     ) {
       newErrors.image = "Image is required.";
     }
-  
+
     if (!productData.name || productData.name.trim() === "") {
       newErrors.name = "Product name is required.";
     }
-  
+
     if (
-      productData.stock === undefined || 
-      productData.stock === null || 
+      productData.stock === undefined ||
+      productData.stock === null ||
       productData.stock === ""
     ) {
       newErrors.stock = "Stock is required.";
     }
-  
+
     if (
-      productData.price === undefined || 
-      productData.price === null || 
+      productData.price === undefined ||
+      productData.price === null ||
       productData.price === ""
     ) {
       newErrors.price = "Price is required.";
     }
-  
+
     if (
-      !productData.service_type_id || 
+      !productData.service_type_id ||
       productData.service_type_id.trim() === ""
     ) {
       newErrors.service_type_id = "Type is required.";
     }
-  
+
     if (!productData.location || productData.location.trim() === "") {
       newErrors.location = "Location is required.";
     }
-  
+
     if (!productData.event_types.length) {
       newErrors.event_types = "At least one event type is required.";
     }
-  
+
     if (!productData.description || productData.description.trim() === "") {
       newErrors.description = "Short description is required.";
     }
-  
+
     setErrors(newErrors);
-  
+
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     const formDataToSend = new FormData();
-  
+
     formDataToSend.append("file", productData.image);
     formDataToSend.append("name", productData.name);
     formDataToSend.append("stock", productData.stock); // Ensure this is numeric or string
@@ -188,7 +187,7 @@ export default function Products() {
       JSON.stringify(productData.event_types)
     ); // Convert array to JSON
     formDataToSend.append("description", productData.description);
-  
+
     let apiCall =
       isEditMode.id !== null
         ? api.put(`/vendor-product/${isEditMode.id}`, formDataToSend, {
@@ -201,7 +200,7 @@ export default function Products() {
               "Content-Type": "multipart/form-data",
             },
           });
-  
+
     apiCall
       .then(() => {
         getProductData();
@@ -214,7 +213,6 @@ export default function Products() {
         setIsLoading(false);
       });
   };
-  
 
   const renderCols = () => {
     return (
@@ -253,12 +251,18 @@ export default function Products() {
         <td className="p-4 text-text3 text-black-300">
           {serviceTypes.find((type) => type.id === item.service_type_id)?.name}
         </td>
-        <td className="p-4 flex items-center justify-center">
+        <td className="p-4 flex gap-2 items-center justify-center">
           <img
             src="/Images/ComponentIcons/EditColored.svg"
             alt="Edit"
             className="w-6 h-6 cursor-pointer"
             onClick={() => handleEdit(item)}
+          />
+          <img
+            src="/Images/ComponentIcons/Delete.svg"
+            alt="delete"
+            className="w-6 h-6 cursor-pointer"
+            onClick={() => handleDelete(item)}
           />
         </td>
       </tr>
@@ -281,6 +285,10 @@ export default function Products() {
       description: item.description,
       image: `${api.defaults.baseURL}image/${item.image}`,
     });
+  };
+
+  const handleDelete = (item) => {
+    console.log(item);
   };
 
   const handleSearch = () => {
@@ -333,13 +341,13 @@ export default function Products() {
         </p>
         <div className="flex items-center gap-3">
           <div className="search-container w-full">
-          <input
-  type="text"
-  placeholder="Search by product"
-  className="search-input"
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-/>
+            <input
+              type="text"
+              placeholder="Search by product"
+              className="search-input h-[42px]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
 
             <button className="search-button" onClick={handleSearch}>
               <svg
@@ -383,7 +391,7 @@ export default function Products() {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white p-6 px-12 rounded-lg w-[70rem] relative animate-fadeIn shadow-lg  max-h-[90vh] overflow-y-auto"
+            className="bg-white p-6 px-12 rounded-lg w-[70rem] relative animate-fadeIn shadow-lg  max-h-[99vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -408,18 +416,18 @@ export default function Products() {
             </button>
 
             {/* Modal header */}
-            <p className="uppercase text-h4 text-primary2-500 mb-6 text-center">
-              {isEditMode.id !== null ? "Edit a Product" : "Create a Product"}{" "}
+            <p className="uppercase text-h3 text-primary2-500 mb-6  text-center">
+              {isEditMode.id !== null ? "Edit a Product" : "Create a Product"}
             </p>
 
-            <form className="mt-4 flex flex-col gap-4">
+            <form className="w-full flex flex-col gap-5 px-8 py-5">
               {/* Image Upload */}
               <ImageUpload
                 setImage={(file) =>
                   setProductData((prev) => ({ ...prev, image: file }))
                 }
                 image={productData.image}
-                editMode={!!isEditMode} 
+                editMode={!!isEditMode}
                 error={errors.image}
               />
 

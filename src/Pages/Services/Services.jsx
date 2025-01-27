@@ -10,6 +10,7 @@ import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import api from "../../utils/api";
 import useServiceTypes from "../../store/data/useServiceTypes";
 import useLoading from "../../store/useLoading";
+import useModal from "../../store/useModal";
 
 export default function Services() {
   const { setIsLoading } = useLoading();
@@ -18,6 +19,7 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [transformed, setTransformed] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
+  const { showSuccess, showError } = useModal();
   const [isEditMode, setIsEditMode] = useState({
     id: null,
     data: null,
@@ -215,7 +217,6 @@ export default function Services() {
 
   const saveData = (e) => {
     e.preventDefault();
-    setIsLoading(true);
     let newErrors = {
       location: "",
       service_type_id: "",
@@ -262,14 +263,17 @@ export default function Services() {
     let apiCall = isEditMode.id
       ? api.put(`/vendor-service/${isEditMode.id}`, serviceData)
       : api.post("/vendor-service", serviceData);
+      setIsLoading(true);
 
     apiCall
       .then(() => {
         getServices();
         handleCloseModal();
+        showSuccess();
       })
       .catch((error) => {
         console.error("Error saving data:", error);
+        showError();
       })
       .finally(() => {
         setIsLoading(false);
@@ -465,7 +469,7 @@ export default function Services() {
                   id="specification-0"
                   label={
                     <div className="flex items-center gap-2">
-                      <span>Specification *</span>
+                      <span>Specification</span>
                       <Info
                         data-tooltip-id="specificationTooltip"
                         className="w-5 h-5 text-secondary-800 cursor-pointer"

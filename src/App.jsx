@@ -13,11 +13,26 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "react-tooltip/dist/react-tooltip.css";
 import Loader from "./components/Loader";
+import useModal from "./store/useModal";
+import { ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComponent";
 
 function App() {
+  const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError } = useModal();
+
   return (
     <Router>
       <Loader />
+      {isOpen && content && (
+          <ModalComponent isOpen={isOpen} onClose={onClose} content={content} />
+        )}
+         <SuccessModal 
+        isOpen={isSuccessOpen}
+        onClose={closeSuccess}
+      />
+      <ErrorModal 
+        isOpen={isErrorOpen}
+        onClose={closeError}
+      />
       <Routes>
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />

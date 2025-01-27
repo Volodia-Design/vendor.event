@@ -10,6 +10,7 @@ import useLoading from "../../store/useLoading";
 import api from "../../utils/api";
 import useServiceTypes from "../../store/data/useServiceTypes";
 import useEventTypes from "../../store/data/useEventTypes";
+import useModal from "../../store/useModal";
 
 export default function Products() {
   const location = useLocation();
@@ -19,6 +20,7 @@ export default function Products() {
   const { serviceTypes } = useServiceTypes();
   const { eventTypes } = useEventTypes();
   const [searchTerm, setSearchTerm] = useState("");
+  const { showSuccess, showError } = useModal();
 
   const [isEditMode, setIsEditMode] = useState({
     id: null,
@@ -205,9 +207,11 @@ export default function Products() {
       .then(() => {
         getProductData();
         handleCloseModal();
+        showSuccess();
       })
       .catch((error) => {
         console.error("Error saving data:", error);
+        showError();
       })
       .finally(() => {
         setIsLoading(false);
@@ -333,13 +337,13 @@ export default function Products() {
       </div>
 
       {/* Main Content */}
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex lg:items-center lg:flex-row justify-between flex-col items-start">
         <p className="text-text2Medium uppercase">
           {location.pathname === "/products/product-store"
             ? "Products"
             : "Order History"}
         </p>
-        <div className="flex items-center gap-3">
+        <div className="flex md:items-center gap-3 flex-col md:flex-row items-start lg:mt-0 mt-4">
           <div className="search-container w-full">
             <input
               type="text"
@@ -380,7 +384,7 @@ export default function Products() {
         </div>
       </div>
       {/* Table */}
-      <div className="mt-6">
+      <div className="mt-6 overflow-auto">
         {location.pathname === "/products/product-store" && (
           <TableComponent renderCols={renderCols} renderRows={renderRows} />
         )}

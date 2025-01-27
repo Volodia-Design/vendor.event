@@ -4,12 +4,14 @@ import { InputComponent } from "../../components/InputComponent";
 import Button from "../../components/Button";
 import ImageUpload from "../../components/ImageUpload";
 import useLoading from "../../store/useLoading";
+import useModal from "../../store/useModal";
 
 export default function Settings() {
   const { setIsLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [temporaryImage, setTemporaryImage] = useState(null);
+  const { showSuccess, showError } = useModal();
 
   const [formData, setFormData] = useState({
     position: "",
@@ -179,9 +181,11 @@ export default function Settings() {
       .then(() => {
         setErrors({});
         setModalErrors({});
+        showSuccess()
       })
       .catch((error) => {
         console.error("Error updating settings", error);
+        showError();
       })
       .finally(() => {
         setIsLoading(false);
@@ -221,10 +225,12 @@ export default function Settings() {
       .then(() => {
         console.log("Password changed successfully");
         handleCloseModal();
+        showSuccess();
       })
       .catch(() => {
         newErrors.confirmPassword = "Failed to change password.";
         setModalErrors(newErrors);
+        showError();
       })
       .finally(() => {
         setIsLoading(false);

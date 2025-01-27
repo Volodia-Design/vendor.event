@@ -10,9 +10,6 @@ import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import api from "../../utils/api";
 import useServiceTypes from "../../store/data/useServiceTypes";
 import useLoading from "../../store/useLoading";
-import useModal from "../../store/useModal";
-import ServiceCrud from "./ServiceCrud";
-import { useNavigate } from "react-router-dom";
 
 export default function Services() {
   const { setIsLoading } = useLoading();
@@ -21,8 +18,6 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [transformed, setTransformed] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
-  const { showSuccess, showError, onOpen } = useModal();
-  const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState({
     id: null,
     data: null,
@@ -187,7 +182,6 @@ export default function Services() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setIsEditMode({ id: null, data: null });
     setServiceData({
       location: "",
       service_type_id: "",
@@ -219,16 +213,9 @@ export default function Services() {
     service_specifications: [],
   });
 
-  const handleCRUDService = (type) => {
-    setIsModalOpen(true);
-    // if (type === "desktop1") {
-    // } else {
-    //   navigate(`/service/create`);
-    // }
-  };
-
   const saveData = (e) => {
     e.preventDefault();
+    setIsLoading(true);
     let newErrors = {
       location: "",
       service_type_id: "",
@@ -275,17 +262,14 @@ export default function Services() {
     let apiCall = isEditMode.id
       ? api.put(`/vendor-service/${isEditMode.id}`, serviceData)
       : api.post("/vendor-service", serviceData);
-    setIsLoading(true);
 
     apiCall
       .then(() => {
         getServices();
         handleCloseModal();
-        showSuccess();
       })
       .catch((error) => {
         console.error("Error saving data:", error);
-        showError();
       })
       .finally(() => {
         setIsLoading(false);
@@ -298,13 +282,13 @@ export default function Services() {
 
   return (
     <div className="w-full flex flex-col items-center gap-3">
-      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg md:px-8">
+      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg px-8">
         <div className="flex items-center justify-between w-full">
           <p className="text-text2Medium uppercase">My Services</p>
           <Button
             text="Create a Service"
             buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2"
-            onClick={() => handleCRUDService("desktop")}
+            onClick={() => setIsModalOpen(true)}
           />
         </div>
         {/* Swiper Component */}
@@ -330,7 +314,7 @@ export default function Services() {
                       <SelectComponent
                         id={`select-${service.id}`}
                         placeholder={
-                          <div className="flex justify-between lg:gap-28 gap-2 w-full">
+                          <div className="flex justify-between lg:gap-48 gap-2 w-full">
                             <span>{transformedService?.serviceName}</span>
                             <span>{transformedService?.priceRange}</span>
                           </div>
@@ -340,7 +324,7 @@ export default function Services() {
                             ? transformedService.specifications.map((spec) => ({
                                 id: `${spec.id}`,
                                 name: (
-                                  <div className="flex justify-between lg:gap-28 gap-2 w-full">
+                                  <div className="flex justify-between lg:gap-44 gap-2 w-full">
                                     <span>{spec.name}</span>
                                     <span>{spec.price}$</span>
                                   </div>
@@ -358,25 +342,16 @@ export default function Services() {
                         }}
                       />
                       <div
-                        className="bg-primary2-50 inputSelectStyle w-[42px] rounded-full flex items-center justify-center cursor-pointer"
+                        className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
                         onClick={() => handleEdit(service)}
                       >
                         <img
                           src="/Images/ComponentIcons/Edit.svg"
                           alt="edit"
-                          className="w-6 h-6 cursor-pointer"
+                          width={24}
+                          height={24}
                         />
                       </div>
-                      {/* <div
-                        className="delete-button inputSelectStyle w-[42px] rounded-full flex items-center justify-center cursor-pointer"
-                        onClick={() => handleEdit(service)}
-                      >
-                        <img
-                          src="/Images/ComponentIcons/Delete.svg"
-                          alt="delete "
-                          className="w-6 h-6 cursor-pointer"
-                        />
-                      </div> */}
                     </div>
                   );
                 })}
@@ -392,7 +367,7 @@ export default function Services() {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white p-8 px-12 rounded-lg w-[640px] relative animate-fadeIn shadow-lg"
+            className="bg-white p-6 rounded-lg w-[640px] relative animate-fadeIn shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -417,12 +392,12 @@ export default function Services() {
             </button>
 
             {/* Modal header */}
-            <p className="uppercase text-h3 text-primary2-500 mb-6 pr-8 text-center">
+            <p className="uppercase text-h4 text-primary2-500 mb-6 pr-8 text-center">
               {isEditMode.id ? "Edit a Service" : "Create a Service"}
             </p>
 
             {/* Form content */}
-            <form className="w-full flex flex-col gap-5">
+            <form className="w-full flex flex-col gap-2">
               <MultiSelectComponent
                 id="location"
                 label="Location *"
@@ -454,7 +429,7 @@ export default function Services() {
                   <label className="text-text4Medium text-black-400">
                     Price Range *
                   </label>
-                  <div className="flex items-center justify-start pl-3 w-full h-[42px] rounded-lg cursor-pointer inputSelectStyle">
+                  <div className="flex items-center justify-start pl-3 w-full h-10 rounded-lg cursor-pointer inputSelectStyle">
                     <p
                       className={`${
                         calculatePriceRange(serviceData.service_specifications)
@@ -479,7 +454,7 @@ export default function Services() {
                   id="specification-0"
                   label={
                     <div className="flex items-center gap-2">
-                      <span>Specification</span>
+                      <span>Specification *</span>
                       <Info
                         data-tooltip-id="specificationTooltip"
                         className="w-5 h-5 text-secondary-800 cursor-pointer"

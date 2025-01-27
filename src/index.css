@@ -18,6 +18,10 @@ html,body {
 .\[\&\>span\]\:line-clamp-1>span{
   width: 100%;
 }
+[id^="radix-"] {
+  width: 100%;
+}
+
 [data-state="open"] .select-arrow {
   transform: rotate(180deg);
 }

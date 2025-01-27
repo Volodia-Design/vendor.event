@@ -43,10 +43,10 @@ export function SelectComponent({
           }`}
         >
           <SelectValue 
-            placeholder={<div className="w-full flex items-center justify-between px-4">
+            placeholder={<div className="w-full px-4">
               {placeholder}
             </div>} 
-            className="text-black-200 w-full" 
+            className="text-black-200" 
           />
         </SelectTrigger>
 
@@ -55,7 +55,7 @@ export function SelectComponent({
             <SelectItem
               key={option.id}
               value={option.id.toString()} 
-              className="focus:bg-gray-100 focus:text-black cursor-pointer hover:bg-gray-100"
+              className="focus:bg-gray-100 focus:text-black cursor-pointer hover:bg-gray-100 px-4"
             >
               {option.name}
             </SelectItem>

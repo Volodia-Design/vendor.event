@@ -396,7 +396,7 @@ export default function Products() {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white p-6 px-12 rounded-lg w-[60rem] relative animate-fadeIn shadow-lg  max-h-[99vh] overflow-y-auto"
+            className="bg-white p-6 px-12 rounded-lg w-[50rem] relative animate-fadeIn shadow-lg  max-h-[99vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}

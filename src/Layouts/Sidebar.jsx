@@ -32,7 +32,7 @@ export default function Sidebar() {
   
 
   return (
-    <div className="p-4 h-full w-full max-w-80">
+    <div className="hidden lg:block p-4 h-full w-full max-w-80">
       <div
         className={`bg-primary2-900 h-full pl-4 py-4 rounded-md flex flex-col justify-between`}
       >

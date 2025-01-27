@@ -16,7 +16,7 @@ export default function Services() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { serviceTypes } = useServiceTypes();
   const [services, setServices] = useState([]);
-  const [transformed, setTransformed] = useState([])
+  const [transformed, setTransformed] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
   const [isEditMode, setIsEditMode] = useState({
     id: null,
@@ -29,8 +29,6 @@ export default function Services() {
     { id: 4, name: "Tokyo" },
     { id: 5, name: "Sydney" },
   ];
-
-
 
   const getServices = () => {
     setIsLoading(true);
@@ -52,16 +50,25 @@ export default function Services() {
           id: service.id,
           location: service.location,
           serviceName: service.service_type.name,
-          priceRange: service.service_specifications.length > 0 
-            ? `${Math.min(...service.service_specifications.map(spec => parseFloat(spec.price)))}$ - 
-               ${Math.max(...service.service_specifications.map(spec => parseFloat(spec.price)))}$` 
-            : 'N/A',
-          specifications: service.service_specifications.map(spec => ({
+          priceRange:
+            service.service_specifications.length > 0
+              ? `${Math.min(
+                  ...service.service_specifications.map((spec) =>
+                    parseFloat(spec.price)
+                  )
+                )}$ - 
+               ${Math.max(
+                 ...service.service_specifications.map((spec) =>
+                   parseFloat(spec.price)
+                 )
+               )}$`
+              : "N/A",
+          specifications: service.service_specifications.map((spec) => ({
             ...spec,
-            price: String(spec.price)
-          }))
+            price: String(spec.price),
+          })),
         }));
-        setTransformed(transformedServices)
+        setTransformed(transformedServices);
       })
       .catch((error) => {
         console.error(error);
@@ -93,7 +100,6 @@ export default function Services() {
       ),
     }));
   };
-
 
   const chunkedSelects = [];
   for (let i = 0; i < services.length; i += 6) {
@@ -293,65 +299,65 @@ export default function Services() {
           pagination={{ clickable: true }}
           className="w-full !pb-10"
         >
-{chunkedSelects.map((chunk, index) => (
-  <SwiperSlide key={index}>
-    <div className="grid grid-cols-3 gap-4 mt-6">
-      {chunk.map((service) => {
-        const transformedService = transformed.find(t => t.id === service.id);
-        console.log("Service:", service);
-        console.log("Transformed Service:", transformedService);
-        
-        return (
-          <div
-            key={service.id}
-            className="flex gap-2 items-center justify-between w-full"
-          >
-            <SelectComponent
-              id={`select-${service.id}`}
-              placeholder={
-                <div className="flex justify-between gap-48 w-full">
-                  <span>{transformedService?.serviceName}</span>
-                  <span>{transformedService?.priceRange}</span>
-                </div>
-              }
-                        options={transformedService ? 
-                transformedService.specifications.map(spec => ({
-                  id: `${spec.id}`,
-                  name: (
-                    <div className="flex justify-between gap-44 w-full">
-                      <span>{spec.name}</span>
-                      <span>{spec.price}$</span>
+          {chunkedSelects.map((chunk, index) => (
+            <SwiperSlide key={index}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+                {chunk.map((service) => {
+                  const transformedService = transformed.find(
+                    (t) => t.id === service.id
+                  );
+                  return (
+                    <div
+                      key={service.id}
+                      className="flex gap-2 items-center justify-between w-full"
+                    >
+                      <SelectComponent
+                        id={`select-${service.id}`}
+                        placeholder={
+                          <div className="flex justify-between lg:gap-48 gap-2 w-full">
+                            <span>{transformedService?.serviceName}</span>
+                            <span>{transformedService?.priceRange}</span>
+                          </div>
+                        }
+                        options={
+                          transformedService
+                            ? transformedService.specifications.map((spec) => ({
+                                id: `${spec.id}`,
+                                name: (
+                                  <div className="flex justify-between lg:gap-44 gap-2 w-full">
+                                    <span>{spec.name}</span>
+                                    <span>{spec.price}$</span>
+                                  </div>
+                                ),
+                              }))
+                            : []
+                        }
+                        className="w-full"
+                        value={selectedServices[service.id] || ""}
+                        onChange={(value) => {
+                          setSelectedServices((prev) => ({
+                            ...prev,
+                            [service.id]: value,
+                          }));
+                        }}
+                      />
+                      <div
+                        className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
+                        onClick={() => handleEdit(service)}
+                      >
+                        <img
+                          src="/Images/ComponentIcons/Edit.svg"
+                          alt="edit"
+                          width={24}
+                          height={24}
+                        />
+                      </div>
                     </div>
-                  )
-                })) 
-                : []
-              }
-              className="w-full"
-              value={selectedServices[service.id] || ''}
-              onChange={(value) => {
-                setSelectedServices(prev => ({
-                  ...prev,
-                  [service.id]: value
-                }));
-              }}
-            />
-            <div
-              className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
-              onClick={() => handleEdit(service)}
-            >
-              <img
-                src="/Images/ComponentIcons/Edit.svg"
-                alt="edit"
-                width={24}
-                height={24}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  </SwiperSlide>
-))}
+                  );
+                })}
+              </div>
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
 

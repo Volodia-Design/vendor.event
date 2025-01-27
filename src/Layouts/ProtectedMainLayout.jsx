@@ -30,7 +30,7 @@ function ProtectedMainLayout() {
   return (
     <div className="flex w-full h-screen">
       <Sidebar />
-      <div className="p-4 w-full flex flex-col items-center overflow-auto">
+      <div className="lg:p-4 w-full flex flex-col items-center overflow-auto">
         <Header />
         <div className="mt-8 w-full">
           <Outlet />

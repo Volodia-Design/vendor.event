@@ -367,7 +367,7 @@ export default function Services() {
                           className="w-6 h-6 cursor-pointer"
                         />
                       </div>
-                      <div
+                      {/* <div
                         className="delete-button inputSelectStyle w-[42px] rounded-full flex items-center justify-center cursor-pointer"
                         onClick={() => handleEdit(service)}
                       >
@@ -376,7 +376,7 @@ export default function Services() {
                           alt="delete "
                           className="w-6 h-6 cursor-pointer"
                         />
-                      </div>
+                      </div> */}
                     </div>
                   );
                 })}

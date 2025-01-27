@@ -263,12 +263,12 @@ export default function Products() {
             className="w-6 h-6 cursor-pointer"
             onClick={() => handleEdit(item)}
           />
-          <img
+          {/* <img
             src="/Images/ComponentIcons/Delete.svg"
             alt="delete"
             className="w-6 h-6 cursor-pointer"
             onClick={() => handleDelete(item)}
-          />
+          /> */}
         </td>
       </tr>
     ));

@@ -15,6 +15,7 @@ import "react-tooltip/dist/react-tooltip.css";
 import Loader from "./components/Loader";
 import useModal from "./store/useModal";
 import { ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComponent";
+import ServiceCrud from "./Pages/Services/ServiceCrud";
 
 function App() {
   const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError } = useModal();
@@ -37,6 +38,8 @@ function App() {
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/service/create" element={<ServiceCrud />} />
+          <Route path="/service/edit/:id" element={<ServiceCrud />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/products/product-store" element={<Products />} />
           <Route path="/products/order-history" element={<Products />} />

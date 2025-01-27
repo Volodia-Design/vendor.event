@@ -11,6 +11,8 @@ import api from "../../utils/api";
 import useServiceTypes from "../../store/data/useServiceTypes";
 import useLoading from "../../store/useLoading";
 import useModal from "../../store/useModal";
+import ServiceCrud from "./ServiceCrud";
+import { useNavigate } from "react-router-dom";
 
 export default function Services() {
   const { setIsLoading } = useLoading();
@@ -19,7 +21,8 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [transformed, setTransformed] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
-  const { showSuccess, showError } = useModal();
+  const { showSuccess, showError, onOpen } = useModal();
+  const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState({
     id: null,
     data: null,
@@ -184,6 +187,7 @@ export default function Services() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setIsEditMode({ id: null, data: null });
     setServiceData({
       location: "",
       service_type_id: "",
@@ -214,6 +218,14 @@ export default function Services() {
     service_type_id: "",
     service_specifications: [],
   });
+
+  const handleCRUDService = (type) => {
+    setIsModalOpen(true);
+    // if (type === "desktop1") {
+    // } else {
+    //   navigate(`/service/create`);
+    // }
+  };
 
   const saveData = (e) => {
     e.preventDefault();
@@ -263,7 +275,7 @@ export default function Services() {
     let apiCall = isEditMode.id
       ? api.put(`/vendor-service/${isEditMode.id}`, serviceData)
       : api.post("/vendor-service", serviceData);
-      setIsLoading(true);
+    setIsLoading(true);
 
     apiCall
       .then(() => {
@@ -292,7 +304,7 @@ export default function Services() {
           <Button
             text="Create a Service"
             buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => handleCRUDService("desktop")}
           />
         </div>
         {/* Swiper Component */}
@@ -353,7 +365,6 @@ export default function Services() {
                           src="/Images/ComponentIcons/Edit.svg"
                           alt="edit"
                           className="w-6 h-6 cursor-pointer"
-
                         />
                       </div>
                       <div
@@ -364,7 +375,6 @@ export default function Services() {
                           src="/Images/ComponentIcons/Delete.svg"
                           alt="delete "
                           className="w-6 h-6 cursor-pointer"
-
                         />
                       </div>
                     </div>

@@ -65,6 +65,7 @@ export default function Products() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setIsEditMode({ id: null, data: null });
     setProductData({
       image: "",
       name: "",

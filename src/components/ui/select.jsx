@@ -21,11 +21,6 @@ const SelectTrigger = React.forwardRef(
       {...props}
     >
       {children}
-      <img
-        src="/Images/ComponentIcons/SelectArrow.svg"
-        alt="arrow"
-        className="h-3 w-3 transition-transform duration-200 select-arrow data-[state=open]:rotate-180"
-      />
     </SelectPrimitive.Trigger>
   )
 );

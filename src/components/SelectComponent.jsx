@@ -5,6 +5,8 @@ import {
   SelectContent,
   SelectItem,
 } from "../components/ui/select";
+import { cn } from "../utils"; // Add this import
+import * as React from "react"; // Add this import
 
 export function SelectComponent({
   id,
@@ -17,6 +19,8 @@ export function SelectComponent({
   withoutLabelMargin,
   error,
 }) {
+  const [isOpen, setIsOpen] = React.useState(false); // Add state for arrow rotation
+
   const handleValueChange = (newValue) => {
     if (onChange && newValue) {
       onChange(newValue);
@@ -36,17 +40,24 @@ export function SelectComponent({
         value={value || ""} 
         onValueChange={handleValueChange}
         className="rounded-lg bg-white h-[42px]"
+        onOpenChange={(open) => setIsOpen(open)} // Add this to handle open state
       >
         <SelectTrigger
           className={`inputSelectStyle ${
             withoutLabelMargin ? "mt-0" : "mt-1"
-          }`}
+          } flex items-center justify-between`}
         >
           <SelectValue 
-            placeholder={<div className="w-full px-4">
-              {placeholder}
-            </div>} 
-            className="text-black-200" 
+            placeholder={placeholder} 
+            className="text-black-200 text-text4 lg:text-text3" 
+          />
+          <img
+            src="/Images/ComponentIcons/SelectArrow.svg"
+            alt="arrow"
+            className={cn(
+              "select-arrow transition-transform w-3 h-3",
+              isOpen ? "rotate-180" : ""
+            )}
           />
         </SelectTrigger>
 

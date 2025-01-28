@@ -5,14 +5,14 @@ import {
 } from "../components/ui/dialog"
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { CheckCircle, XCircle } from 'lucide-react' // Assuming you're using lucide icons
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
-// Regular Modal Component (unchanged)
 export function ModalComponent({ 
   isOpen = false,
   onClose,
   content,
-  title
+  title,
+  className = "",
 }) {
   if (!isOpen) return null;
   
@@ -20,7 +20,7 @@ export function ModalComponent({
     <>
       <div className="fixed inset-0 bg-black-900/80 z-40" />
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent>
+        <DialogContent className={`${className}  max-h-[99vh]`}>
           <VisuallyHidden>
             <DialogTitle>{title}</DialogTitle>
           </VisuallyHidden>

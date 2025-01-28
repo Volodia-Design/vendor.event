@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check } from "lucide-react"; 
+import { Check } from "lucide-react";
 import { cn } from "../utils";
 
 export function MultiSelectComponent({
@@ -54,7 +54,7 @@ export function MultiSelectComponent({
 
       <div className="relative">
         <div
-          className="border rounded-lg p-2 min-h-[42px] flex items-center flex-wrap gap-1 cursor-pointer inputSelectStyle"
+          className="border rounded-lg p-2 flex items-start flex-wrap gap-1 cursor-pointer inputSelectStyle min-h-[42px]"
           onClick={() => setIsOpen(!isOpen)}
         >
           {selectedOptions.length > 0 ? (
@@ -73,13 +73,15 @@ export function MultiSelectComponent({
               </span>
             ))
           ) : (
-            <span className="text-black-200">{placeholder}</span>
+            <span className="text-black-200 text-text4 lg:text-text3">
+              {placeholder}
+            </span>
           )}
           <img
             src="/Images/ComponentIcons/SelectArrow.svg"
             alt="arrow"
             className={cn(
-              "ml-auto select-arrow transition-transform w-3 h-3",
+              "absolute top-4 right-2 transition-transform w-3 h-3",
               isOpen ? "rotate-180" : ""
             )}
           />
@@ -109,7 +111,7 @@ export function MultiSelectComponent({
       </div>
 
       {error && (
-        <p className="text-red-500 text-4Medium">{error}</p>
+        <p className="text-red-500 text-text4Medium">{error}</p>
       )}
     </div>
   );

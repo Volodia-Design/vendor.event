@@ -18,13 +18,13 @@ import { ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComp
 import ServiceCrud from "./Pages/Services/ServiceCrud";
 
 function App() {
-  const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError } = useModal();
+  const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className } = useModal();
 
   return (
     <Router>
       <Loader />
       {isOpen && content && (
-          <ModalComponent isOpen={isOpen} onClose={onClose} content={content} />
+          <ModalComponent isOpen={isOpen} onClose={onClose} content={content} className={className} />
         )}
          <SuccessModal 
         isOpen={isSuccessOpen}
@@ -38,8 +38,7 @@ function App() {
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/service/create" element={<ServiceCrud />} />
-          <Route path="/service/edit/:id" element={<ServiceCrud />} />
+          <Route path="/service/crud" element={<ServiceCrud />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/products/product-store" element={<Products />} />
           <Route path="/products/order-history" element={<Products />} />

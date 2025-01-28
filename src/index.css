@@ -17,14 +17,14 @@ html,body {
 }
 .\[\&\>span\]\:line-clamp-1>span{
   width: 100%;
+  display: flex!important;
+  justify-content: start;
 }
 [id^="radix-"] {
   width: 100%;
 }
 
-[data-state="open"] .select-arrow {
-  transform: rotate(180deg);
-}
+
 .inputSelectStyle {
     outline: none !important;
     box-shadow: none !important;
@@ -32,7 +32,7 @@ html,body {
     border: 1.5px solid #b7b7b7;
     color: #161618;
     border-radius: 8px !important;
-    height: 42px!important;
+    min-height: 42px!important;
   }
   .inputSelectStyle::-webkit-input-placeholder {
     color: #949494 !important;
@@ -166,5 +166,14 @@ html,body {
   }
   100% {
     left: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .inputSelectStyle::-webkit-input-placeholder {
+    font-size: 14px;
+  }
+  .placeholder-gray::placeholder {
+    font-size: 14px;
   }
 }

@@ -51,7 +51,6 @@ export function MultiSelectComponent({
           {label}
         </label>
       )}
-
       <div className="relative">
         <div
           className="border rounded-lg p-2 flex items-start flex-wrap gap-1 cursor-pointer inputSelectStyle min-h-[42px]"

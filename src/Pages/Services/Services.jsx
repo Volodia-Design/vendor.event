@@ -66,17 +66,6 @@ export default function Services() {
       });
   };
 
-  const [serviceData, setServiceData] = useState({
-    location: "",
-    service_type_id: "",
-    service_specifications: [
-      {
-        name: "",
-        price: "",
-      },
-    ],
-  });
-
   const chunkedSelects = [];
   for (let i = 0; i < services.length; i += 6) {
     chunkedSelects.push(services.slice(i, i + 6));

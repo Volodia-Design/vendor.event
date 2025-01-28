@@ -210,7 +210,7 @@ export default function ServiceCrud({ action, editableService }) {
   }, [action, editableService, location.state]);
 
   return (
-    <div className="w-full bg-white px-6 py-8 lg:px-[50px] rounded-2xl">
+    <div className="w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl">
       <p className="uppercase text-text2Medium lg:text-h3 text-primary2-500 mb-6 text-center">
         {currentAction.type === "create"
           ? "Create a Service"

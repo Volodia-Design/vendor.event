@@ -13,8 +13,10 @@ export default function Sidebar() {
         return true;
       }
       if (
-        item.path.startsWith("/products") &&
-        location.pathname.startsWith("/products")
+        (item.path.startsWith("/products") &&
+          location.pathname.startsWith("/products")) ||
+        (item.path.startsWith("/service") &&
+          location.pathname.startsWith("/service"))
       ) {
         return true;
       }

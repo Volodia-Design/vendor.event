@@ -104,7 +104,7 @@ export default function Services() {
 
   return (
     <div className="w-full flex flex-col items-center gap-3">
-      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-lg px-8">
+      <div className="flex flex-col items-center justify-between w-full bg-white p-3 rounded-2xl lg:px-6 px-2">
         <div className="flex items-center justify-between w-full">
           <p className="text-text2Medium uppercase">My Services</p>
           <Button

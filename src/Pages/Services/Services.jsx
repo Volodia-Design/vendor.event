@@ -87,7 +87,6 @@ export default function Services() {
   };
 
   const handleDelete = (service) => {
-    console.log("🚀 ~ handleDelete ~ service:", service)
     openDeleteModal({
       id: service.id,
       type: 'service',

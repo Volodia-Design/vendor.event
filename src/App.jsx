@@ -16,6 +16,8 @@ import Loader from "./components/Loader";
 import useModal from "./store/useModal";
 import { DeleteConfirmationModal, ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComponent";
 import ServiceCrud from "./Pages/Services/ServiceCrud";
+import LocationCrud from "./Pages/Location/LocationCrud";
+import ProductCrud from "./Pages/Products/ProductCrud";
 
 function App() {
   const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className, isDeleteModalOpen, closeDeleteModal, deleteModalData } = useModal();
@@ -46,10 +48,12 @@ function App() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/products/product-store" element={<Products />} />
           <Route path="/products/order-history" element={<Products />} />
+          <Route path="/product/crud" element={<ProductCrud />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/people" element={<People />} />
           <Route path="/location" element={<Location />} />
+          <Route path="/location/crud" element={<LocationCrud />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>

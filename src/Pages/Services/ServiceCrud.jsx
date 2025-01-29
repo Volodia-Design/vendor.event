@@ -11,6 +11,7 @@ import useLoading from "../../store/useLoading";
 import api from "../../utils/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCurrentWidth from "../../utils/useCurrentWidth";
+import useLocations from "../../store/data/useLoactions";
 
 export default function ServiceCrud({ action, editableService }) {
   const location = useLocation();
@@ -18,6 +19,7 @@ export default function ServiceCrud({ action, editableService }) {
   const { serviceTypes } = useServiceTypes();
   const { setIsLoading } = useLoading();
   const { isDesktop } = useCurrentWidth();
+  const { locations } = useLocations()
   const navigate = useNavigate();
   const currentAction = action || location.state?.action;
   const currentService = editableService || location.state?.editableService;
@@ -39,14 +41,6 @@ export default function ServiceCrud({ action, editableService }) {
     service_type_id: "",
     service_specifications: [],
   });
-
-  const locations = [
-    { id: 1, name: "New York" },
-    { id: 2, name: "London" },
-    { id: 3, name: "Paris" },
-    { id: 4, name: "Tokyo" },
-    { id: 5, name: "Sydney" },
-  ];
 
   const handleDataChange = (index, field, value) => {
     setServiceData((prevData) => {

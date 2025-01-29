@@ -11,6 +11,9 @@ import api from "../../utils/api";
 import useServiceTypes from "../../store/data/useServiceTypes";
 import useEventTypes from "../../store/data/useEventTypes";
 import useModal from "../../store/useModal";
+import ProductCrud from "./ProductCrud";
+import useCurrentWidth from "../../utils/useCurrentWidth";
+import useLocations from "../../store/data/useLoactions";
 
 export default function Products() {
   const location = useLocation();
@@ -20,13 +23,16 @@ export default function Products() {
   const { serviceTypes } = useServiceTypes();
   const { eventTypes } = useEventTypes();
   const [searchTerm, setSearchTerm] = useState("");
-  const { showSuccess, showError } = useModal();
-
-  const [isEditMode, setIsEditMode] = useState({
-    id: null,
-    data: null,
-  });
-  console.log("🚀 ~ Products ~ isEditMode:", isEditMode);
+  const { locations } = useLocations();
+  const {
+    onOpen,
+    needToRefetch,
+    setNeedToRefetch,
+    openDeleteModal,
+    showSuccess,
+    showError,
+  } = useModal();
+  const { isDesktop } = useCurrentWidth();
   const [allProducts, setAllProducts] = useState([]);
 
   const getProductData = () => {
@@ -38,181 +44,6 @@ export default function Products() {
       })
       .catch((error) => {
         console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-  const [productData, setProductData] = useState({
-    image: "",
-    name: "",
-    stock: "",
-    price: "",
-    service_type_id: "",
-    location: "",
-    event_types: [],
-    description: "",
-  });
-
-  const locations = [
-    { id: 1, name: "New York" },
-    { id: 2, name: "London" },
-    { id: 3, name: "Paris" },
-    { id: 4, name: "Tokyo" },
-    { id: 5, name: "Sydney" },
-  ];
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setIsEditMode({ id: null, data: null });
-    setProductData({
-      image: "",
-      name: "",
-      stock: "",
-      price: "",
-      service_type_id: "",
-      location: "",
-      event_types: "",
-      description: "",
-    });
-    setErrors({
-      image: "",
-      name: "",
-      stock: "",
-      price: "",
-      service_type_id: "",
-      location: "",
-      event_types: "",
-      description: "",
-    });
-  };
-
-  const handleDataChange = (field, value) => {
-    setProductData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
-  const handleEventChange = (selectedIds) => {
-    handleDataChange("event_types", selectedIds);
-  };
-
-  const [errors, setErrors] = useState({
-    image: "",
-    name: "",
-    stock: "",
-    price: "",
-    service_type_id: "",
-    location: "",
-    event_types: "",
-    description: "",
-  });
-
-  const saveData = (e) => {
-    e.preventDefault();
-    let newErrors = {
-      image: "",
-      name: "",
-      stock: "",
-      price: "",
-      service_type_id: "",
-      location: "",
-      event_types: "",
-      description: "",
-    };
-
-    if (
-      !productData.image ||
-      (typeof productData.image === "string" && productData.image.trim() === "")
-    ) {
-      newErrors.image = "Image is required.";
-    }
-
-    if (!productData.name || productData.name.trim() === "") {
-      newErrors.name = "Product name is required.";
-    }
-
-    if (
-      productData.stock === undefined ||
-      productData.stock === null ||
-      productData.stock === ""
-    ) {
-      newErrors.stock = "Stock is required.";
-    }
-
-    if (
-      productData.price === undefined ||
-      productData.price === null ||
-      productData.price === ""
-    ) {
-      newErrors.price = "Price is required.";
-    }
-
-    if (
-      !productData.service_type_id ||
-      productData.service_type_id.trim() === ""
-    ) {
-      newErrors.service_type_id = "Type is required.";
-    }
-
-    if (!productData.location || productData.location.trim() === "") {
-      newErrors.location = "Location is required.";
-    }
-
-    if (!productData.event_types.length) {
-      newErrors.event_types = "At least one event type is required.";
-    }
-
-    if (!productData.description || productData.description.trim() === "") {
-      newErrors.description = "Short description is required.";
-    }
-
-    setErrors(newErrors);
-
-    if (Object.values(newErrors).some((error) => error)) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    const formDataToSend = new FormData();
-
-    formDataToSend.append("file", productData.image);
-    formDataToSend.append("name", productData.name);
-    formDataToSend.append("stock", productData.stock); // Ensure this is numeric or string
-    formDataToSend.append("price", productData.price); // Ensure this is numeric or string
-    formDataToSend.append("service_type_id", productData.service_type_id);
-    formDataToSend.append("location", productData.location);
-    formDataToSend.append(
-      "event_types",
-      JSON.stringify(productData.event_types)
-    ); // Convert array to JSON
-    formDataToSend.append("description", productData.description);
-
-    let apiCall =
-      isEditMode.id !== null
-        ? api.put(`/vendor-product/${isEditMode.id}`, formDataToSend, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-        : api.post("/vendor-product", formDataToSend, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-
-    apiCall
-      .then(() => {
-        getProductData();
-        handleCloseModal();
-        showSuccess();
-      })
-      .catch((error) => {
-        console.error("Error saving data:", error);
-        showError();
       })
       .finally(() => {
         setIsLoading(false);
@@ -261,39 +92,77 @@ export default function Products() {
             src="/Images/ComponentIcons/EditColored.svg"
             alt="Edit"
             className="w-6 h-6 cursor-pointer"
-            onClick={() => handleEdit(item)}
+            onClick={() => handleCrud({ type: "edit", data: item })}
           />
-          {/* <img
+          <img
             src="/Images/ComponentIcons/Delete.svg"
             alt="delete"
             className="w-6 h-6 cursor-pointer"
             onClick={() => handleDelete(item)}
-          /> */}
+          />
         </td>
       </tr>
     ));
   };
 
-  const handleEdit = (item) => {
-    setIsEditMode({
-      id: item.id,
-      data: item,
-    });
-    setIsModalOpen(true);
-    setProductData({
-      name: item.name,
-      stock: item.stock,
-      price: item.price,
-      service_type_id: item.service_type_id.toString(),
-      location: item.location,
-      event_types: item.event_types.map((event) => event.id.toString()),
-      description: item.description,
-      image: `${api.defaults.baseURL}image/${item.image}`,
-    });
+  const handleCrud = async (action) => {
+    if (action.type === 'edit' && action.data) {
+      // Create a new copy of the data
+      let transformedData = {
+        ...action.data,
+        service_type_id: String(action.data.service_type_id),
+        event_types: action.data.event_types.map(event => String(event.id))
+      };
+  
+      // Handle image transformation
+      if (action.data.image) {
+        try {
+          const response = await api.get(`/image/${action.data.image}`, {
+            responseType: 'blob',
+          });
+          transformedData.image = URL.createObjectURL(response.data);
+        } catch (error) {
+          console.error('Error loading image:', error);
+          // Handle error appropriately
+        }
+      }
+  
+      // Update the action object
+      action = {
+        ...action,
+        data: transformedData
+      };
+    }
+  
+    const props = { action };
+  
+    if (isDesktop) {
+      onOpen(
+        <ProductCrud {...props} />,
+        "!max-w-[50rem] max-h-[99vh] overflow-auto"
+      );
+    } else {
+      navigate("/product/crud", { state: props });
+    }
   };
 
-  const handleDelete = (item) => {
-    console.log(item);
+  const handleDelete = (product) => {
+    openDeleteModal({
+      id: product.id,
+      type: 'product',
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          await api.delete(`/vendor-product/${product.id}`);
+          showSuccess();
+          getProductData();
+        } catch (error) {
+          showError();
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
   };
 
   const handleSearch = () => {
@@ -302,7 +171,8 @@ export default function Products() {
 
   useEffect(() => {
     getProductData();
-  }, []);
+    setNeedToRefetch(false);
+  }, [needToRefetch]);
 
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">
@@ -380,7 +250,7 @@ export default function Products() {
           <Button
             text="Create"
             buttonStyles="bg-secondary-700 text-white hover:bg-secondary-600 px-7"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => handleCrud({ type: "create", data: null })}
           />
         </div>
       </div>
@@ -390,156 +260,6 @@ export default function Products() {
           <TableComponent renderCols={renderCols} renderRows={renderRows} />
         )}
       </div>
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black-900/50 backdrop-blur-sm flex justify-center items-center z-50 transition-opacity duration-300"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="bg-white p-6 px-12 rounded-lg w-[50rem] relative animate-fadeIn shadow-lg  max-h-[99vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close button */}
-            <button
-              onClick={handleCloseModal}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* Modal header */}
-            <p className="uppercase text-h3 text-primary2-500 mb-6  text-center">
-              {isEditMode.id !== null ? "Edit a Product" : "Create a Product"}
-            </p>
-
-            <form className="w-full flex flex-col gap-5 px-8 py-5">
-              {/* Image Upload */}
-              <ImageUpload
-                setImage={(file) =>
-                  setProductData((prev) => ({ ...prev, image: file }))
-                }
-                image={productData.image}
-                editMode={!!isEditMode}
-                error={errors.image}
-              />
-
-              {/* Product Name */}
-              <InputComponent
-                id="name"
-                label="Product Name *"
-                placeholder="Write a name of product"
-                className="w-full"
-                value={productData.name}
-                onChange={(value) => handleDataChange("name", value)}
-                error={errors.name}
-              />
-
-              {/* Stock and Price */}
-              <div className="flex items-center gap-4">
-                <InputComponent
-                  id="stock"
-                  label="Stock *"
-                  placeholder="Write a QNT"
-                  className="w-full"
-                  value={productData.stock}
-                  onChange={(value) => handleDataChange("stock", value)}
-                  error={errors.stock}
-                  onlyDigits={true}
-                />
-                <InputComponent
-                  id="price"
-                  label="Price *"
-                  placeholder="Write a price"
-                  className="w-full"
-                  value={productData.price}
-                  onChange={(value) => handleDataChange("price", value)}
-                  error={errors.price}
-                />
-              </div>
-
-              {/* Select Type and Location */}
-              <div className="flex items-center gap-4">
-                <SelectComponent
-                  id="service_type_id"
-                  label="Type *"
-                  placeholder={
-                    <span className="text-black-200">Select a Type</span>
-                  }
-                  className="w-full"
-                  options={serviceTypes}
-                  value={productData.service_type_id}
-                  onChange={(value) =>
-                    handleDataChange("service_type_id", value)
-                  }
-                  error={errors.service_type_id}
-                />
-                <SelectComponent
-                  id="location"
-                  label="Location *"
-                  placeholder={
-                    <span className="text-black-200">Select a Location</span>
-                  }
-                  className="w-full"
-                  options={locations}
-                  value={productData.location}
-                  onChange={(value) => handleDataChange("location", value)}
-                  error={errors.location}
-                />
-              </div>
-
-              {/* Event Multi Select */}
-              <MultiSelectComponent
-                id="event_types"
-                label="Event"
-                options={eventTypes}
-                placeholder="Select an Event"
-                className="w-full"
-                value={productData.event_types}
-                onChange={handleEventChange}
-                error={errors.event_types}
-              />
-
-              {/* Short Description */}
-              <InputComponent
-                id="description"
-                label="Short Description"
-                placeholder="Write a short description"
-                className="w-full"
-                value={productData.description}
-                onChange={(value) => handleDataChange("description", value)}
-                error={errors.description}
-              />
-
-              {/* Modal Actions */}
-              <div className="w-full flex gap-3 items-center justify-end mt-2">
-                <Button
-                  text="Cancel"
-                  onClick={handleCloseModal}
-                  buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
-                />
-                <Button
-                  text={isEditMode.id !== null ? "Save" : "Create"}
-                  onClick={(e) => saveData(e)}
-                  buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
-                />
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

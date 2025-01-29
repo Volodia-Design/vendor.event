@@ -198,7 +198,7 @@ export default function ProductCrud({ action }) {
       </p>
 
       {/* Form content */}
-      <form className="w-full flex flex-col gap-5 px-8 py-5">
+      <form className="w-full flex flex-col gap-5">
         {/* Image Upload */}
         <ImageUpload
           setImage={(file) =>

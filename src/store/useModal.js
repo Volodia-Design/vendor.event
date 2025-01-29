@@ -1,4 +1,3 @@
-// Store
 import { create } from "zustand";
 
 const useModal = create((set) => ({
@@ -42,6 +41,12 @@ const useModal = create((set) => ({
     }, 3000);
   },
   closeError: () => set({ isErrorOpen: false }),
+
+  // Delete modal state
+  isDeleteModalOpen: false,
+  deleteModalData: null,
+  openDeleteModal: (data) => set({ isDeleteModalOpen: true, deleteModalData: data }),
+  closeDeleteModal: () => set({ isDeleteModalOpen: false, deleteModalData: null }),
 }));
 
 export default useModal;

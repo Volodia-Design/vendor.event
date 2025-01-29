@@ -6,6 +6,7 @@ import {
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { CheckCircle, XCircle } from 'lucide-react' // Assuming you're using lucide icons
 import { motion } from 'framer-motion'
+import { useState } from "react";
 
 export function ModalComponent({ 
   isOpen = false,
@@ -13,6 +14,7 @@ export function ModalComponent({
   content,
   title,
   className = "",
+  onConfirm
 }) {
   if (!isOpen) return null;
   
@@ -134,4 +136,55 @@ export function ErrorModal({ isOpen, onClose }) {
     </>
   )
 }
+
+// Delete Confirmation Modal
+export function DeleteConfirmationModal({ isOpen, onClose, data, onConfirm }) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    if (!data?.onConfirm) return;
+    
+    setIsLoading(true);
+    try {
+      await data.onConfirm(); // Execute the delete function
+      onClose(); // Close modal only after success
+    } catch (error) {
+      console.error("Error deleting:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="bg-white p-6 rounded-lg shadow-lg max-w-sm">
+        <DialogTitle className="text-lg font-semibold">Are you sure?</DialogTitle>
+        <p className="text-gray-600">
+          Do you really want to delete this service? This action cannot be undone.
+        </p>
+        <div className="flex justify-end gap-4 mt-4">
+          <motion.button
+            className="px-4 py-2 bg-gray-300 rounded-md"
+            whileHover={{ scale: 1.05 }}
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Cancel
+          </motion.button>
+          <motion.button
+            className="px-4 py-2 bg-red-500 text-white rounded-md disabled:opacity-50"
+            whileHover={{ scale: 1.05 }}
+            onClick={handleConfirm}
+            disabled={isLoading}
+          >
+            {isLoading ? "Deleting..." : "Yes, Delete"}
+          </motion.button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 

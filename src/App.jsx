@@ -14,11 +14,11 @@ import "swiper/css/pagination";
 import "react-tooltip/dist/react-tooltip.css";
 import Loader from "./components/Loader";
 import useModal from "./store/useModal";
-import { ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComponent";
+import { DeleteConfirmationModal, ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComponent";
 import ServiceCrud from "./Pages/Services/ServiceCrud";
 
 function App() {
-  const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className } = useModal();
+  const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className, isDeleteModalOpen, closeDeleteModal, deleteModalData } = useModal();
 
   return (
     <Router>
@@ -34,7 +34,11 @@ function App() {
         isOpen={isErrorOpen}
         onClose={closeError}
       />
-      <Routes>
+   <DeleteConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        data={deleteModalData}
+      />      <Routes>
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />

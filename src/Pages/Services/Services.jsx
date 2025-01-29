@@ -15,7 +15,7 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [transformed, setTransformed] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
-  const { onOpen, needToRefetch, setNeedToRefetch } = useModal();
+  const { onOpen, needToRefetch, setNeedToRefetch, openDeleteModal, showSuccess, showError } = useModal();
   const { isDesktop } = useCurrentWidth();
   const navigate = useNavigate();
   const getServices = () => {
@@ -84,6 +84,26 @@ export default function Services() {
     } else {
       navigate("/service/crud", { state: props });
     }
+  };
+
+  const handleDelete = (service) => {
+    console.log("🚀 ~ handleDelete ~ service:", service)
+    openDeleteModal({
+      id: service.id,
+      type: 'service',
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          await api.delete(`/vendor-service/${service.id}`);
+          showSuccess();
+          getServices();
+        } catch (error) {
+          showError();
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
   };
 
   useEffect(() => {
@@ -161,6 +181,19 @@ export default function Services() {
                         <img
                           src="/Images/ComponentIcons/Edit.svg"
                           alt="edit"
+                          width={24}
+                          height={24}
+                        />
+                      </div>
+                      <div
+                        className="bg-primary2-50 inputSelectStyle delete-button w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
+                        onClick={() =>
+                          handleDelete({ id: service.id, type: "service" })
+                        }
+                      >
+                        <img
+                          src="/Images/ComponentIcons/Delete.svg"
+                          alt="delete"
                           width={24}
                           height={24}
                         />

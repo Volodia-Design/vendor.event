@@ -18,6 +18,7 @@ import ServiceCrud from "./Pages/Services/ServiceCrud";
 import LocationCrud from "./Pages/Location/LocationCrud";
 import ProductCrud from "./Pages/Products/ProductCrud";
 import Staff from "./Pages/Staff/Staff";
+import StaffCrud from "./Pages/Staff/StaffCrud";
 
 function App() {
   const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className, isDeleteModalOpen, closeDeleteModal, deleteModalData } = useModal();
@@ -52,6 +53,7 @@ function App() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/staff" element={<Staff />} />
+          <Route path="/staff/crud" element={<StaffCrud />} />
           <Route path="/location" element={<Location />} />
           <Route path="/location/crud" element={<LocationCrud />} />
           <Route path="/settings" element={<Settings />} />

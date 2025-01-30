@@ -3,7 +3,7 @@ import useModal from "../../store/useModal";
 import useServiceTypes from "../../store/data/useServiceTypes";
 import useLoading from "../../store/useLoading";
 import useCurrentWidth from "../../utils/useCurrentWidth";
-import useLocations from "../../store/data/useLoactions";
+import useLocations from "../../store/data/useLocations";
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import ImageUpload from "../../components/ImageUpload";

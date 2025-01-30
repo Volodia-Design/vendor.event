@@ -29,8 +29,8 @@ export default function LocationCrud({ action }) {
           fullAddress: location.fullAddress,
           phone: location.phone,
           workingDays: location.workingDays ? location.workingDays.split(",") : [],
-          startHour: location.workingHoursFrom,
-          endHour: location.workingHoursTO,
+          workingHoursFrom: location.workingHoursFrom,
+          workingHoursTo: location.workingHoursTo,
           id: location.id
         });
 
@@ -55,11 +55,12 @@ export default function LocationCrud({ action }) {
   ];
 
   let startHourOptions = Array.from({ length: 48 }, (_, i) => {
-    let hours = String(Math.floor(i / 2)).padStart(2, "0");
-    let minutes = i % 2 === 0 ? "00" : "30";
+    let hours = String(Math.floor(i / 2)).padStart(2, "0"); 
+    let minutes = i % 2 === 0 ? "00" : "30"; 
     let time = `${hours}:${minutes}`;
-    return { id: time, name: time };
+    return { id: time, name: time }; 
   });
+  
 
   const [location, setLocation] = useState({
     name: "",
@@ -67,8 +68,8 @@ export default function LocationCrud({ action }) {
     fullAddress: "",
     phone: "",
     workingDays: [],
-    startHour: "",
-    endHour: "",
+    workingHoursFrom: "",
+    workingHoursTo: "",
   });
   console.log("🚀 ~ LocationCrud ~ location:", location)
 
@@ -78,8 +79,8 @@ export default function LocationCrud({ action }) {
     fullAddress: "",
     phone: "",
     workingDays: [],
-    startHour: "",
-    endHour: "",
+    workingHoursFrom: "",
+    workingHoursTo: "",
   });
 
   const handleChangeData = (field) => (value) => {
@@ -95,13 +96,13 @@ export default function LocationCrud({ action }) {
         }
       }
 
-      if (field === "startHour") {
-        return { ...prev, startHour: value, endHour: "" };
+      if (field === "workingHoursFrom") {
+        return { ...prev, workingHoursFrom: value, workingHoursTo: "" };
       }
 
-      if (field === "endHour") {
-        if (value >= prev.startHour) {
-          return { ...prev, endHour: value };
+      if (field === "workingHoursTo") {
+        if (value >= prev.workingHoursFrom) {
+          return { ...prev, workingHoursTo: value };
         }
         return prev;
       }
@@ -118,8 +119,8 @@ export default function LocationCrud({ action }) {
       fullAddress: "",
       phone: "",
       workingDays: "",
-      startHour: "",
-      endHour: "",
+      workingHoursFrom: "",
+      workingHoursTo: "",
     };
 
     if (!location.name || location.name.trim() === "") {
@@ -137,11 +138,11 @@ export default function LocationCrud({ action }) {
     if (!location.workingDays.length) {
       newErrors.workingDays = "Working days is required.";
     }
-    if (!location.startHour || location.startHour.trim() === "") {
-      newErrors.startHour = "Start hour is required.";
+    if (!location.workingHoursFrom || location.workingHoursFrom.trim() === "") {
+      newErrors.workingHoursFrom = "Start hour is required.";
     }
-    if (!location.endHour || location.endHour.trim() === "") {
-      newErrors.endHour = "End hour is required.";
+    if (!location.workingHoursTo || location.workingHoursTo.trim() === "") {
+      newErrors.workingHoursTo = "End hour is required.";
     }
 
     setErrors(newErrors);
@@ -156,8 +157,8 @@ export default function LocationCrud({ action }) {
     formData.append("fullAddress", location.fullAddress);
     formData.append("phone", location.phone);
     formData.append("workingDays", location.workingDays.join(","));
-    formData.append("startHour", location.startHour);
-    formData.append("endHour", location.endHour);
+    formData.append("workingHoursFrom", location.workingHoursFrom);
+    formData.append("workingHoursTo", location.workingHoursTo);
 
     setIsLoading(true);
     const apiCall =
@@ -234,10 +235,11 @@ export default function LocationCrud({ action }) {
         <InputComponent
           type="text"
           label="Phone Number *"
-          placeholder="+374987765544"
+          placeholder="Write Phone Number"
           value={location.phone}
           onChange={handleChangeData("phone")}
           error={errors.phone}
+          isPhoneNumber
         />
         <div className="flex items-start justify-between gap-3">
           <MultiSelectComponent
@@ -253,26 +255,26 @@ export default function LocationCrud({ action }) {
             <SelectComponent
               label="Start hour *"
               options={startHourOptions}
-              value={location.startHour}
-              onChange={handleChangeData("startHour")}
+              value={location.workingHoursFrom}
+              onChange={handleChangeData("workingHoursFrom")}
               className="w-full max-w-32"
               placeholder={<span className="text-black-200">09:00</span>}
-              error={errors.startHour}
+              error={errors.workingHoursFrom}
             />
             <SelectComponent
               label="End hour *"
               options={
-                location.startHour
+                location.workingHoursFrom
                   ? startHourOptions.filter(
-                      (option) => option.id > location.startHour
+                      (option) => option.id > location.workingHoursFrom
                     )
                   : startHourOptions
               }
-              value={location.endHour}
-              onChange={handleChangeData("endHour")}
+              value={location.workingHoursTo}
+              onChange={handleChangeData("workingHoursTo")}
               className="w-full max-w-32"
               placeholder={<span className="text-black-200">10:00</span>}
-              error={errors.endHour}
+              error={errors.workingHoursTo}
             />
           </div>
         </div>
@@ -280,26 +282,26 @@ export default function LocationCrud({ action }) {
           <SelectComponent
             label="Start hour *"
             options={startHourOptions}
-            value={location.startHour}
-            onChange={handleChangeData("startHour")}
+            value={location.workingHoursFrom}
+            onChange={handleChangeData("workingHoursFrom")}
             className="w-full lg:max-w-32"
             placeholder={<span className="text-black-200">09:00</span>}
-            error={errors.startHour}
+            error={errors.workingHoursFrom}
           />
           <SelectComponent
             label="End hour *"
             options={
-              location.startHour
+              location.workingHoursFrom
                 ? startHourOptions.filter(
-                    (option) => option.id > location.startHour
+                    (option) => option.id > location.workingHoursFrom
                   )
                 : startHourOptions
             }
-            value={location.endHour}
-            onChange={handleChangeData("endHour")}
+            value={location.workingHoursTo}
+            onChange={handleChangeData("workingHoursTo")}
             className="w-full max-w-32"
             placeholder={<span className="text-black-200">10:00</span>}
-            error={errors.endHour}
+            error={errors.workingHoursTo}
           />
         </div>
         <div className="w-full flex gap-3 items-center justify-end mt-2">

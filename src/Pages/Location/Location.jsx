@@ -32,9 +32,11 @@ export default function Location() {
 
   const getLocations = () => {
     api
-      .get(`/location`)
+      .get(
+        `/location?page=${paginationData.currentPage}&limit=${paginationData.pageSize}&search=${searchTerm}`
+      )
       .then((response) => {
-        setLocations(response.data.data);
+        setLocations(response.data.data.data);
         setPaginationData({
           ...paginationData,
           totalPages: response.data.data.total,
@@ -83,7 +85,10 @@ export default function Location() {
         <td className="p-4 text-text3 text-black-300">{item.phone}</td>
         <td className="p-4 text-text3 text-black-300">{item.fullAddress}</td>
         <td className="p-4 text-text3 text-black-300">-</td>
-        <td className="p-4 text-text3 text-black-300">{item.workingDays}  {item.workingHoursFrom + " - " + item.workingHoursTO}</td>
+        <td className="p-4 text-text3 text-black-300">
+          {item.workingDays}{" "}
+          {item.workingHoursFrom + " - " + item.workingHoursTo}
+        </td>
         <td className="p-4 flex gap-2 items-center justify-center">
           <img
             src="/Images/ComponentIcons/EditColored.svg"
@@ -126,7 +131,6 @@ export default function Location() {
       ...prevData,
       currentPage: page,
     }));
-    getLocations();
   };
 
   const handleDelete = (location) => {
@@ -151,7 +155,7 @@ export default function Location() {
   useEffect(() => {
     getLocations();
     setNeedToRefetch(false);
-  }, [needToRefetch]);
+  }, [needToRefetch, paginationData.currentPage]);
   return (
     <div className="w-full flex flex-col items-center gap-3 bg-white p-3 rounded-2xl lg:px-6 px-2">
       <div className="flex lg:items-center items-start justify-between w-full lg:flex-row flex-col">

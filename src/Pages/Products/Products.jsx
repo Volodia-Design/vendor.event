@@ -13,7 +13,7 @@ import useEventTypes from "../../store/data/useEventTypes";
 import useModal from "../../store/useModal";
 import ProductCrud from "./ProductCrud";
 import useCurrentWidth from "../../utils/useCurrentWidth";
-import useLocations from "../../store/data/useLoactions";
+import useLocations from "../../store/data/useLocations";
 import Pagination from "../../components/Pagination";
 
 export default function Products() {
@@ -186,13 +186,12 @@ export default function Products() {
       ...prevData,
       currentPage: page,
     }));
-    getProductData();
   };
 
   useEffect(() => {
     getProductData();
     setNeedToRefetch(false);
-  }, [needToRefetch]);
+  }, [needToRefetch, paginationData.currentPage]);
 
   return (
     <div className="w-full bg-white py-6 px-8 rounded-lg">

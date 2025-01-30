@@ -11,7 +11,7 @@ import useLoading from "../../store/useLoading";
 import api from "../../utils/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCurrentWidth from "../../utils/useCurrentWidth";
-import useLocations from "../../store/data/useLoactions";
+import useLocations from "../../store/data/useLocations";
 
 export default function ServiceCrud({ action, editableService }) {
   const location = useLocation();

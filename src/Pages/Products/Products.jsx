@@ -39,18 +39,20 @@ export default function Products() {
     currentPage: 1,
     totalPages: 1,
     pageSize: 10,
-  })
+  });
 
   const getProductData = () => {
     setIsLoading(true);
     api
-      .get(`/vendor-product?page=${paginationData.currentPage}&search=${searchTerm}`)
+      .get(
+        `/vendor-product?page=${paginationData.currentPage}&search=${searchTerm}`
+      )
       .then((response) => {
         setAllProducts(response.data.data.data);
         setPaginationData({
-          ...paginationData, 
+          ...paginationData,
           totalPages: response.data.data.total,
-        })
+        });
       })
       .catch((error) => {
         console.error(error);
@@ -116,36 +118,36 @@ export default function Products() {
   };
 
   const handleCrud = async (action) => {
-    if (action.type === 'edit' && action.data) {
+    if (action.type === "edit" && action.data) {
       // Create a new copy of the data
       let transformedData = {
         ...action.data,
         service_type_id: String(action.data.service_type_id),
-        event_types: action.data.event_types.map(event => String(event.id))
+        event_types: action.data.event_types.map((event) => String(event.id)),
       };
-  
+
       // Handle image transformation
       if (action.data.image) {
         try {
           const response = await api.get(`/image/${action.data.image}`, {
-            responseType: 'blob',
+            responseType: "blob",
           });
           transformedData.image = URL.createObjectURL(response.data);
         } catch (error) {
-          console.error('Error loading image:', error);
+          console.error("Error loading image:", error);
           // Handle error appropriately
         }
       }
-  
+
       // Update the action object
       action = {
         ...action,
-        data: transformedData
+        data: transformedData,
       };
     }
-  
+
     const props = { action };
-  
+
     if (isDesktop) {
       onOpen(
         <ProductCrud {...props} />,
@@ -159,7 +161,7 @@ export default function Products() {
   const handleDelete = (product) => {
     openDeleteModal({
       id: product.id,
-      type: 'product',
+      type: "product",
       onConfirm: async () => {
         setIsLoading(true);
         try {
@@ -171,7 +173,7 @@ export default function Products() {
         } finally {
           setIsLoading(false);
         }
-      }
+      },
     });
   };
 
@@ -224,7 +226,6 @@ export default function Products() {
           }`}
         />
       </div>
-
       {/* Main Content */}
       <div className="mt-4 flex lg:items-center lg:flex-row justify-between flex-col items-start">
         <p className="text-text2Medium uppercase">
@@ -242,7 +243,10 @@ export default function Products() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <button className="search-button" onClick={handleSearch}>
+            <button
+              className="search-button duration-300"
+              onClick={handleSearch}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -278,8 +282,12 @@ export default function Products() {
           <TableComponent renderCols={renderCols} renderRows={renderRows} />
         )}
       </div>
-<div className="w-full flex justify-end">
-<Pagination paginationData={paginationData} onPageChange={handlePageChange} />
-</div>    </div>
+      <div className="w-full flex justify-end">
+        <Pagination
+          paginationData={paginationData}
+          onPageChange={handlePageChange}
+        />
+      </div>
+    </div>
   );
 }

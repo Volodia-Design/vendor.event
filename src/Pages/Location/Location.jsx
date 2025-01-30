@@ -7,6 +7,7 @@ import useCurrentWidth from "../../utils/useCurrentWidth";
 import useModal from "../../store/useModal";
 import LocationCrud from "./LocationCrud";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../components/Pagination";
 
 export default function Location() {
   const [locations, setLocations] = useState([]);
@@ -22,11 +23,21 @@ export default function Location() {
     showError,
   } = useModal();
 
+  const [paginationData, setPaginationData] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+  });
+
   const getLocations = () => {
     api
-      .get(`/location?search=${searchTerm}`)
+      .get(`/location?page=${paginationData.currentPage}&search=${searchTerm}`)
       .then((response) => {
         setLocations(response.data.data);
+        setPaginationData({
+          ...paginationData,
+          totalPages: response.data.data.total,
+        });
       })
       .catch((error) => {
         console.error(error);
@@ -107,25 +118,36 @@ export default function Location() {
     }
   };
 
+  const handlePageChange = (page) => {
+    setPaginationData((prevData) => ({
+      ...prevData,
+      currentPage: page,
+    }));
+    getLocations();
+  };
+
   useEffect(() => {
     getLocations();
-  }, []);
-
+    setNeedToRefetch(false);
+  }, [needToRefetch]);
   return (
     <div className="w-full flex flex-col items-center gap-3 bg-white p-3 rounded-2xl lg:px-6 px-2">
       <div className="flex items-center justify-between w-full">
         <p className="text-text2Medium uppercase">Location</p>
-      <div className="flex items-center gap-3">
-      <div className="search-container w-full">
+        <div className="flex items-center gap-3">
+          <div className="search-container w-full">
             <input
               type="text"
-              placeholder="Search by product"
+              placeholder="Search by location"
               className="search-input h-[42px]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <button className="search-button" onClick={handleSearch}>
+            <button
+              className="search-button duration-300"
+              onClick={handleSearch}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -137,15 +159,21 @@ export default function Location() {
             </button>
           </div>
 
-        <Button
-          text="Create"
-          buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2"
-          onClick={() => handleCrud({ type: "create", data: null })}
-        />
-      </div>
+          <Button
+            text="Create a Location"
+            buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2"
+            onClick={() => handleCrud({ type: "create", data: null })}
+          />
+        </div>
       </div>
       <div className="mt-3 overflow-auto w-full">
         <TableComponent renderCols={renderCols} renderRows={renderRows} />
+      </div>
+      <div className="w-full flex justify-end">
+        <Pagination
+          paginationData={paginationData}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

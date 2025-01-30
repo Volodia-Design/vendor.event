@@ -1,8 +1,6 @@
 import ReactPaginate from "react-paginate";
 
 const Pagination = ({ paginationData, onPageChange }) => {
-  console.log("🚀 ~ Pagination ~ paginationData:", paginationData);
-
   const { totalPages, pageSize, currentPage } = paginationData;
   const pageCount = Math.ceil(totalPages / pageSize);
 

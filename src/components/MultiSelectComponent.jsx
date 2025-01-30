@@ -13,7 +13,46 @@ export function MultiSelectComponent({
   error,
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [dropdownPosition, setDropdownPosition] = React.useState("bottom");
   const dropdownRef = React.useRef(null);
+  const triggerRef = React.useRef(null);
+  const dropdownListRef = React.useRef(null);
+
+  // Calculate dropdown position
+  React.useEffect(() => {
+    if (isOpen && triggerRef.current && dropdownListRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const dropdownRect = dropdownListRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Find the closest parent with overflow: auto/scroll
+      let parent = triggerRef.current.parentElement;
+      let scrollParent = null;
+      
+      while (parent && parent !== document.body) {
+        const overflow = window.getComputedStyle(parent).overflow;
+        if (overflow === 'auto' || overflow === 'scroll') {
+          scrollParent = parent;
+          break;
+        }
+        parent = parent.parentElement;
+      }
+
+      const parentRect = scrollParent 
+        ? scrollParent.getBoundingClientRect() 
+        : { top: 0, bottom: windowHeight };
+
+      const bottomSpace = parentRect.bottom - triggerRect.bottom;
+      const topSpace = triggerRect.top - parentRect.top;
+      const dropdownHeight = dropdownRect.height;
+
+      if (bottomSpace < dropdownHeight && topSpace > bottomSpace) {
+        setDropdownPosition("top");
+      } else {
+        setDropdownPosition("bottom");
+      }
+    }
+  }, [isOpen]);
 
   // Handle clicking outside to close dropdown
   React.useEffect(() => {
@@ -51,8 +90,9 @@ export function MultiSelectComponent({
           {label}
         </label>
       )}
-      <div className="relative">
+      <div className="relative mt-1">
         <div
+          ref={triggerRef}
           className="border rounded-lg p-2 flex items-start flex-wrap gap-1 cursor-pointer inputSelectStyle min-h-[42px]"
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -64,7 +104,7 @@ export function MultiSelectComponent({
               >
                 {option.name}
                 <button
-                  className="ml-1 text-gray-500 hover:text-gray-700"
+                  className="ml-1 text-gray-500 hover:text-red-500"
                   onClick={(e) => removeValue(option.id.toString(), e)}
                 >
                   ×
@@ -87,7 +127,18 @@ export function MultiSelectComponent({
         </div>
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-auto">
+          <div
+            ref={dropdownListRef}
+            className={cn(
+              "absolute z-[9999] w-full bg-white border rounded-lg shadow-lg max-h-60 overflow-auto",
+              dropdownPosition === "top"
+                ? "bottom-[calc(100%+4px)]"
+                : "top-[calc(100%+4px)]"
+            )}
+            style={{
+              maxHeight: "240px" 
+            }}
+          >
             {options.map((option) => (
               <div
                 key={option.id}
@@ -99,7 +150,7 @@ export function MultiSelectComponent({
               >
                 <div className="w-4 h-4 border rounded flex items-center justify-center">
                   {value.includes(option.id.toString()) && (
-                    <Check className="h-3 w-3" />
+                    <Check className="w-4 h-4 rounded bg-secondary-700 text-white" />
                   )}
                 </div>
                 <span>{option.name}</span>
@@ -109,9 +160,7 @@ export function MultiSelectComponent({
         )}
       </div>
 
-      {error && (
-        <p className="text-red-500 text-text4Medium">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-text4Medium">{error}</p>}
     </div>
   );
 }

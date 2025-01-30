@@ -31,7 +31,7 @@ export default function Location() {
 
   const getLocations = () => {
     api
-      .get(`/location?page=${paginationData.currentPage}&search=${searchTerm}`)
+      .get(`/location?page=${paginationData.currentPage}&limit=${paginationData.pageSize}&search=${searchTerm}`)
       .then((response) => {
         setLocations(response.data.data);
         setPaginationData({
@@ -132,9 +132,9 @@ export default function Location() {
   }, [needToRefetch]);
   return (
     <div className="w-full flex flex-col items-center gap-3 bg-white p-3 rounded-2xl lg:px-6 px-2">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex lg:items-center items-start justify-between w-full lg:flex-row flex-col">
         <p className="text-text2Medium uppercase">Location</p>
-        <div className="flex items-center gap-3">
+        <div className="flex lg:items-center items-start gap-3 lg:flex-row flex-col">
           <div className="search-container w-full">
             <input
               type="text"

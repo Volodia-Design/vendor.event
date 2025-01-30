@@ -45,7 +45,7 @@ export default function Products() {
     setIsLoading(true);
     api
       .get(
-        `/vendor-product?page=${paginationData.currentPage}&search=${searchTerm}`
+        `/vendor-product?page=${paginationData.currentPage}&limit=${paginationData.pageSize}&search=${searchTerm}`
       )
       .then((response) => {
         setAllProducts(response.data.data.data);

@@ -34,21 +34,22 @@ export default function Sidebar() {
   const handleGoMainPage = () => {
     window.open("https://eml-gishyans-projects.vercel.app/", "_blank");
   };
-  
-const handleLogout = () => {
-setIsLoading(true);
-  api.post("/auth/sign-out")
-    .then(() => {
-      localStorage.removeItem("authToken");
-      window.location.href = "https://eml-gishyans-projects.vercel.app/";
-    })
-    .catch((error) => {
-      console.error("Error logging out:", error);
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
-}
+
+  const handleLogout = () => {
+    setIsLoading(true);
+    api
+      .post("/auth/sign-out")
+      .then(() => {
+        localStorage.removeItem("authToken");
+        window.location.href = "https://eml-gishyans-projects.vercel.app?isUser=logout";
+      })
+      .catch((error) => {
+        console.error("Error logging out:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
   return (
     <div className="hidden lg:block p-4 h-full w-full max-w-80">
       <div

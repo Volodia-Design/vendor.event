@@ -40,7 +40,8 @@ export default function Products() {
     api
       .get(`/vendor-product?search=${searchTerm}`)
       .then((response) => {
-        setAllProducts(response.data.data);
+        console.log("🚀 ~ .then ~ response:", response)
+        setAllProducts(response.data.data.data);
       })
       .catch((error) => {
         console.error(error);

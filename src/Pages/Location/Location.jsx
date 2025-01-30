@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import TableComponent from "../../components/TableComponent";
-import { SelectComponent } from "../../components/SelectComponent";
 import Button from "../../components/Button";
 import api from "../../utils/api";
 import useCurrentWidth from "../../utils/useCurrentWidth";
@@ -8,10 +7,12 @@ import useModal from "../../store/useModal";
 import LocationCrud from "./LocationCrud";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Pagination";
+import useLoading from "../../store/useLoading";
 
 export default function Location() {
   const [locations, setLocations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { setIsLoading, startLoading, stopLoading } = useLoading();
   const navigate = useNavigate();
   const { isDesktop } = useCurrentWidth();
   const {
@@ -31,7 +32,7 @@ export default function Location() {
 
   const getLocations = () => {
     api
-      .get(`/location?page=${paginationData.currentPage}&limit=${paginationData.pageSize}&search=${searchTerm}`)
+      .get(`/location`)
       .then((response) => {
         setLocations(response.data.data);
         setPaginationData({
@@ -77,23 +78,25 @@ export default function Location() {
       <tr key={item.id} className="border hover:bg-primary2-50/50">
         <td className="p-4 text-text3 text-black-300">{item.name}</td>
         <td className="p-4 text-black-300 max-w-md truncate text-text4">
-          {item.description}
+          {item.email}
         </td>
-        <td className="p-4 text-text3 text-black-300">{item.stock}</td>
-        <td className="p-4 text-text3 text-black-300">USD {item.price}</td>
+        <td className="p-4 text-text3 text-black-300">{item.phone}</td>
+        <td className="p-4 text-text3 text-black-300">{item.fullAddress}</td>
+        <td className="p-4 text-text3 text-black-300">-</td>
+        <td className="p-4 text-text3 text-black-300">{item.workingDays}  {item.workingHoursFrom + " - " + item.workingHoursTO}</td>
         <td className="p-4 flex gap-2 items-center justify-center">
           <img
             src="/Images/ComponentIcons/EditColored.svg"
             alt="Edit"
             className="w-6 h-6 cursor-pointer"
-            // onClick={() => handleEdit(item)}
+            onClick={() => handleCrud({ type: "edit", data: item })}
           />
-          {/* <img
+          <img
             src="/Images/ComponentIcons/Delete.svg"
             alt="delete"
             className="w-6 h-6 cursor-pointer"
             onClick={() => handleDelete(item)}
-          /> */}
+          />
         </td>
       </tr>
     ));
@@ -124,6 +127,25 @@ export default function Location() {
       currentPage: page,
     }));
     getLocations();
+  };
+
+  const handleDelete = (location) => {
+    openDeleteModal({
+      id: location.id,
+      type: "location",
+      onConfirm: async () => {
+        setIsLoading(true);
+        try {
+          await api.delete(`/location/${location.id}`);
+          showSuccess();
+          getLocations();
+        } catch (error) {
+          showError();
+        } finally {
+          setIsLoading(false);
+        }
+      },
+    });
   };
 
   useEffect(() => {

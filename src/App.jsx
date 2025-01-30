@@ -6,7 +6,6 @@ import Schedule from "./Pages/Schedule/Schedule";
 import Products from "./Pages/Products/Products";
 import Portfolio from "./Pages/Portfolio/Portfolio";
 import AboutUs from "./Pages/AboutUs/AboutUs";
-import People from "./Pages/People/People";
 import Location from "./Pages/Location/Location";
 import Settings from "./Pages/Settings/Settings";
 import "swiper/css";
@@ -18,6 +17,7 @@ import { DeleteConfirmationModal, ErrorModal, ModalComponent, SuccessModal } fro
 import ServiceCrud from "./Pages/Services/ServiceCrud";
 import LocationCrud from "./Pages/Location/LocationCrud";
 import ProductCrud from "./Pages/Products/ProductCrud";
+import Staff from "./Pages/Staff/Staff";
 
 function App() {
   const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className, isDeleteModalOpen, closeDeleteModal, deleteModalData } = useModal();
@@ -51,7 +51,7 @@ function App() {
           <Route path="/product/crud" element={<ProductCrud />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/people" element={<People />} />
+          <Route path="/staff" element={<Staff />} />
           <Route path="/location" element={<Location />} />
           <Route path="/location/crud" element={<LocationCrud />} />
           <Route path="/settings" element={<Settings />} />

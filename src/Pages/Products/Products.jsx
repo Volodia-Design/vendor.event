@@ -14,6 +14,7 @@ import useModal from "../../store/useModal";
 import ProductCrud from "./ProductCrud";
 import useCurrentWidth from "../../utils/useCurrentWidth";
 import useLocations from "../../store/data/useLoactions";
+import Pagination from "../../components/Pagination";
 
 export default function Products() {
   const location = useLocation();
@@ -34,14 +35,22 @@ export default function Products() {
   } = useModal();
   const { isDesktop } = useCurrentWidth();
   const [allProducts, setAllProducts] = useState([]);
+  const [paginationData, setPaginationData] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+  })
 
   const getProductData = () => {
     setIsLoading(true);
     api
-      .get(`/vendor-product?search=${searchTerm}`)
+      .get(`/vendor-product?page=${paginationData.currentPage}&search=${searchTerm}`)
       .then((response) => {
-        console.log("🚀 ~ .then ~ response:", response)
         setAllProducts(response.data.data.data);
+        setPaginationData({
+          ...paginationData, 
+          totalPages: response.data.data.total,
+        })
       })
       .catch((error) => {
         console.error(error);
@@ -170,6 +179,14 @@ export default function Products() {
     getProductData();
   };
 
+  const handlePageChange = (page) => {
+    setPaginationData((prevData) => ({
+      ...prevData,
+      currentPage: page,
+    }));
+    getProductData();
+  };
+
   useEffect(() => {
     getProductData();
     setNeedToRefetch(false);
@@ -261,6 +278,8 @@ export default function Products() {
           <TableComponent renderCols={renderCols} renderRows={renderRows} />
         )}
       </div>
-    </div>
+<div className="w-full flex justify-end">
+<Pagination paginationData={paginationData} onPageChange={handlePageChange} />
+</div>    </div>
   );
 }

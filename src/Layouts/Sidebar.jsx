@@ -31,7 +31,6 @@ export default function Sidebar() {
   const handleGoMainPage = () => {
     window.location.href = "https://eml-gishyans-projects.vercel.app/";
   };
-  
 
   return (
     <div className="hidden lg:block p-4 h-full w-full max-w-80">
@@ -70,12 +69,14 @@ export default function Sidebar() {
           })}
         </div>
 
-        <div
-          className="mt-auto flex justify-center items-center gap-3 p-4 rounded-2xl bg-[#192634] mr-4 hover:bg-black-100/40  duration-300 ease-in-out cursor-pointer"
-          onClick={() => handleGoMainPage()}
-        >
-          <img src="/Logo.svg" alt="Logo" className="h-10" />
-          <p className="text-text2Bold text-white">Event my Life</p>
+        <div className="mt-auto">
+          <div
+            onClick={() => handleGoMainPage()}
+            className="flex justify-center items-center gap-3 p-4 rounded-2xl bg-[#192634] mr-4 hover:bg-black-100/40  duration-300 ease-in-out cursor-pointer"
+          >
+            <img src="/Logo.svg" alt="Logo" className="h-10" />
+            <p className="text-text2Bold text-white">Event my Life</p>
+          </div>
         </div>
       </div>
     </div>

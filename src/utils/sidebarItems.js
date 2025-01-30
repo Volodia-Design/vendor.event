@@ -36,8 +36,8 @@ const sidebarItems = [
         activeIcon: "/Images/SidebarIcons/AboutUsActive.svg"
     },
     {
-        name: "People",
-        path: "/people",
+        name: "Staff",
+        path: "/staff",
         icon: "/Images/SidebarIcons/People.svg",
         activeIcon: "/Images/SidebarIcons/PeopleActive.svg"
     },

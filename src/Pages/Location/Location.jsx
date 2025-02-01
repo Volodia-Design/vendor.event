@@ -85,16 +85,16 @@ export default function Location() {
     Sunday: "Su",
     "All Week": "All Week",
   };
-  
+
   const getAbbreviatedDays = (days) => {
     console.log("🚀 ~ getAbbreviatedDays ~ days:", days);
-  
+
     return days
       .split(/\s*,\s*/)
       .map((day) => daysAbbreviationMap[day.trim()] || day.trim())
       .join(", ");
   };
-  
+
   const renderRows = () => {
     return locations.map((item) => (
       <tr key={item.id} className="border hover:bg-primary2-50/50">
@@ -106,13 +106,13 @@ export default function Location() {
         <td className="p-4 text-text3 text-black-300">{item.fullAddress}</td>
         <td className="p-4 text-text3 text-black-300">-</td>
         <td className="p-4 text-text3 text-black-300">
-  <div className="flex justify-between items-center w-full">
-    <p>{getAbbreviatedDays(item.workingDays)},</p>
-    <p>
-      {item.workingHoursFrom} - {item.workingHoursTo}
-    </p>
-  </div>
-</td>
+          <div className="flex justify-between items-center w-full">
+            <p>{getAbbreviatedDays(item.workingDays)},</p>
+            <p>
+              {item.workingHoursFrom} - {item.workingHoursTo}
+            </p>
+          </div>
+        </td>
 
         <td className="p-4 flex gap-2 items-center justify-center">
           <img
@@ -131,7 +131,6 @@ export default function Location() {
       </tr>
     ));
   };
-  
 
   const handleSearch = () => {
     getLocations();

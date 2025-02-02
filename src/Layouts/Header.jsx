@@ -43,7 +43,7 @@ export default function Header() {
     <>
       {/* Desktop Header */}
       <div className="hidden lg:flex items-center justify-between w-full bg-white p-3 rounded-lg">
-        <p className="text-text1Medium text-primary2-500 uppercase">
+        <p className="text-text2Medium text-primary2-500 uppercase">
           {activeTab}
         </p>
         <div className="flex items-center gap-4">
@@ -124,7 +124,7 @@ export default function Header() {
         )}
         {/* User Info (always visible at the bottom) */}
         <div className="w-full flex items-center justify-between p-4 bg-white">
-          <p className="text-text1Medium text-primary2-500 uppercase">
+          <p className="text-text3Medium text-primary2-500 uppercase">
             {activeTab}
           </p>
 

@@ -3,12 +3,12 @@ import useActiveTab from "../store/useActiveTab";
 import useAuth from "../store/useAuth";
 import { useApiImage } from "../utils/useApiImage";
 import sidebarItems from "../utils/sidebarItems";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { user } = useAuth();
   const { imageUrl } = useApiImage(user?.image);
-
+const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { activeTab, setActiveTab } = useActiveTab();
@@ -33,9 +33,8 @@ export default function Header() {
   }, [location.pathname, setActiveTab]);
 
   const handleGoMainPage = () => {
-    window.location.href = import.meta.env.VITE_HOME_PAGE
+    navigate("/");
   };
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen); 
   };

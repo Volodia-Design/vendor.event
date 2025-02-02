@@ -22,19 +22,20 @@ export function InputComponent({
 
   const formatValue = (val) => {
     if (!val) return '';
-    
+  
     if (isPrice) {
-      return isFocused ? val.replace('$', '') : `${val}$`;
+      return isFocused ? String(val).replace('$', '') : `${val}$`;
     }
     if (isPhoneNumber) {
-      const digitsOnly = val.replace(/\D/g, '');
+      const digitsOnly = String(val).replace(/\D/g, '');
       return digitsOnly ? `+${digitsOnly}` : '';
     }
     if (onlyDigits) {
-      return val.replace(/\D/g, '');
+      return String(val).replace(/\D/g, '');
     }
-    return val;
+    return String(val);
   };
+  
 
   const handleFocus = () => {
     setIsFocused(true);

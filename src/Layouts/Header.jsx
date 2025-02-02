@@ -33,11 +33,11 @@ export default function Header() {
   }, [location.pathname, setActiveTab]);
 
   const handleGoMainPage = () => {
-    window.location.href = "https://eml-gishyans-projects.vercel.app/";
+    window.location.href = import.meta.env.VITE_HOME_PAGE
   };
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); // Toggle the menu state
+    setIsMenuOpen(!isMenuOpen); 
   };
 
   return (

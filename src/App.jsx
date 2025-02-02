@@ -13,7 +13,12 @@ import "swiper/css/pagination";
 import "react-tooltip/dist/react-tooltip.css";
 import Loader from "./components/Loader";
 import useModal from "./store/useModal";
-import { DeleteConfirmationModal, ErrorModal, ModalComponent, SuccessModal } from "./components/ModalComponent";
+import {
+  DeleteConfirmationModal,
+  ErrorModal,
+  ModalComponent,
+  SuccessModal,
+} from "./components/ModalComponent";
 import ServiceCrud from "./Pages/Services/ServiceCrud";
 import LocationCrud from "./Pages/Location/LocationCrud";
 import ProductCrud from "./Pages/Products/ProductCrud";
@@ -21,27 +26,39 @@ import Staff from "./Pages/Staff/Staff";
 import StaffCrud from "./Pages/Staff/StaffCrud";
 
 function App() {
-  const { isOpen, content, onClose, isSuccessOpen, isErrorOpen, closeSuccess, closeError, className, isDeleteModalOpen, closeDeleteModal, deleteModalData } = useModal();
+  const {
+    isOpen,
+    content,
+    onClose,
+    isSuccessOpen,
+    isErrorOpen,
+    closeSuccess,
+    closeError,
+    className,
+    isDeleteModalOpen,
+    closeDeleteModal,
+    deleteModalData,
+  } = useModal();
 
   return (
     <Router>
       <Loader />
       {isOpen && content && (
-          <ModalComponent isOpen={isOpen} onClose={onClose} content={content} className={className} />
-        )}
-         <SuccessModal 
-        isOpen={isSuccessOpen}
-        onClose={closeSuccess}
-      />
-      <ErrorModal 
-        isOpen={isErrorOpen}
-        onClose={closeError}
-      />
-   <DeleteConfirmationModal 
+        <ModalComponent
+          isOpen={isOpen}
+          onClose={onClose}
+          content={content}
+          className={className}
+        />
+      )}
+      <SuccessModal isOpen={isSuccessOpen} onClose={closeSuccess} />
+      <ErrorModal isOpen={isErrorOpen} onClose={closeError} />
+      <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
         data={deleteModalData}
-      />      <Routes>
+      />
+      <Routes>
         <Route element={<ProtectedMainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />

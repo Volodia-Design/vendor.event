@@ -32,7 +32,7 @@ export default function Sidebar() {
   }, [location.pathname, setActiveTab]);
 
   const handleGoMainPage = () => {
-    window.open("https://eml-gishyans-projects.vercel.app/", "_blank");
+    window.open(import.meta.env.VITE_HOME_PAGE, "_blank");
   };
 
   const handleLogout = () => {
@@ -41,7 +41,7 @@ export default function Sidebar() {
       .post("/auth/sign-out")
       .then(() => {
         localStorage.removeItem("authToken");
-        window.location.href = "https://eml-gishyans-projects.vercel.app?isUser=logout";
+        window.location.href = import.meta.env.VITE_HOME_PAGE_LOGOUT
       })
       .catch((error) => {
         console.error("Error logging out:", error);

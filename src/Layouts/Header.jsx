@@ -8,7 +8,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export default function Header() {
   const { user } = useAuth();
   const { imageUrl } = useApiImage(user?.image);
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const { activeTab, setActiveTab } = useActiveTab();
@@ -36,14 +36,16 @@ const navigate = useNavigate();
     navigate("/");
   };
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen); 
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
     <>
       {/* Desktop Header */}
       <div className="hidden lg:flex items-center justify-between w-full bg-white p-3 rounded-lg">
-        <p className="text-text1Medium text-primary2-500 uppercase">{activeTab}</p>
+        <p className="text-text1Medium text-primary2-500 uppercase">
+          {activeTab}
+        </p>
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full border border-secondary-700 flex items-center justify-center">
             <img
@@ -91,8 +93,6 @@ const navigate = useNavigate();
           </div>
         </div>
 
-     
-
         {/* Mobile Menu (appears when isMenuOpen is true) */}
         {isMenuOpen && (
           <nav className="absolute top-16 left-0 right-0 bg-black-900 p-3 flex flex-col gap-3 z-50">
@@ -103,7 +103,10 @@ const navigate = useNavigate();
                   <Link
                     key={item.name}
                     to={item.path}
-                    onClick={() => setActiveTab(item.name)}
+                    onClick={() => {
+                      setActiveTab(item.name);
+                      setIsMenuOpen(false);
+                    }}
                     className="flex items-center gap-3"
                   >
                     <div
@@ -119,24 +122,26 @@ const navigate = useNavigate();
             </div>
           </nav>
         )}
-           {/* User Info (always visible at the bottom) */}
-           <div className="w-full flex items-center justify-between p-4 bg-white">
-        <p className="text-text1Medium text-primary2-500 uppercase">{activeTab}</p>
+        {/* User Info (always visible at the bottom) */}
+        <div className="w-full flex items-center justify-between p-4 bg-white">
+          <p className="text-text1Medium text-primary2-500 uppercase">
+            {activeTab}
+          </p>
 
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full border border-secondary-700 flex items-center justify-center">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full border border-secondary-700 flex items-center justify-center">
+              <img
+                src="/Images/ComponentIcons/Notification.svg"
+                alt="notification"
+                className="w-6 h-6 cursor-pointer"
+              />
+            </div>
             <img
-              src="/Images/ComponentIcons/Notification.svg"
-              alt="notification"
-              className="w-6 h-6 cursor-pointer"
+              src={imageUrl}
+              alt="profile"
+              className="w-10 h-10 rounded-full"
             />
           </div>
-          <img
-            src={imageUrl}
-            alt="profile"
-            className="w-10 h-10 rounded-full"
-          />
-        </div>
         </div>
       </div>
     </>

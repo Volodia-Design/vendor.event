@@ -184,9 +184,9 @@ export default function Location() {
   return (
     <div className="w-full flex flex-col items-center gap-3 bg-white p-3 rounded-2xl lg:px-6 px-2">
       <div className="flex lg:items-center items-start justify-between w-full lg:flex-row flex-col">
-        <p className="text-text2Medium uppercase">Location</p>
-        <div className="flex lg:items-center items-start gap-3 lg:flex-row flex-col">
-          <div className="search-container w-full">
+        <p className="text-text2Medium uppercase md:block hidden">Location</p>
+        <div className="flex lg:items-center items-end gap-3 lg:flex-row flex-col lg:w-auto w-full">
+          <div className="search-container">
             <input
               type="text"
               placeholder="Search by location"

@@ -126,7 +126,7 @@ export default function LocationCrud({ action }) {
     if (!location.name || location.name.trim() === "") {
       newErrors.name = "Name is required.";
     }
-    if (!location.email || location.email.trim() === "") {
+    if (!location.email || location.email.trim() === "" || !/^\S+@\S+\.\S+$/.test(location.email)) {
       newErrors.email = "Email is required.";
     }
     if (!location.fullAddress || location.fullAddress.trim() === "") {

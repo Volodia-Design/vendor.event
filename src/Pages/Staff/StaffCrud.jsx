@@ -80,7 +80,7 @@ export default function StaffCrud({ action }) {
     if (!staff.fullName || staff.fullName.trim() === "") {
       newErrors.fullName = "Full name is required.";
     }
-    if (!staff.email || staff.email.trim() === "") {
+    if (!staff.email || staff.email.trim() === "" || !/^\S+@\S+\.\S+$/.test(staff.email)) {
       newErrors.email = "Email is required.";
     }
     if (currentAction?.type !== "edit") {

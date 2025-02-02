@@ -194,7 +194,7 @@ export default function Products() {
   }, [needToRefetch, paginationData.currentPage]);
 
   return (
-    <div className="w-full bg-white py-6 px-8 rounded-lg">
+    <div className="w-full bg-white p-3 rounded-2xl lg:px-6 px-2">
       {/* Navigation */}
       <div className="w-full flex justify-start items-center gap-4 relative text-text2">
         <div
@@ -227,12 +227,12 @@ export default function Products() {
       </div>
       {/* Main Content */}
       <div className="mt-4 flex lg:items-center lg:flex-row justify-between flex-col items-start">
-        <p className="text-text2Medium uppercase">
+        <p className="text-text2Medium uppercase lg:block hidden">
           {location.pathname === "/products/product-store"
             ? "Products"
             : "Order History"}
         </p>
-        <div className="flex md:items-center gap-3 flex-col md:flex-row items-start lg:mt-0 mt-4">
+        <div className="flex md:items-center gap-3 flex-col md:flex-row items-end lg:mt-0 mt-4 lg:w-auto w-full">
           <div className="search-container w-full">
             <input
               type="text"
@@ -264,7 +264,7 @@ export default function Products() {
             options={locations}
             placeholder="All Locations"
             placeholderColor="text-black-200"
-            className="w-48"
+            className="lg:w-48 w-full"
             value={""}
             onChange={() => {}}
           />

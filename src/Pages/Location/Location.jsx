@@ -181,6 +181,12 @@ export default function Location() {
     getLocations();
     setNeedToRefetch(false);
   }, [needToRefetch, paginationData.currentPage]);
+
+  useEffect(() => {
+    if (searchTerm === "") {
+      getLocations();
+    }
+  }, [searchTerm]);
   return (
     <div className="w-full flex flex-col items-center gap-3 bg-white p-3 rounded-2xl lg:px-6 px-2">
       <div className="flex lg:items-center items-start justify-between w-full lg:flex-row flex-col">

@@ -187,6 +187,12 @@ export default function Products() {
     setNeedToRefetch(false);
   }, [needToRefetch, paginationData.currentPage]);
 
+  useEffect(() => {
+    if (searchTerm === "") {
+      getProductData();
+    }
+  }, [searchTerm]);
+
   return (
     <div className="w-full bg-white p-3 rounded-2xl lg:px-6 px-2">
       {/* Navigation */}

@@ -2,14 +2,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { SelectComponent } from "../../components/SelectComponent";
 import Button from "../../components/Button";
 import { useEffect, useState } from "react";
-import ImageUpload from "../../components/ImageUpload";
-import { InputComponent } from "../../components/InputComponent";
-import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import TableComponent from "../../components/TableComponent";
 import useLoading from "../../store/useLoading";
 import api from "../../utils/api";
 import useServiceTypes from "../../store/data/useServiceTypes";
-import useEventTypes from "../../store/data/useEventTypes";
 import useModal from "../../store/useModal";
 import ProductCrud from "./ProductCrud";
 import useCurrentWidth from "../../utils/useCurrentWidth";
@@ -19,10 +15,8 @@ import Pagination from "../../components/Pagination";
 export default function Products() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { setIsLoading } = useLoading();
   const { serviceTypes } = useServiceTypes();
-  const { eventTypes } = useEventTypes();
   const [searchTerm, setSearchTerm] = useState("");
   const { locations } = useLocations();
   const {

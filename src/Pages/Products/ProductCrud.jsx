@@ -240,6 +240,7 @@ export default function ProductCrud({ action }) {
             value={productData.price}
             onChange={(value) => handleDataChange("price", value)}
             error={errors.price}
+            isPrice
           />
         </div>
 

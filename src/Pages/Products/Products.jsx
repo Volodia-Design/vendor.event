@@ -112,12 +112,14 @@ export default function Products() {
   };
 
   const handleCrud = async (action) => {
+    console.log("🚀 ~ handleCrud ~ action:", action)
     if (action.type === "edit" && action.data) {
       // Create a new copy of the data
       let transformedData = {
         ...action.data,
         service_type_id: String(action.data.service_type_id),
         event_types: action.data.event_types.map((event) => String(event.id)),
+        location_id: String(action.data.location_id),
       };
 
       // Handle image transformation

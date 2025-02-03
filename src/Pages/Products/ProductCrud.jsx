@@ -31,7 +31,7 @@ export default function ProductCrud({ action }) {
     stock: "",
     price: "",
     service_type_id: "",
-    location: "",
+    location_id: "",
     event_types: [],
     description: "",
   });
@@ -43,7 +43,7 @@ export default function ProductCrud({ action }) {
     stock: "",
     price: "",
     service_type_id: "",
-    location: "",
+    location_id: "",
     event_types: "",
     description: "",
   });
@@ -67,7 +67,7 @@ export default function ProductCrud({ action }) {
       stock: "",
       price: "",
       service_type_id: "",
-      location: "",
+      location_id: "",
       event_types: "",
       description: "",
     };
@@ -106,8 +106,8 @@ export default function ProductCrud({ action }) {
       newErrors.service_type_id = "Type is required.";
     }
 
-    if (!productData.location || productData.location.trim() === "") {
-      newErrors.location = "Location is required.";
+    if (!productData.location_id || productData.location_id.trim() === "") {
+      newErrors.location_id = "Location is required.";
     }
 
     if (!productData.event_types.length) {
@@ -133,7 +133,7 @@ export default function ProductCrud({ action }) {
     formDataToSend.append("stock", productData.stock); 
     formDataToSend.append("price", productData.price); 
     formDataToSend.append("service_type_id", productData.service_type_id);
-    formDataToSend.append("location", productData.location);
+    formDataToSend.append("location_id", productData.location_id);
     formDataToSend.append(
       "event_types",
       JSON.stringify(productData.event_types)
@@ -257,16 +257,16 @@ export default function ProductCrud({ action }) {
             error={errors.service_type_id}
           />
           <SelectComponent
-            id="location"
+            id="location_id"
             label="Location *"
             placeholder={
               <span className="text-black-200">Select a Location</span>
             }
             className="w-full"
             options={locations}
-            value={productData.location}
-            onChange={(value) => handleDataChange("location", value)}
-            error={errors.location}
+            value={productData.location_id}
+            onChange={(value) => handleDataChange("location_id", value)}
+            error={errors.location_id}
           />
         </div>
 

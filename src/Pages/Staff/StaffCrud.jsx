@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { InputComponent } from "../../components/InputComponent";
 import { SelectComponent } from "../../components/SelectComponent";
 import useLocations from "../../store/data/useLocations";
-import { stringify } from "postcss";
 
 export default function StaffCrud({ action }) {
   const locationParam = useLocation();
@@ -32,7 +31,7 @@ export default function StaffCrud({ action }) {
           id: staff.id,
           fullName: staff.fullName,
           email: staff.email,
-          location: String(staff.location?.id) 
+          location_id: String(staff.location?.id) 
         });
       })
       .catch((error) => {
@@ -48,7 +47,7 @@ export default function StaffCrud({ action }) {
     email: "",
     password: "",
     confirmPassword: "",
-    location: "",
+    location_id: "",
   });
 
   const [errors, setErrors] = useState({
@@ -74,7 +73,7 @@ export default function StaffCrud({ action }) {
       email: "",
       password: "",
       confirmPassword: "",
-      location: "",
+      location_id: "",
     };
 
     if (!staff.fullName || staff.fullName.trim() === "") {
@@ -94,8 +93,8 @@ export default function StaffCrud({ action }) {
         newErrors.confirmPassword = "Passwords do not match.";
       }
     }
-    if (!staff.location || staff.location.trim() === "") {
-      newErrors.location = "Location is required.";
+    if (!staff.location_id || staff.location_id.trim() === "") {
+      newErrors.location_id = "Location is required.";
     }
     
     console.log("🚀 ~ saveData ~ newErrors:", newErrors)
@@ -107,7 +106,7 @@ export default function StaffCrud({ action }) {
     const formData = new FormData();
 
     formData.append("fullName", staff.fullName);
-    formData.append("location", staff.location);
+    formData.append("location_id", staff.location_id);
     if (currentAction?.type !== "edit" || staff.email !== originalEmail) {
       formData.append("email", staff.email);
     }
@@ -202,13 +201,13 @@ export default function StaffCrud({ action }) {
           className={currentAction.type == "edit" && "hidden"}
         />
         <SelectComponent
-          id="location"
+          id="location_id"
           label="Attach Location *"
           placeholder={<span className="text-black-200">Select Location</span>}
-          value={staff.location}
-          onChange={handleChangeData("location")}
+          value={staff.location_id}
+          onChange={handleChangeData("location_id")}
           options={locations}
-          error={errors.location}
+          error={errors.location_id}
         />
         <div className="w-full flex gap-3 items-center justify-end mt-2">
           <Button

@@ -8,6 +8,10 @@ import { useEffect, useState } from "react";
 import { InputComponent } from "../../components/InputComponent";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import { SelectComponent } from "../../components/SelectComponent";
+import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
+
+const libraries = ["places"];
+
 
 export default function LocationCrud({ action }) {
   const locationParam = useLocation();
@@ -16,6 +20,21 @@ export default function LocationCrud({ action }) {
   const { isDesktop } = useCurrentWidth();
   const navigate = useNavigate();
   const currentAction = action || locationParam.state?.action;
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API,
+    libraries,
+  });
+  const [autocomplete, setAutocomplete] = useState(null);
+
+  const onLoad = (autoC) => setAutocomplete(autoC);
+  const onPlaceChanged = () => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place.name) {
+        setLocation((prev) => ({ ...prev, name: place.name }));
+      }
+    }
+  };
 
   const getLocationById = (id) => {
     setIsLoading(true);
@@ -208,14 +227,28 @@ export default function LocationCrud({ action }) {
       </p>
 
       <form className="w-full flex flex-col gap-5">
-        <InputComponent
+      {isLoaded && (
+          <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+            <InputComponent
+              type="text"
+              label="Location Name *"
+              placeholder="Search for location"
+              value={location.name}
+              onChange={handleChangeData("name")}
+              error={errors.name}
+            />
+          </Autocomplete>
+        )
+      }
+
+        {/* <InputComponent
           type="text"
           label="Location Name *"
           placeholder="Write Name"
           value={location.name}
           onChange={handleChangeData("name")}
           error={errors.name}
-        />
+        /> */}
         <InputComponent
           type="email"
           label="Email *"

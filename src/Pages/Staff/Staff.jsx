@@ -73,8 +73,8 @@ export default function Staff() {
         <td className="p-4 text-black-300 max-w-md truncate text-text4">
           {item.email}
         </td>
-        <td className="p-4 text-text3 text-black-300">{item.location.name}</td>
-        <td className="p-4 text-text3 text-black-300">{item.location.fullAddress}</td>
+        <td className="p-4 text-text3 text-black-300">{item.location?.name}</td>
+        <td className="p-4 text-text3 text-black-300">{item.location?.fullAddress}</td>
         <td className="p-4 flex gap-2 items-center justify-center">
           <img
             src="/Images/ComponentIcons/EditColored.svg"

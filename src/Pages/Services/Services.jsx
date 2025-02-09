@@ -15,7 +15,14 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [transformed, setTransformed] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
-  const { onOpen, needToRefetch, setNeedToRefetch, openDeleteModal, showSuccess, showError } = useModal();
+  const {
+    onOpen,
+    needToRefetch,
+    setNeedToRefetch,
+    openDeleteModal,
+    showSuccess,
+    showError,
+  } = useModal();
   const { isDesktop } = useCurrentWidth();
   const navigate = useNavigate();
   const getServices = () => {
@@ -25,6 +32,7 @@ export default function Services() {
       .then((response) => {
         const transformedData = response.data.data.map((service) => ({
           ...service,
+          location: service.location.map((loc) => String(loc.id)),
           service_type_id: String(service.service_type_id),
           service_specifications: service.service_specifications.map(
             (spec) => ({
@@ -89,7 +97,7 @@ export default function Services() {
   const handleDelete = (service) => {
     openDeleteModal({
       id: service.id,
-      type: 'service',
+      type: "service",
       onConfirm: async () => {
         setIsLoading(true);
         try {
@@ -101,7 +109,7 @@ export default function Services() {
         } finally {
           setIsLoading(false);
         }
-      }
+      },
     });
   };
 

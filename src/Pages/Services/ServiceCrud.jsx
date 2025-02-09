@@ -26,7 +26,7 @@ export default function ServiceCrud({ action, editableService }) {
   const type = currentAction?.type || "create";
 
   const [serviceData, setServiceData] = useState({
-    location: "",
+    location: [],
     service_type_id: "",
     service_specifications: [
       {
@@ -35,6 +35,7 @@ export default function ServiceCrud({ action, editableService }) {
       },
     ],
   });
+  console.log("🚀 ~ ServiceCrud ~ serviceData:", serviceData)
 
   const [errors, setErrors] = useState({
     location: "",
@@ -83,9 +84,9 @@ export default function ServiceCrud({ action, editableService }) {
   };
 
   const handleLocationChange = (selectedIds) => {
-    const locationString = selectedIds.join(", ");
-    handleDataChange(undefined, "location", locationString);
+    handleDataChange(undefined, "location", selectedIds);
   };
+  
 
   const calculatePriceRange = (specifications) => {
     if (!specifications || specifications.length === 0) {
@@ -124,7 +125,7 @@ export default function ServiceCrud({ action, editableService }) {
       service_specifications: [],
     };
 
-    if (!serviceData.location || serviceData.location.trim() === "") {
+    if (!serviceData.location || serviceData.location.length === 0) {
       newErrors.location = "Location is required.";
     }
 
@@ -219,7 +220,7 @@ export default function ServiceCrud({ action, editableService }) {
           options={locations}
           placeholder="Select Location"
           className="w-full"
-          value={serviceData.location.split(", ").filter((id) => id !== "")}
+          value={serviceData.location.filter((id) => id !== "")}
           onChange={handleLocationChange}
           error={errors.location}
         />

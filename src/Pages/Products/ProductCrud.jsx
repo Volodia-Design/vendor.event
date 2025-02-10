@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import useModal from "../../store/useModal";
-import useServiceTypes from "../../store/data/useServiceTypes";
 import useLoading from "../../store/useLoading";
 import useCurrentWidth from "../../utils/useCurrentWidth";
 import useLocations from "../../store/data/useLocations";
@@ -12,15 +11,19 @@ import { SelectComponent } from "../../components/SelectComponent";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
 import Button from "../../components/Button";
 import useEventTypes from "../../store/data/useEventTypes";
+import useProductTypes from "../../store/data/useProductTypes";
+import useRecipients from "../../store/data/useRecipients";
+import { TextareaComponent } from "../../components/TextareaComponent";
 
 export default function ProductCrud({ action }) {
   const location = useLocation();
   const { onClose, showSuccess, showError } = useModal();
-  const { serviceTypes } = useServiceTypes();
+  const { productTypes } = useProductTypes();
   const { setIsLoading } = useLoading();
   const { isDesktop } = useCurrentWidth();
   const { locations } = useLocations();
   const { eventTypes } = useEventTypes();
+  const { recipients } = useRecipients();
   const navigate = useNavigate();
   const currentAction = action || location.state?.action;
   const type = currentAction?.type || "create";
@@ -30,19 +33,21 @@ export default function ProductCrud({ action }) {
     name: "",
     stock: "",
     price: "",
-    service_type_id: "",
+    product_type_id: "",
     location_id: "",
     event_types: [],
+    recipients: [],
     description: "",
   });
-  console.log("🚀 ~ ProductCrud ~ productData:", productData)
+  console.log("🚀 ~ ProductCrud ~ productData:", productData);
 
   const [errors, setErrors] = useState({
     image: "",
     name: "",
     stock: "",
     price: "",
-    service_type_id: "",
+    product_type_id: "",
+    recipients: "",
     location_id: "",
     event_types: "",
     description: "",
@@ -59,6 +64,10 @@ export default function ProductCrud({ action }) {
     handleDataChange("event_types", selectedIds);
   };
 
+  const handleRecipientChange = (selectedIds) => {
+    handleDataChange("recipients", selectedIds);
+  };
+
   const saveData = (e) => {
     e.preventDefault();
     let newErrors = {
@@ -66,7 +75,8 @@ export default function ProductCrud({ action }) {
       name: "",
       stock: "",
       price: "",
-      service_type_id: "",
+      product_type_id: "",
+      recipients: "",
       location_id: "",
       event_types: "",
       description: "",
@@ -100,10 +110,10 @@ export default function ProductCrud({ action }) {
     }
 
     if (
-      !productData.service_type_id ||
-      productData.service_type_id.trim() === ""
+      !productData.product_type_id ||
+      productData.product_type_id.trim() === ""
     ) {
-      newErrors.service_type_id = "Type is required.";
+      newErrors.product_type_id = "Type is required.";
     }
 
     if (!productData.location_id || productData.location_id.trim() === "") {
@@ -112,6 +122,10 @@ export default function ProductCrud({ action }) {
 
     if (!productData.event_types.length) {
       newErrors.event_types = "At least one event type is required.";
+    }
+
+    if (!productData.recipients.length) {
+      newErrors.recipients = "At least one recipient is required.";
     }
 
     if (!productData.description || productData.description.trim() === "") {
@@ -130,14 +144,15 @@ export default function ProductCrud({ action }) {
 
     formDataToSend.append("file", productData.image);
     formDataToSend.append("name", productData.name);
-    formDataToSend.append("stock", productData.stock); 
-    formDataToSend.append("price", productData.price); 
-    formDataToSend.append("service_type_id", productData.service_type_id);
+    formDataToSend.append("stock", productData.stock);
+    formDataToSend.append("price", productData.price);
+    formDataToSend.append("product_type_id", productData.product_type_id);
     formDataToSend.append("location_id", productData.location_id);
     formDataToSend.append(
       "event_types",
       JSON.stringify(productData.event_types)
     );
+    formDataToSend.append("recipients", JSON.stringify(productData.recipients));
     formDataToSend.append("description", productData.description);
 
     let apiCall =
@@ -247,14 +262,14 @@ export default function ProductCrud({ action }) {
         {/* Select Type and Location */}
         <div className="flex items-center gap-4">
           <SelectComponent
-            id="service_type_id"
+            id="product_type_id"
             label="Type *"
             placeholder={<span className="text-black-200">Select a Type</span>}
             className="w-full"
-            options={serviceTypes}
-            value={productData.service_type_id}
-            onChange={(value) => handleDataChange("service_type_id", value)}
-            error={errors.service_type_id}
+            options={productTypes}
+            value={productData.product_type_id}
+            onChange={(value) => handleDataChange("product_type_id", value)}
+            error={errors.product_type_id}
           />
           <SelectComponent
             id="location_id"
@@ -270,6 +285,18 @@ export default function ProductCrud({ action }) {
           />
         </div>
 
+        {/* Recipient Multi Select */}
+        <MultiSelectComponent
+          id="recipients"
+          label="Recipients"
+          options={recipients}
+          placeholder="Select an Recipient"
+          className="w-full"
+          value={productData.recipients}
+          onChange={handleRecipientChange}
+          error={errors.recipients}
+        />
+
         {/* Event Multi Select */}
         <MultiSelectComponent
           id="event_types"
@@ -283,9 +310,9 @@ export default function ProductCrud({ action }) {
         />
 
         {/* Short Description */}
-        <InputComponent
+        <TextareaComponent
           id="description"
-          label="Short Description"
+          label="Short Description *"
           placeholder="Write a short description"
           className="w-full"
           value={productData.description}

@@ -86,12 +86,14 @@ export default function Products() {
       <tr key={item.id} className="border hover:bg-primary2-50/50">
         <td className="p-4 text-text3 text-black-300">{item.name}</td>
         <td className="p-4 text-black-300 max-w-md truncate text-text4">
-          {item.description}
+          {item.description.length > 50
+            ? `${item.description.substring(0, 50)}...`
+            : item.description}
         </td>
         <td className="p-4 text-text3 text-black-300">{item.stock}</td>
         <td className="p-4 text-text3 text-black-300">USD {item.price}</td>
         <td className="p-4 text-text3 text-black-300">
-          {serviceTypes.find((type) => type.id === item.service_type_id)?.name}
+          {item.product_type?.name}
         </td>
         <td className="p-4 flex gap-2 items-center justify-center">
           <img
@@ -112,13 +114,14 @@ export default function Products() {
   };
 
   const handleCrud = async (action) => {
-    console.log("🚀 ~ handleCrud ~ action:", action)
+    console.log("🚀 ~ handleCrud ~ action:", action);
     if (action.type === "edit" && action.data) {
       // Create a new copy of the data
       let transformedData = {
         ...action.data,
-        service_type_id: String(action.data.service_type_id),
+        product_type_id: String(action.data.product_type_id),
         event_types: action.data.event_types.map((event) => String(event.id)),
+        recipients: action.data.recipients.map((recipient) => String(recipient.id)),
         location_id: String(action.data.location_id),
       };
 

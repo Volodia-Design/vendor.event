@@ -104,7 +104,7 @@ export default function Location() {
         </td>
         <td className="p-4 text-text3 text-black-300">{item.phone}</td>
         <td className="p-4 text-text3 text-black-300">{item.fullAddress}</td>
-        <td className="p-4 text-text3 text-black-300">-</td>
+        <td className="p-4 text-text3 text-black-300">{item.vendor_employee?.map((person) => person.fullName).join(", ")}</td>
         <td className="p-4 text-text3 text-black-300">
           <div className="flex justify-between items-center w-full">
             <p>{getAbbreviatedDays(item.workingDays)},</p>

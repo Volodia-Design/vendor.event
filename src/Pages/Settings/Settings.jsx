@@ -19,37 +19,47 @@ export default function Settings() {
     email: "",
     phone: "+",
     fullAddress: "",
-    socialLinks: [{ url: "" }],
+    socialLinks: [{ url: "", image: null, imagePreview: "" }],
     profileImage: null,
   });
-  const getUserData = () => {
-    setIsLoading(true);
-    api
-      .get("/auth/self")
-      .then((res) => {
-        const { vendor, fullName, email, phone, image } = res.data.data;
-        console.log("🚀 ~ .then ~ vendor:", vendor.socials);
+  const getUserData = async () => {
+    try {
+      setIsLoading(true);
+      const userResponse = await api.get("/auth/self");
+      const { vendor, fullName, email, phone, image } = userResponse.data.data;
 
-        setFormData({
-          position: vendor?.position || "",
-          fullName: fullName || "",
-          email: email || "",
-          phone: phone || "",
-          fullAddress: vendor?.address || "",
-          socialLinks:
-            vendor?.socials?.length > 0 ? vendor.socials : [{ url: "" }],
-          profileImage: "",
-          profileImagePreview: image
-            ? `${api.defaults.baseURL}image/${image}`
-            : null,
-        });
-      })
-      .catch((err) => {
-        console.error("Error fetching user data:", err);
-      })
-      .finally(() => {
-        setIsLoading(false);
+      const socialsResponse = await api.get("/social");
+      const socials = socialsResponse.data.data.data;
+
+      const formattedSocials =
+        socials.length > 0
+          ? socials.map((social) => ({
+              id: social.id, // Make sure to preserve the ID
+              url: social.url || "",
+              image: null,
+              imagePreview: social.image
+                ? `${api.defaults.baseURL}image/${social.image}`
+                : "",
+            }))
+          : [{ url: "", image: null, imagePreview: "" }];
+
+      setFormData({
+        position: vendor?.position || "",
+        fullName: fullName || "",
+        email: email || "",
+        phone: phone || "",
+        fullAddress: vendor?.address || "",
+        socialLinks: formattedSocials,
+        profileImage: null,
+        profileImagePreview: image
+          ? `${api.defaults.baseURL}image/${image}`
+          : null,
       });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const [errors, setErrors] = useState({});
@@ -96,31 +106,49 @@ export default function Settings() {
 
   const handleSocialLinkChange = (index, value) => {
     const updatedLinks = [...formData.socialLinks];
-    updatedLinks[index] = { url: value };
+    updatedLinks[index] = {
+      ...updatedLinks[index], // Preserve existing properties including image
+      url: value, // Only update the URL
+    };
     setFormData({ ...formData, socialLinks: updatedLinks });
   };
-
-  const addSocialLink = () => {
-    // Get the first social link input
-    const firstSocialLink = formData.socialLinks[0].url.trim();
-
-    // Only add if there's a non-empty value
-    if (firstSocialLink) {
-      setFormData({
-        ...formData,
-        // Add the current input as a new social link
-        socialLinks: [
-          { url: "" }, // Reset first input to empty
-          ...formData.socialLinks.slice(0, 1), // Keep the first input
-          { url: firstSocialLink }, // Add the current input as a new link
-        ],
-      });
+  const handleIconUpload = (index, file) => {
+    if (file) {
+      const imagePreview = URL.createObjectURL(file);
+      const updatedLinks = [...formData.socialLinks];
+      updatedLinks[index] = {
+        ...updatedLinks[index],
+        image: file,
+        imagePreview: imagePreview,
+      };
+      setFormData({ ...formData, socialLinks: updatedLinks });
     }
   };
 
-  const removeSocialLink = (index) => {
-    const updatedLinks = formData.socialLinks.filter((_, i) => i !== index);
-    setFormData({ ...formData, socialLinks: updatedLinks });
+  const addSocialLink = () => {
+    setFormData({
+      ...formData,
+      socialLinks: [
+        ...formData.socialLinks,
+        { url: "", image: null, imagePreview: "" },
+      ],
+    });
+  };
+
+  const removeSocialLink = (id) => {
+    setIsLoading(true);
+    api
+      .delete(`/social/${id}`)
+      .then((response) => {
+        showSuccess();
+        getUserData();
+      })
+      .catch((error) => {
+        showError();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleModalChange = (e) => {
@@ -128,68 +156,119 @@ export default function Settings() {
     setModalData({ ...modalData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const isValidUrl = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let newErrors = {};
 
-    // Existing validations
-    if (!formData.fullName || formData.fullName.trim() === "") {
+    // Basic validations
+    if (!formData.fullName?.trim())
       newErrors.fullName = "Full name is required.";
-    }
-    if (!formData.email || formData.email.trim() === "") {
-      newErrors.email = "Email is required.";
-    }
-    if (
-      !formData.phone ||
-      formData.phone.trim() === "" ||
-      formData.phone === "+"
-    ) {
+    if (!formData.email?.trim()) newErrors.email = "Email is required.";
+    if (!formData.phone?.trim() || formData.phone === "+")
       newErrors.phone = "Phone number is required.";
+
+    // Validate social links
+    formData.socialLinks.forEach((link, index) => {
+      if (link.url.trim() !== "" && !isValidUrl(link.url)) {
+        if (!newErrors.socialLinks) newErrors.socialLinks = {};
+        newErrors.socialLinks[index] = "Invalid URL format.";
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
-
-    // New validation for social links
-    const validSocialLinks = formData.socialLinks.filter(
-      (link) => link.url.trim() !== ""
-    );
-
-    const formDataToSend = new FormData();
-
-    // User data
-    formDataToSend.append("fullName", formData.fullName);
-    formDataToSend.append("email", formData.email);
-    formDataToSend.append("phone", formData.phone);
-
-    if (formData.profileImage) {
-      formDataToSend.append("file", formData.profileImage);
-    }
-
-    const vendorData = {
-      position: formData.position,
-      address: formData.fullAddress,
-      socials: validSocialLinks,
-    };
-
-    formDataToSend.append("vendor", JSON.stringify(vendorData));
 
     setIsLoading(true);
-    api
-      .put("/auth/self", formDataToSend, {
+    try {
+      // Handle user profile update
+      const formDataToSend = new FormData();
+      formDataToSend.append("fullName", formData.fullName);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("phone", formData.phone);
+
+      if (formData.profileImage) {
+        formDataToSend.append("file", formData.profileImage);
+      }
+
+      const vendorData = {
+        position: formData.position,
+        address: formData.fullAddress,
+      };
+
+      formDataToSend.append("vendor", JSON.stringify(vendorData));
+
+      // Update user profile
+      await api.put("/auth/self", formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
-      .then(() => {
-        setErrors({});
-        setModalErrors({});
-        showSuccess()
-      })
-      .catch((error) => {
-        console.error("Error updating settings", error);
-        showError();
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
+
+      // Handle social links
+      const socialsResponse = await api.get("/social");
+      const existingSocials = socialsResponse.data.data.data;
+
+      // Filter valid social links
+      const validSocialLinks = formData.socialLinks.filter((link) => {
+        if (link.id) {
+          return link.url.trim() !== "";
+        } else {
+          return link.url.trim() !== "" && link.image instanceof File;
+        }
+      });
+
+      for (const socialLink of validSocialLinks) {
+        const socialFormData = new FormData();
+        socialFormData.append("url", socialLink.url);
+
+        if (socialLink.image instanceof File) {
+          socialFormData.append("file", socialLink.image);
+        }
+
+        if (socialLink.id) {
+          await api.put(`/social/${socialLink.id}`, socialFormData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+        } else {
+          await api.post("/social", socialFormData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+        }
+      }
+
+      for (const existingSocial of existingSocials) {
+        const stillExists = validSocialLinks.some(
+          (link) => link.id === existingSocial.id
+        );
+        if (!stillExists) {
+          await api.delete(`/social/${existingSocial.id}`);
+        }
+      }
+
+      setErrors({});
+      showSuccess();
+      getUserData();
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      showError();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleModalSubmit = (e) => {
@@ -223,7 +302,6 @@ export default function Settings() {
     api
       .put("/auth/self", formDataToSend)
       .then(() => {
-        console.log("Password changed successfully");
         handleCloseModal();
         showSuccess();
       })
@@ -341,17 +419,43 @@ export default function Settings() {
         />
 
         {formData.socialLinks.map((socialLink, index) => (
-          <div key={index} className="flex gap-2 items-center">
+          <div key={index} className="flex items-center justify-center gap-3">
+            {/* Social Link Input */}
             <InputComponent
+              type="url"
               id={`socialLink-${index}`}
               label={index === 0 ? "Social Links" : undefined}
               value={socialLink.url}
               onChange={(value) => handleSocialLinkChange(index, value)}
               className="flex-grow"
               placeholderColorGray={true}
-              placeholder="Write Your Social Links"
+              placeholder="Enter social link"
               error={errors.socialLinks?.[index]}
             />
+            {/* File Input for Icon */}
+            <div className={`relative w-12 h-12 ${index === 0 ? "mt-6" : ""}`}>
+              {socialLink.imagePreview ? (
+                <img
+                  src={socialLink.imagePreview}
+                  alt="Social Icon"
+                  className="w-12 h-12 object-cover rounded-full border"
+                />
+              ) : (
+                <img
+                  src="/NoImage.webp"
+                  alt="Social Icon"
+                  className="w-12 h-12 object-cover rounded-full border"
+                />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={(e) => handleIconUpload(index, e.target.files[0])}
+              />
+            </div>
+
+            {/* Add / Remove Buttons */}
             {index === 0 ? (
               <div
                 onClick={addSocialLink}
@@ -361,7 +465,7 @@ export default function Settings() {
               </div>
             ) : (
               <div
-                onClick={() => removeSocialLink(index)}
+                onClick={() => removeSocialLink(socialLink.id)}
                 className="flex items-center justify-center w-10 h-10 bg-red-600 hover:bg-red-700 rounded-lg cursor-pointer"
               >
                 <span className="text-h4 text-white">-</span>

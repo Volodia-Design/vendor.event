@@ -161,9 +161,14 @@ export function DeleteConfirmationModal({ isOpen, onClose, data, onConfirm }) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white p-6 rounded-lg shadow-lg max-w-sm">
         <DialogTitle className="text-lg font-semibold">Are you sure?</DialogTitle>
+        <div className="flex flex-col gap-2">
         <p className="text-gray-600">
-          Do you really want to delete this service? This action cannot be undone.
+          Do you really want to delete? 
         </p>
+        <p className="text-gray-600">
+          This action cannot be undone.
+        </p>
+        </div>
         <div className="flex justify-end gap-4 mt-4">
           <motion.button
             className="px-4 py-2 bg-gray-300 rounded-md"

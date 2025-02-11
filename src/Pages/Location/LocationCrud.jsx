@@ -226,7 +226,7 @@ export default function LocationCrud({ action }) {
           : "Edit a Location"}
       </p>
 
-      <form className="w-full flex flex-col gap-5">
+      <div className="w-full flex flex-col gap-5">
         <InputComponent
           type="text"
           label="Location Name *"
@@ -321,19 +321,23 @@ export default function LocationCrud({ action }) {
             error={errors.workingHoursTo}
           />
         </div>
-        <div className="w-full flex gap-3 items-center justify-end mt-2">
-          <Button
-            text="Cancel"
-            onClick={handleCloseCrud}
-            buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
-          />
-          <Button
-            text={currentAction?.type === "create" ? "Create" : "Save"}
-            onClick={saveData}
-            buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
-          />
-        </div>
-      </form>
+      </div>
+      <div className="w-full flex gap-3 items-center justify-end mt-6">
+        <Button
+          text="Cancel"
+          onClick={handleCloseCrud}
+          buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
+          type="button" // Make sure to specify type="button" to prevent form submission
+
+        />
+        <Button
+          text={currentAction?.type === "create" ? "Create" : "Save"}
+          onClick={saveData}
+          buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
+          type="button" // Make sure to specify type="button" to prevent form submission
+
+        />
+      </div>
     </div>
   );
 }

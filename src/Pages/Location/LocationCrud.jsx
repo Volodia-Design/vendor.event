@@ -34,7 +34,6 @@ export default function LocationCrud({ action }) {
     lng: "",
   });
 
-  console.log("🚀 ~ LocationCrud ~ location:", location);
   const getLocationById = (id) => {
     setIsLoading(true);
     api

@@ -7,11 +7,8 @@ import api from "../../utils/api";
 import { useEffect, useState } from "react";
 import { InputComponent } from "../../components/InputComponent";
 import { MultiSelectComponent } from "../../components/MultiSelectComponent";
+import AddressInputComponent from "../../components/AddressInputComponent";
 import { SelectComponent } from "../../components/SelectComponent";
-// import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
-
-// const libraries = ["places"];
-
 
 export default function LocationCrud({ action }) {
   const locationParam = useLocation();
@@ -20,22 +17,24 @@ export default function LocationCrud({ action }) {
   const { isDesktop } = useCurrentWidth();
   const navigate = useNavigate();
   const currentAction = action || locationParam.state?.action;
-  // const { isLoaded } = useJsApiLoader({
-  //   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAP_API,
-  //   libraries,
-  // });
-  // const [autocomplete, setAutocomplete] = useState(null);
 
-  // const onLoad = (autoC) => setAutocomplete(autoC);
-  // const onPlaceChanged = () => {
-  //   if (autocomplete) {
-  //     const place = autocomplete.getPlace();
-  //     if (place.name) {
-  //       setLocation((prev) => ({ ...prev, name: place.name }));
-  //     }
-  //   }
-  // };
+  const [location, setLocation] = useState({
+    name: "",
+    email: "",
+    fullAddress: "",
+    phone: "",
+    workingDays: [],
+    workingHoursFrom: "",
+    workingHoursTo: "",
+    country: "",
+    city: "",
+    state: "",
+    postal_code: "",
+    lat: "",
+    lng: "",
+  });
 
+  console.log("🚀 ~ LocationCrud ~ location:", location);
   const getLocationById = (id) => {
     setIsLoading(true);
     api
@@ -47,20 +46,27 @@ export default function LocationCrud({ action }) {
           email: location.email,
           fullAddress: location.fullAddress,
           phone: location.phone,
-          workingDays: location.workingDays ? location.workingDays.split(",") : [],
+          workingDays: location.workingDays
+            ? location.workingDays.split(",")
+            : [],
           workingHoursFrom: location.workingHoursFrom,
           workingHoursTo: location.workingHoursTo,
-          id: location.id
+          country: location.country,
+          city: location.city,
+          state: location.state,
+          postal_code: location.postal_code,
+          lat: location.lat,
+          lng: location.lng,
+          id: location.id,
         });
-
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
         setIsLoading(false);
-      })
-  }
+      });
+  };
 
   let workingDaysOptions = [
     { id: "All week", name: "All week" },
@@ -74,23 +80,11 @@ export default function LocationCrud({ action }) {
   ];
 
   let startHourOptions = Array.from({ length: 48 }, (_, i) => {
-    let hours = String(Math.floor(i / 2)).padStart(2, "0"); 
-    let minutes = i % 2 === 0 ? "00" : "30"; 
+    let hours = String(Math.floor(i / 2)).padStart(2, "0");
+    let minutes = i % 2 === 0 ? "00" : "30";
     let time = `${hours}:${minutes}`;
-    return { id: time, name: time }; 
+    return { id: time, name: time };
   });
-  
-
-  const [location, setLocation] = useState({
-    name: "",
-    email: "",
-    fullAddress: "",
-    phone: "",
-    workingDays: [],
-    workingHoursFrom: "",
-    workingHoursTo: "",
-  });
-  console.log("🚀 ~ LocationCrud ~ location:", location)
 
   const [errors, setErrors] = useState({
     name: "",
@@ -129,6 +123,9 @@ export default function LocationCrud({ action }) {
       return { ...prev, [field]: value };
     });
   };
+  const handleAddressChange = (newAddress) => {
+    setLocation((prev) => ({ ...prev, ...newAddress }));
+  };
 
   const saveData = (e) => {
     e.preventDefault();
@@ -145,7 +142,11 @@ export default function LocationCrud({ action }) {
     if (!location.name || location.name.trim() === "") {
       newErrors.name = "Name is required.";
     }
-    if (!location.email || location.email.trim() === "" || !/^\S+@\S+\.\S+$/.test(location.email)) {
+    if (
+      !location.email ||
+      location.email.trim() === "" ||
+      !/^\S+@\S+\.\S+$/.test(location.email)
+    ) {
       newErrors.email = "Email is required.";
     }
     if (!location.fullAddress || location.fullAddress.trim() === "") {
@@ -166,7 +167,7 @@ export default function LocationCrud({ action }) {
 
     setErrors(newErrors);
 
-    console.log(newErrors)
+    console.log(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) {
       return;
     }
@@ -215,8 +216,7 @@ export default function LocationCrud({ action }) {
     if (currentAction?.type === "edit") {
       getLocationById(currentAction.data.id);
     }
-  }, [action])
-  
+  }, [action]);
 
   return (
     <div className="w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl">
@@ -227,20 +227,6 @@ export default function LocationCrud({ action }) {
       </p>
 
       <form className="w-full flex flex-col gap-5">
-      {/* {isLoaded && (
-          <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-            <InputComponent
-              type="text"
-              label="Location Name *"
-              placeholder="Search for location"
-              value={location.name}
-              onChange={handleChangeData("name")}
-              error={errors.name}
-            />
-          </Autocomplete>
-        )
-      } */}
-
         <InputComponent
           type="text"
           label="Location Name *"
@@ -257,12 +243,10 @@ export default function LocationCrud({ action }) {
           onChange={handleChangeData("email")}
           error={errors.email}
         />
-        <InputComponent
-          type="text"
+        <AddressInputComponent
           label="Full Address *"
-          placeholder="Country, city, street, zip code"
-          value={location.fullAddress}
-          onChange={handleChangeData("fullAddress")}
+          value={location}
+          onChange={handleAddressChange}
           error={errors.fullAddress}
         />
         <InputComponent

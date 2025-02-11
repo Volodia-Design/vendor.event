@@ -87,8 +87,6 @@ export default function Location() {
   };
 
   const getAbbreviatedDays = (days) => {
-    console.log("🚀 ~ getAbbreviatedDays ~ days:", days);
-
     return days
       .split(/\s*,\s*/)
       .map((day) => daysAbbreviationMap[day.trim()] || day.trim())

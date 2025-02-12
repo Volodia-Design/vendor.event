@@ -174,6 +174,12 @@ export default function LocationCrud({ action }) {
     formData.append("name", location.name);
     formData.append("email", location.email);
     formData.append("fullAddress", location.fullAddress);
+    formData.append("country", location.country);
+    formData.append("city", location.city);
+    formData.append("state", location.state);
+    formData.append("postal_code", location.postal_code);
+    formData.append("lat", location.lat);
+    formData.append("lng", location.lng);
     formData.append("phone", location.phone);
     formData.append("workingDays", location.workingDays.join(","));
     formData.append("workingHoursFrom", location.workingHoursFrom);

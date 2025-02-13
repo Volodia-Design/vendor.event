@@ -5,6 +5,7 @@ import Button from "../../components/Button";
 import ImageUpload from "../../components/ImageUpload";
 import useLoading from "../../store/useLoading";
 import useModal from "../../store/useModal";
+import AddressInputComponent from "../../components/AddressInputComponent";
 
 export default function Settings() {
   const { setIsLoading } = useLoading();
@@ -103,7 +104,9 @@ export default function Settings() {
       [name]: value,
     });
   };
-
+  const handleAddressChange = (newAddress) => {
+    setFormData((prev) => ({ ...prev, ...newAddress }));
+  };
   const handleSocialLinkChange = (index, value) => {
     const updatedLinks = [...formData.socialLinks];
     updatedLinks[index] = {
@@ -404,20 +407,12 @@ export default function Settings() {
           isPhoneNumber
           error={errors.phone}
         />
-
-        <InputComponent
-          id="fullAddress"
-          label="Full Address"
-          value={formData.fullAddress}
-          onChange={(value) =>
-            handleInputChange({ target: { name: "fullAddress", value } })
-          }
-          className="w-full"
-          placeholderColorGray={true}
-          placeholder="Write Your Full Address"
+        <AddressInputComponent
+          label="Full Address *"
+          value={formData}
+          onChange={handleAddressChange}
           error={errors.fullAddress}
         />
-
         {formData.socialLinks.map((socialLink, index) => (
           <div key={index} className="flex items-center justify-center gap-3">
             {/* Social Link Input */}

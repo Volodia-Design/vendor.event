@@ -28,7 +28,7 @@ const useModal = create((set) => ({
     set({ isSuccessOpen: true });
     setTimeout(() => {
       set({ isSuccessOpen: false });
-    }, 3000);
+    }, 1500);
   },
   closeSuccess: () => set({ isSuccessOpen: false }),
 
@@ -38,7 +38,7 @@ const useModal = create((set) => ({
     set({ isErrorOpen: true });
     setTimeout(() => {
       set({ isErrorOpen: false });
-    }, 3000);
+    }, 1500);
   },
   closeError: () => set({ isErrorOpen: false }),
 

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import TableComponent from "../../components/TableComponent";
 import useLoading from "../../store/useLoading";
 import api from "../../utils/api";
-import useServiceTypes from "../../store/data/useServiceTypes";
 import useModal from "../../store/useModal";
 import ProductCrud from "./ProductCrud";
 import useCurrentWidth from "../../utils/useCurrentWidth";
@@ -16,7 +15,6 @@ export default function Products() {
   const location = useLocation();
   const navigate = useNavigate();
   const { setIsLoading } = useLoading();
-  const { serviceTypes } = useServiceTypes();
   const [searchTerm, setSearchTerm] = useState("");
   const { locations } = useLocations();
   const {

@@ -3,7 +3,7 @@ import { create } from "zustand";
 import api from "../utils/api";
 
 const useAuth = create((set) => ({
-  isLoggedIn: false,
+  isLoggedIn: true,
   user: null,
   login: async (token) => {
     try {

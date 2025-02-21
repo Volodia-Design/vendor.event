@@ -25,7 +25,7 @@ const sidebarItems = [
     },
     {
         name: "Portfolio",
-        path: "/portfolio",
+        path: "/portfolio/gallery",
         icon: "/Images/SidebarIcons/Portfolio.svg",
         activeIcon: "/Images/SidebarIcons/PortfolioActive.svg"
     },

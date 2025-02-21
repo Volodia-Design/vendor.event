@@ -69,9 +69,9 @@ export default function Staff() {
   const renderRows = () => {
     return staffs.map((item) => (
       <tr key={item.id} className="border hover:bg-primary2-50/50">
-        <td className="p-4 text-text3 text-black-300">{item.fullName}</td>
+        <td className="p-4 text-text3 text-black-300">{item.user.fullName}</td>
         <td className="p-4 text-black-300 max-w-md truncate text-text4">
-          {item.email}
+          {item.user.email}
         </td>
         <td className="p-4 text-text3 text-black-300">{item.location?.name}</td>
         <td className="p-4 text-text3 text-black-300">{item.location?.fullAddress}</td>

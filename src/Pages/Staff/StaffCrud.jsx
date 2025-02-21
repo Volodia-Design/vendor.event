@@ -31,6 +31,7 @@ export default function StaffCrud({ action }) {
           id: staff.id,
           fullName: staff.fullName,
           email: staff.email,
+          phone: staff.phone,
           location_id: String(staff.location?.id) 
         });
       })
@@ -45,6 +46,7 @@ export default function StaffCrud({ action }) {
   const [staff, setStaff] = useState({
     fullName: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     location_id: "",
@@ -71,6 +73,7 @@ export default function StaffCrud({ action }) {
     let newErrors = {
       fullName: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
       location_id: "",
@@ -81,6 +84,9 @@ export default function StaffCrud({ action }) {
     }
     if (!staff.email || staff.email.trim() === "" || !/^\S+@\S+\.\S+$/.test(staff.email)) {
       newErrors.email = "Email is required.";
+    }
+    if (!staff.phone || staff.phone.trim() === "") {
+      newErrors.phone = "Phone is required.";
     }
     if (currentAction?.type !== "edit") {
       if (!staff.password || staff.password.trim() === "") {
@@ -106,6 +112,7 @@ export default function StaffCrud({ action }) {
     const formData = new FormData();
 
     formData.append("fullName", staff.fullName);
+    formData.append("phone", staff.phone);
     formData.append("location_id", staff.location_id);
     if (currentAction?.type !== "edit" || staff.email !== originalEmail) {
       formData.append("email", staff.email);
@@ -182,6 +189,15 @@ export default function StaffCrud({ action }) {
             className={"w-full"}
           />
         </div>
+        <InputComponent
+          type="text"
+          label="Phone Number *"
+          placeholder="Write Phone Number"
+          value={staff.phone}
+          onChange={handleChangeData("phone")}
+          error={errors.phone}
+          isPhoneNumber
+        />
         <InputComponent
           type="password"
           label="Password *"

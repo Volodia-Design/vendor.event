@@ -5,9 +5,11 @@ import useCurrentWidth from "../../utils/useCurrentWidth";
 import UploadGallery from "./UploadGallery";
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
+import useLoading from "../../store/useLoading";
 
 export default function Gallery() {
   const [mediaItems, setMediaItems] = useState([]);
+  console.log("🚀 ~ Gallery ~ mediaItems:", mediaItems)
   const { isDesktop } = useCurrentWidth();
   const {
     onOpen,
@@ -17,6 +19,7 @@ export default function Gallery() {
     showSuccess,
     showError,
   } = useModal();
+  const { setIsLoading } = useLoading();
   const navigate = useNavigate();
 
   const handleCrud = (action) => {
@@ -34,27 +37,53 @@ export default function Gallery() {
   };
 
   const getMediaData = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get("/gallery");
       const data = response.data.data.data;
   
       const transformedData = await Promise.all(
         data.map(async (item) => {
+          // Process the file image
           if (item.file && item.file.filename) {
             try {
               const imageResponse = await api.get(`/image/${item.file.filename}`, {
                 responseType: "blob",
               });
               const imageUrl = URL.createObjectURL(imageResponse.data);
-              return { ...item, image: imageUrl };
+              item.image = imageUrl; // Attach image directly to item
             } catch (error) {
               console.error("Error loading image for file:", item.file.filename, error);
-              return { ...item, image: null }; 
+              item.image = null;
             }
           } else {
             console.warn("Missing file or filename for item:", item);
-            return { ...item, image: null }; 
+            item.image = null;
           }
+  
+          // Process the service type image
+          if (item.service_type && item.service_type.image) {
+            try {
+              const serviceTypeImageResponse = await api.get(
+                `/image/${item.service_type.image}`,
+                {
+                  responseType: "blob",
+                }
+              );
+              item.service_type.serviceTypeImage = URL.createObjectURL(
+                serviceTypeImageResponse.data
+              );
+            } catch (error) {
+              console.error(
+                "Error loading image for service type:",
+                item.service_type.image,
+                error
+              );
+              item.service_type.serviceTypeImage = null;
+            }
+          }
+  
+          return item; // Return the item with both file and service type images attached
         })
       );
   
@@ -62,9 +91,10 @@ export default function Gallery() {
     } catch (error) {
       console.log("Error fetching gallery data:", error);
     }
+    setIsLoading(false);
   };
+  
 
-  // Function to format the date as "12 Nov, 2024"
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric' });

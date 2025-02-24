@@ -1,5 +1,4 @@
 export default function Dashboard() {
-  return (
-    <div>Dashboard</div>
-  )
+  // TODO: Implement Dashboard
+  return <div>Dashboard</div>
 }

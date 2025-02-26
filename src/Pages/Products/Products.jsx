@@ -56,23 +56,23 @@ export default function Products() {
 
   const renderCols = () => {
     return (
-      <tr className="bg-primary2-50 border border-primary2-50">
-        <th className="text-left p-4 text-text3Medium text-primary2-500">
+      <tr className='bg-primary2-50 border border-primary2-50'>
+        <th className='text-left p-4 text-text3Medium text-primary2-500'>
           Product
         </th>
-        <th className="text-left p-4 text-text3Medium text-primary2-500">
+        <th className='text-left p-4 text-text3Medium text-primary2-500'>
           Details
         </th>
-        <th className="text-left p-4 text-text3Medium text-primary2-500">
+        <th className='text-left p-4 text-text3Medium text-primary2-500'>
           Stock
         </th>
-        <th className="text-left p-4 text-text3Medium text-primary2-500">
+        <th className='text-left p-4 text-text3Medium text-primary2-500'>
           Price
         </th>
-        <th className="text-left p-4 text-text3Medium text-primary2-500">
+        <th className='text-left p-4 text-text3Medium text-primary2-500'>
           Type
         </th>
-        <th className="text-center p-4 text-text3Medium text-primary2-500">
+        <th className='text-center p-4 text-text3Medium text-primary2-500'>
           Actions
         </th>
       </tr>
@@ -81,29 +81,29 @@ export default function Products() {
 
   const renderRows = () => {
     return allProducts.map((item) => (
-      <tr key={item.id} className="border hover:bg-primary2-50/50">
-        <td className="p-4 text-text3 text-black-300">{item.name}</td>
-        <td className="p-4 text-black-300 max-w-md truncate text-text4">
+      <tr key={item.id} className='border hover:bg-primary2-50/50'>
+        <td className='p-4 text-text3 text-black-300'>{item.name}</td>
+        <td className='p-4 text-black-300 max-w-md truncate text-text4'>
           {item.description.length > 50
             ? `${item.description.substring(0, 50)}...`
             : item.description}
         </td>
-        <td className="p-4 text-text3 text-black-300">{item.stock}</td>
-        <td className="p-4 text-text3 text-black-300">USD {item.price}</td>
-        <td className="p-4 text-text3 text-black-300">
+        <td className='p-4 text-text3 text-black-300'>{item.stock}</td>
+        <td className='p-4 text-text3 text-black-300'>USD {item.price}</td>
+        <td className='p-4 text-text3 text-black-300'>
           {item.product_type?.name}
         </td>
-        <td className="p-4 flex gap-2 items-center justify-center">
+        <td className='p-4 flex gap-2 items-center justify-center'>
           <img
-            src="/Images/ComponentIcons/EditColored.svg"
-            alt="Edit"
-            className="w-6 h-6 cursor-pointer"
+            src='/Images/ComponentIcons/EditColored.svg'
+            alt='Edit'
+            className='w-6 h-6 cursor-pointer'
             onClick={() => handleCrud({ type: "edit", data: item })}
           />
           <img
-            src="/Images/ComponentIcons/Delete.svg"
-            alt="delete"
-            className="w-6 h-6 cursor-pointer"
+            src='/Images/ComponentIcons/Delete.svg'
+            alt='delete'
+            className='w-6 h-6 cursor-pointer'
             onClick={() => handleDelete(item)}
           />
         </td>
@@ -119,7 +119,9 @@ export default function Products() {
         ...action.data,
         product_type_id: String(action.data.product_type_id),
         event_types: action.data.event_types.map((event) => String(event.id)),
-        recipients: action.data.recipients.map((recipient) => String(recipient.id)),
+        recipients: action.data.recipients.map((recipient) =>
+          String(recipient.id)
+        ),
         location_id: String(action.data.location_id),
       };
 
@@ -197,9 +199,9 @@ export default function Products() {
   }, [searchTerm]);
 
   return (
-    <div className="w-full bg-white p-3 rounded-2xl lg:px-6 px-2">
+    <div className='w-full bg-white p-3 rounded-2xl lg:px-6 px-2'>
       {/* Navigation */}
-      <div className="w-full flex justify-start items-center gap-4 relative text-text2">
+      <div className='w-full flex justify-start items-center gap-4 relative text-text2'>
         <div
           className={`w-32 text-center cursor-pointer transition-all duration-200 ${
             location.pathname === "/products/product-store"
@@ -229,33 +231,33 @@ export default function Products() {
         />
       </div>
       {/* Main Content */}
-      <div className="mt-4 flex lg:items-center lg:flex-row justify-between flex-col items-start">
-        <p className="text-text2Medium uppercase lg:block hidden">
+      <div className='mt-4 flex lg:items-center lg:flex-row justify-between flex-col items-start'>
+        <p className='text-text2Medium uppercase lg:block hidden'>
           {location.pathname === "/products/product-store"
             ? "Products"
             : "Order History"}
         </p>
-        <div className="flex md:items-center gap-3 flex-col md:flex-row items-end lg:mt-0 mt-4 lg:w-auto w-full">
-          <div className="search-container w-full">
+        <div className='flex md:items-center gap-3 flex-col md:flex-row items-end lg:mt-0 mt-4 lg:w-auto w-full'>
+          <div className='search-container w-full'>
             <input
-              type="text"
-              placeholder="Search by product"
-              className="search-input h-[42px]"
+              type='text'
+              placeholder='Search by product'
+              className='search-input h-[42px]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
             <button
-              className="search-button duration-300"
+              className='search-button duration-300'
               onClick={handleSearch}
             >
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="white"
-                className="search-icon"
+                xmlns='http://www.w3.org/2000/svg'
+                viewBox='0 0 24 24'
+                fill='white'
+                className='search-icon'
               >
-                <path d="M21.71 20.29l-5.4-5.39a8 8 0 10-1.42 1.42l5.4 5.4a1 1 0 001.42-1.42zM10 16a6 6 0 110-12 6 6 0 010 12z" />
+                <path d='M21.71 20.29l-5.4-5.39a8 8 0 10-1.42 1.42l5.4 5.4a1 1 0 001.42-1.42zM10 16a6 6 0 110-12 6 6 0 010 12z' />
               </svg>
             </button>
           </div>
@@ -263,28 +265,28 @@ export default function Products() {
           {/* Select components */}
           <SelectComponent
             withoutLabelMargin={true}
-            id="locationSearch"
+            id='locationSearch'
             options={locations}
-            placeholder="All Locations"
-            placeholderColor="text-black-200"
-            className="lg:w-48 w-full"
+            placeholder='All Locations'
+            placeholderColor='text-black-200'
+            className='lg:w-48 w-full'
             value={""}
             onChange={() => {}}
           />
           <Button
-            text="Create"
-            buttonStyles="bg-secondary-700 text-white hover:bg-secondary-600 px-7"
+            text='Create'
+            buttonStyles='bg-secondary-700 text-white hover:bg-secondary-600 px-7'
             onClick={() => handleCrud({ type: "create", data: null })}
           />
         </div>
       </div>
       {/* Table */}
-      <div className="mt-6 overflow-auto">
+      <div className='mt-6 overflow-auto'>
         {location.pathname === "/products/product-store" && (
           <TableComponent renderCols={renderCols} renderRows={renderRows} />
         )}
       </div>
-      <div className="w-full flex justify-end">
+      <div className='w-full flex justify-end'>
         <Pagination
           paginationData={paginationData}
           onPageChange={handlePageChange}

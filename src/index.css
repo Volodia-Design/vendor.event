@@ -10,95 +10,107 @@
   }
 }
 
-html,body {
-    margin: 0;
-    padding: 0;
-    background-color: #F2F2F2;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F2F2F2;
 }
-.\[\&\>span\]\:line-clamp-1>span{
+
+.\[\&\>span\]\:line-clamp-1>span {
   width: 100%;
-  display: flex!important;
+  display: flex !important;
   justify-content: start;
 }
+
 [id^="radix-"] {
   width: 100%;
 }
 
 
 .inputSelectStyle {
-    outline: none !important;
-    box-shadow: none !important;
-    ring: 0 !important;
-    border: 1.5px solid #b7b7b7;
-    color: #161618;
-    border-radius: 8px !important;
-    min-height: 42px!important;
-  }
-  .inputSelectStyle::-webkit-input-placeholder {
-    color: #949494 !important;
-  }
-  .placeholder-gray::placeholder {
-    color: #949494 !important;
-  }
-  .inputSelectStyle:hover {
-    background-color: #f4faff !important;
-  }
+  outline: none !important;
+  box-shadow: none !important;
+  ring: 0 !important;
+  border: 1.5px solid #b7b7b7;
+  color: #161618;
+  border-radius: 8px !important;
+  min-height: 42px !important;
+}
 
-  .delete-button {
-    border: 1.5px solid #C11919;
-    background-color: #ffaeae!important;
-  }
+.inputSelectStyle::-webkit-input-placeholder {
+  color: #949494 !important;
+}
 
-  .delete-button:hover {
-    background-color: #fd9797!important;
-  }
-  .timePickerNoIcon::-webkit-calendar-picker-indicator {
-    display: none;
-    -webkit-appearance: none;
-    color: black;
-  }
-  .timePicker {
-    outline: none !important;
-    box-shadow: none !important;
-    ring: 0 !important;
-    color: #949494;
-  }
-  .search-container {
-    display: flex;
-    align-items: center;
-    border: 1.5px solid #949494;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 300px;
-    height: 42px;
-  }
-  
-  .search-input {
-    flex: 1;
-    border: none;
-    padding: 0 10px;
-    font-size: 16px;
-    outline: none;
-  }
-  
-  .search-button {
-    background-color: #4299e1; /* Blue background */
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 12px;
-    cursor: pointer;
-  }
-  
-  .search-button:hover {
-    background-color: #3182ce; /* Slightly darker blue on hover */
-  }
-  
-  .search-icon {
-    width: 20px;
-    height: 20px;
-  }
+.placeholder-gray::placeholder {
+  color: #949494 !important;
+}
+
+.inputSelectStyle:hover {
+  background-color: #f4faff !important;
+}
+
+.delete-button {
+  border: 1.5px solid #C11919;
+  background-color: #ffaeae !important;
+}
+
+.delete-button:hover {
+  background-color: #fd9797 !important;
+}
+
+.timePickerNoIcon::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+  color: black;
+}
+
+.timePicker {
+  outline: none !important;
+  box-shadow: none !important;
+  ring: 0 !important;
+  color: #949494;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #949494;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 300px;
+  height: 42px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  padding: 0 10px;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-button {
+  background-color: #4299e1;
+  /* Blue background */
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 12px;
+  cursor: pointer;
+}
+
+.search-button:hover {
+  background-color: #3182ce;
+  /* Slightly darker blue on hover */
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .wrapper {
   position: fixed;
   top: 0;
@@ -142,6 +154,7 @@ html,body {
   0% {
     left: -50%;
   }
+
   100% {
     left: 100%;
   }
@@ -151,13 +164,16 @@ html,body {
   .inputSelectStyle::-webkit-input-placeholder {
     font-size: 14px;
   }
+
   .placeholder-gray::placeholder {
     font-size: 14px;
   }
+
   .search-container {
     width: 100%;
   }
 }
+
 .custom-dropdown {
   position: absolute;
   background-color: white;
@@ -175,4 +191,10 @@ html,body {
 
 .dropdown-item:hover {
   background-color: #f0f0f0;
+}
+
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
 }

@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { cn } from "../utils";
 
 export default function Button({
   text,
@@ -11,9 +12,12 @@ export default function Button({
 }) {
   return (
     <button
-    type="button"
+      type='button'
       onClick={onClick}
-      className={`flex items-center justify-center gap-2 p-2 rounded-lg duration-300 ease-in-out cursor-pointer h-[42px] ${buttonStyles}`}
+      className={cn(
+        "flex items-center justify-center gap-2 p-2 rounded-lg duration-300 ease-in-out cursor-pointer h-[42px]",
+        buttonStyles
+      )}
     >
       {imgSrc && (
         <img

@@ -234,7 +234,7 @@ export default function UploadGallery({ action }) {
           buttonStyles='bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6'
         />
         <Button
-          text={currentAction.type === "create" ? "Create" : "Save"}
+          text={currentAction?.type === "create" ? "Create" : "Save"}
           onClick={(e) => saveData(e)}
           buttonStyles='bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6'
         />

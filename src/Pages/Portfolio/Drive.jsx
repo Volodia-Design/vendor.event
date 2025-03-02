@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { FcFolder } from "react-icons/fc";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Plus } from "lucide-react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,6 +10,24 @@ import {
 } from "../../components/ui/context-menu";
 import { useSearchParams } from "react-router-dom";
 import api from "../../utils/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+  DialogDescription,
+} from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input";
+import { isValidEmail } from "../../utils";
+import toast from "react-hot-toast";
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "../../components/ui/tooltip";
 
 const mockData = [
   { id: 1, name: "Jane's birthday", created_at: "10/11/2024" },
@@ -33,8 +51,48 @@ export default function Drive() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("query") || "");
   const [data, setData] = useState([]);
-  const buttonRef = useRef(null);
-  const triggerRef = useRef(null);
+  const [emails, setEmails] = useState([""]);
+  const buttonRefs = useRef([]);
+  const triggerRefs = useRef([]);
+  const [selectedFolderForDelete, setSelectedFolderForDelete] = useState(null);
+  const [selectedFolderForShare, setSelectedFolderForShare] = useState(null);
+  const [folderName, setFolderName] = useState("");
+
+  const handleCreateFolder = async () => {
+    if (!folderName) {
+      toast.error("Please enter a folder name");
+      return;
+    }
+    try {
+      // await api.post("/api/v1/portfolio/folders", { name: folderName });
+      setFolderName("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEmailChange = (index, value) => {
+    const newEmails = [...emails];
+    newEmails[index] = value;
+    setEmails(newEmails);
+  };
+
+  const handleShare = async () => {
+    if (!emails.every(isValidEmail)) {
+      toast.error("Please enter valid email addresses");
+      return;
+    }
+    try {
+      // await api.post("/api/v1/portfolio/folders/share", {
+      //   folder_id: selectedFolderForShare.id,
+      //   emails,
+      // });
+      setSelectedFolderForShare(null);
+      setEmails([""]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getData = async () => {
     const res = await api.get("/api/v1/portfolio/folders");
@@ -53,29 +111,40 @@ export default function Drive() {
     }
   };
 
-  const handleButtonClick = (e) => {
+  // const handleButtonClick = (e) => {
+  //   e.preventDefault();
+  //   if (triggerRef.current && buttonRef.current) {
+  //     triggerRef.current.dispatchEvent(
+  //       new MouseEvent("contextmenu", {
+  //         bubbles: true,
+  //         clientX: e.clientX,
+  //         clientY: e.clientY + 14,
+  //       })
+  //     );
+  //   }
+  // };
+
+  const handleButtonClick = (e, index) => {
     e.preventDefault();
-    if (triggerRef.current && buttonRef.current) {
-      triggerRef.current.dispatchEvent(
+    if (triggerRefs.current[index] && buttonRefs.current[index]) {
+      const buttonRect = buttonRefs.current[index].getBoundingClientRect();
+      triggerRefs.current[index].dispatchEvent(
         new MouseEvent("contextmenu", {
           bubbles: true,
-          clientX: e.clientX,
-          clientY: e.clientY + 14,
+          clientX: buttonRect.left,
+          clientY: buttonRect.bottom + 5,
         })
       );
     }
   };
 
-  const handleShare = () => {
-    console.log("Share clicked");
-  };
-
-  const handleCopyLink = () => {
-    console.log("Copy Link clicked");
-  };
-
-  const handleDelete = () => {
-    console.log("Delete clicked");
+  const handleDelete = async () => {
+    try {
+      // await api.delete(`/api/v1/portfolio/folders/${selectedFolderForDelete.id}`);
+      setSelectedFolderForDelete(null);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -107,14 +176,47 @@ export default function Drive() {
           </button>
         </div>
 
-        <Button className='bg-secondary-700 hover:bg-secondary-800 !text-white rounded-lg px-6 py-2 text-text4Medium'>
-          Create Folder
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant='secondary' className='text-text4Medium'>
+              Create Folder
+            </Button>
+          </DialogTrigger>
+          <DialogContent className='sm:max-w-xl max-w-[90%] px-12 py-8'>
+            <DialogHeader>
+              <DialogTitle className='!text-text2Medium text-primary2-500'>
+                Folder Name
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className='hidden'>
+              Share this folder with others by entering their email addresses
+              below:
+            </DialogDescription>
+            <div className='flex flex-col gap-4 mt-2 mb-3'>
+              <Input
+                type='email'
+                placeholder='Write email'
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <DialogTrigger asChild>
+                <Button variant='outline'>Cancel</Button>
+              </DialogTrigger>
+              <Button variant='secondary' onClick={handleCreateFolder}>
+                Create
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className='auto-grid'>
         {mockData.map((item) => (
           <ContextMenu key={item.id} modal={false}>
-            <ContextMenuTrigger ref={triggerRef}>
+            <ContextMenuTrigger
+              ref={(el) => (triggerRefs.current[item.id] = el)}
+            >
               <div
                 key={item.id}
                 className='flex gap-4 border rounded-lg border-neutral-100 px-3 py-4 items-center justify-between'
@@ -122,9 +224,19 @@ export default function Drive() {
                 <div className='flex gap-4 items-center'>
                   <FcFolder className='text-5xl' />
                   <div>
-                    <div className='text-text4Medium text-primary2-500'>
-                      {item.name}
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className='text-text4Medium text-primary2-500 line-clamp-1'>
+                            {item.name}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p> {item.name}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
                     <div className='text-text5 text-neutral-200'>
                       {item.created_at}
                     </div>
@@ -132,22 +244,111 @@ export default function Drive() {
                 </div>
                 <Button
                   className='size-8 hover:bg-neutral-50 p-0'
-                  onClick={handleButtonClick}
-                  ref={buttonRef}
+                  onClick={(e) => handleButtonClick(e, item.id)}
+                  ref={(el) => (buttonRefs.current[item.id] = el)}
                 >
                   <EllipsisVertical className='text-neutral-400 scale-125' />
                 </Button>
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent>
-              <ContextMenuItem onClick={handleShare}>Share</ContextMenuItem>
-              <ContextMenuItem onClick={handleCopyLink}>
+              <ContextMenuItem onClick={() => setSelectedFolderForShare(item)}>
+                Share
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => navigator.clipboard.writeText(item.name)}
+              >
                 Copy Link
               </ContextMenuItem>
-              <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
+              <ContextMenuItem onClick={() => setSelectedFolderForDelete(item)}>
+                Delete
+              </ContextMenuItem>
             </ContextMenuContent>
           </ContextMenu>
         ))}
+
+        <Dialog
+          open={selectedFolderForShare}
+          onOpenChange={(open) => {
+            if (!open) setSelectedFolderForShare(null);
+          }}
+        >
+          <DialogContent className='sm:max-w-xl max-w-[90%] px-12 py-8'>
+            <DialogHeader>
+              <DialogTitle className='!text-text2Medium text-primary2-500'>
+                {`Share "${selectedFolderForShare?.name}" Folder`}
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className='hidden'>
+              Share this folder with others by entering their email addresses
+              below:
+            </DialogDescription>
+            <div className='flex flex-col gap-4 mt-2 mb-3'>
+              {emails.map((email, index) => (
+                <div key={index} className='flex items-center gap-2'>
+                  <Input
+                    type='email'
+                    placeholder='Write email'
+                    value={email}
+                    onChange={(e) => handleEmailChange(index, e.target.value)}
+                  />
+                  <Button
+                    onClick={() => setEmails([...emails, ""])}
+                    variant='secondary'
+                    size='icon'
+                  >
+                    <Plus className='scale-150' />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <DialogFooter>
+              <DialogTrigger asChild>
+                <Button
+                  variant='outline'
+                  onClick={() => {
+                    setSelectedFolderForShare(null);
+                    setEmails([""]);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </DialogTrigger>
+              <Button variant='secondary' onClick={handleShare}>
+                Share
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={selectedFolderForDelete}
+          onOpenChange={(open) => {
+            if (!open) setSelectedFolderForDelete(null);
+          }}
+        >
+          <DialogContent className='sm:max-w-md max-w-[90%] px-12 py-8'>
+            <DialogHeader>
+              <DialogTitle className='!text-text2Medium text-primary2-500'>
+                Are you sure?
+              </DialogTitle>
+            </DialogHeader>
+            <div className='flex flex-col gap-2 pt-2 pb-3'>
+              <DialogDescription>
+                Do you really want to delete?
+              </DialogDescription>
+              <p className='text-gray-600'>This action cannot be undone.</p>
+            </div>
+            <DialogFooter>
+              <DialogTrigger asChild>
+                <Button variant='outline'>Cancel</Button>
+              </DialogTrigger>
+              <Button variant='destructive' onClick={handleDelete}>
+                Yes, Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

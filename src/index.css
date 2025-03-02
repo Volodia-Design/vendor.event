@@ -8,6 +8,25 @@
   body {
     @apply font-sans bg-background text-foreground;
   }
+
+  @media (hover: hover) {
+    body {
+      scrollbar-gutter: stable both-edges;
+    }
+
+    body::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    body::-webkit-scrollbar-thumb {
+      @apply rounded-full bg-neutral-200 hover:bg-neutral-200/80;
+    }
+
+    body::-webkit-scrollbar-thumb:hover {
+      @apply bg-neutral-200 hover:bg-neutral-200/80;
+    }
+  }
 }
 
 html,
@@ -25,6 +44,25 @@ body {
 
 [id^="radix-"] {
   width: 100%;
+}
+
+@media (hover: hover) {
+  .custom-scrollbar {
+    scrollbar-gutter: stable both-edges;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-neutral-100 hover:bg-neutral-100/80;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-100 hover:bg-neutral-100/80;
+  }
 }
 
 

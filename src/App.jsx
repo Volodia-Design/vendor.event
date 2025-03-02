@@ -27,6 +27,7 @@ import StaffCrud from "./Pages/Staff/StaffCrud";
 import Gallery from "./Pages/Portfolio/Gallery";
 import Drive from "./Pages/Portfolio/Drive";
 import UploadGallery from "./Pages/Portfolio/UploadGallery";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const {
@@ -46,6 +47,7 @@ function App() {
   return (
     <Router>
       <Loader />
+      <Toaster />
       {isOpen && content && (
         <ModalComponent
           isOpen={isOpen}
@@ -77,7 +79,7 @@ function App() {
                 <Route path='/' element={<Portfolio />}>
                   <Route path='gallery' element={<Gallery />} />
                   <Route path='drive' element={<Drive />} />
-                  <Route path='upload' element={<UploadGallery />} />
+                  <Route path='gallery/upload' element={<UploadGallery />} />
                 </Route>
               </Routes>
             }

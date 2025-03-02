@@ -1,21 +1,21 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Button from "../../components/Button";
 
-import { Button as ShButton } from "../../components/ui/button";
 import useModal from "../../store/useModal";
 import useCurrentWidth from "../../utils/useCurrentWidth";
 import UploadGallery from "./UploadGallery";
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import useLoading from "../../store/useLoading";
-import { Fullscreen } from "lucide-react";
 import useSelfData from "../../store/data/useSelfData";
 import { cn } from "../../utils";
+import MediaViewer from "./MediaViewer";
 
 export default function Gallery() {
   const [mediaItems, setMediaItems] = useState([]);
   const { userData } = useSelfData();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const serviceType = searchParams.get("service-type");
   const { isDesktop } = useCurrentWidth();
   const {
@@ -60,7 +60,7 @@ export default function Gallery() {
         "!max-w-2xl max-h-[99vh] overflow-auto"
       );
     } else {
-      navigate("/portfolio/gallery/crud", { state: props });
+      navigate("/portfolio/gallery/upload", { state: props });
     }
   };
 
@@ -133,15 +133,6 @@ export default function Gallery() {
     setIsLoading(false);
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   useEffect(() => {
     getMediaData();
     setNeedToRefetch(false);
@@ -149,8 +140,8 @@ export default function Gallery() {
 
   return (
     <div className='w-full'>
-      <div className='w-full flex justify-between'>
-        <div className='flex gap-2'>
+      <div className='w-full flex flex-col sm:flex-row justify-between gap-4 sm:gap-2'>
+        <div className='flex gap-2 overflow-x-auto custom-scrollbar'>
           {serviceTypes.map((item) => (
             <Button
               key={item.id}
@@ -168,7 +159,7 @@ export default function Gallery() {
 
         <Button
           text='Upload'
-          buttonStyles='bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2'
+          buttonStyles='bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2 self-end'
           onClick={() => handleCrud({ type: "create", data: null })}
         />
       </div>
@@ -176,21 +167,7 @@ export default function Gallery() {
       {mediaItems.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 mt-6'>
           {mediaItems.map((item) => (
-            <div key={item.id} className='relative rounded-xl'>
-              {item.createdAt && (
-                <div className='absolute top-2 left-2 text-white bg-black bg-opacity-50 px-2 py-1 text-text3Medium rounded-md drop-shadow-md'>
-                  {formatDate(item.createdAt)}
-                </div>
-              )}
-              <ShButton className='absolute top-2.5 right-3 text-white w-[38px] h-[38px] bg-black-900/40 hover:bg-black-900/60'>
-                <Fullscreen className='scale-[2.2]' strokeWidth={1.4} />
-              </ShButton>
-              <img
-                src={item.image}
-                alt={item.name}
-                className='w-full h-72 object-cover rounded-xl'
-              />
-            </div>
+            <MediaViewer key={item.id} item={item} />
           ))}
         </div>
       ) : (

@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
-import api from './api';
+import { useState, useEffect } from "react";
+import api from "./api";
 
 export const useApiImage = (imagePath) => {
-  const [imageUrl, setImageUrl] = useState("/NoImage.webp"); 
+  const [imageUrl, setImageUrl] = useState("/NoImage.webp");
+  const [isImageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
     if (!imagePath || imagePath.trim() === "") {
       setImageUrl("/NoImage.webp");
+      setImageLoading(false);
       return;
     }
 
     const fetchImage = async () => {
+      setImageLoading(true);
       try {
         const response = await api.get(`/image/${imagePath}`, {
-          responseType: 'blob',
+          responseType: "blob",
         });
         const url = URL.createObjectURL(response.data);
 
@@ -23,6 +26,8 @@ export const useApiImage = (imagePath) => {
       } catch (err) {
         console.error(err);
         setImageUrl("/NoImage.webp");
+      } finally {
+        setImageLoading(false);
       }
     };
 
@@ -35,5 +40,5 @@ export const useApiImage = (imagePath) => {
     };
   }, [imagePath]);
 
-  return { imageUrl };
+  return { imageUrl, isImageLoading };
 };

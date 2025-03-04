@@ -64,8 +64,10 @@ export default function Drive() {
       return;
     }
     try {
-      // await api.post("/api/v1/portfolio/folders", { name: folderName });
+      await api.post("/folder", { name: folderName });
+      toast.success("Folder created successfully");
       setFolderName("");
+      getData();
     } catch (error) {
       console.log(error);
     }
@@ -95,12 +97,12 @@ export default function Drive() {
   };
 
   const getData = async () => {
-    const res = await api.get("/api/v1/portfolio/folders");
+    const res = await api.get("/folder");
     setData(res.data);
   };
 
   useEffect(() => {
-    // getData()
+    getData();
   }, []);
 
   const handleSearch = () => {
@@ -140,7 +142,9 @@ export default function Drive() {
 
   const handleDelete = async () => {
     try {
-      // await api.delete(`/api/v1/portfolio/folders/${selectedFolderForDelete.id}`);
+      await api.delete(`/folder/${selectedFolderForDelete.id}`);
+      toast.success("Folder deleted successfully");
+      getData();
       setSelectedFolderForDelete(null);
     } catch (error) {
       console.log(error);

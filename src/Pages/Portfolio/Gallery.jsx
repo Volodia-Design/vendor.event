@@ -86,7 +86,7 @@ export default function Gallery() {
                 }
               );
               const imageUrl = URL.createObjectURL(imageResponse.data);
-              item.image = imageUrl; // Attach image directly to item
+              item.image = imageUrl;
             } catch (error) {
               console.error(
                 "Error loading image for file:",
@@ -122,7 +122,7 @@ export default function Gallery() {
             }
           }
 
-          return item; // Return the item with both file and service type images attached
+          return item;
         })
       );
 

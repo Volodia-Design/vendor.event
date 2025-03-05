@@ -28,6 +28,7 @@ import Gallery from "./Pages/Portfolio/Gallery";
 import Drive from "./Pages/Portfolio/Drive";
 import UploadGallery from "./Pages/Portfolio/UploadGallery";
 import { Toaster } from "react-hot-toast";
+import DriveItem from "./Pages/Portfolio/DriveItem";
 
 function App() {
   const {
@@ -79,6 +80,7 @@ function App() {
                 <Route path='/' element={<Portfolio />}>
                   <Route path='gallery' element={<Gallery />} />
                   <Route path='drive' element={<Drive />} />
+                  <Route path="drive/:id" element={<DriveItem />} />
                   <Route path='gallery/upload' element={<UploadGallery />} />
                 </Route>
               </Routes>

@@ -9,7 +9,7 @@ const tabs = [
 export default function Portfolio() {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentTab = location.pathname.split("/").pop();
+  const currentTab = location.pathname.includes("drive") ? "drive" : "gallery";
 
   return (
     <div className='w-full flex flex-col items-start gap-1 sm:gap-3 bg-white p-8 rounded-2xl lg:px-8 px-6 pt-4 sm:pt-8'>

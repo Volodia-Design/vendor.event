@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import { SelectComponent } from "../../components/SelectComponent";
-import useServiceTypes from "../../store/data/useServiceTypes";
 import Button from "../../components/Button";
 import useCurrentWidth from "../../utils/useCurrentWidth";
 import useModal from "../../store/useModal";
@@ -9,8 +8,8 @@ import api from "../../utils/api";
 import useLoading from "../../store/useLoading";
 
 export default function UploadGallery({ action }) {
+  console.log("🚀 ~ UploadGallery ~ action:", action)
   const currentAction = action || location.state?.action;
-  const { serviceTypes } = useServiceTypes();
   const { isDesktop } = useCurrentWidth();
   const { setIsLoading } = useLoading();
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ export default function UploadGallery({ action }) {
     files: [],
     thumbnail: null,
   });
-  console.log("🚀 ~ UploadGallery ~ mediaData:", mediaData);
+
   const [errors, setErrors] = useState({
     serviceTypeId: "",
   });
@@ -135,7 +134,7 @@ export default function UploadGallery({ action }) {
       <div className='w-full flex flex-col items-center gap-4'>
         <SelectComponent
           id='serviceTypeId'
-          options={serviceTypes}
+          options={currentAction?.services}
           label='Select Service *'
           placeholder={
             <span className='text-black-200 text-text4 lg:text-text3'>

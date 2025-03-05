@@ -8,7 +8,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../../components/ui/context-menu";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../utils/api";
 import {
   Dialog,
@@ -28,26 +28,10 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "../../components/ui/tooltip";
-
-const mockData = [
-  { id: 1, name: "Jane's birthday", created_at: "10/11/2024" },
-  { id: 2, name: "John's wedding", created_at: "10/11/2024" },
-  { id: 3, name: "Doe's graduation", created_at: "10/11/2024" },
-  { id: 4, name: "Smith's anniversary", created_at: "10/11/2024" },
-  { id: 5, name: "Brown's family reunion", created_at: "10/11/2024" },
-  { id: 6, name: "Taylor's retirement party", created_at: "10/11/2024" },
-  { id: 7, name: "Wilson's baby shower", created_at: "10/11/2024" },
-  { id: 8, name: "Moore's housewarming", created_at: "10/11/2024" },
-  { id: 9, name: "Anderson's engagement", created_at: "10/11/2024" },
-  { id: 10, name: "Thomas's graduation", created_at: "10/11/2024" },
-  { id: 11, name: "Jackson's birthday", created_at: "10/11/2024" },
-  { id: 12, name: "White's wedding", created_at: "10/11/2024" },
-  { id: 13, name: "Harris's anniversary", created_at: "10/11/2024" },
-  { id: 14, name: "Martin's family reunion", created_at: "10/11/2024" },
-  { id: 15, name: "Thompson's retirement party", created_at: "10/11/2024" },
-];
+import Pagination from "../../components/Pagination";
 
 export default function Drive() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("query") || "");
   const [data, setData] = useState([]);
@@ -57,7 +41,12 @@ export default function Drive() {
   const [selectedFolderForDelete, setSelectedFolderForDelete] = useState(null);
   const [selectedFolderForShare, setSelectedFolderForShare] = useState(null);
   const [folderName, setFolderName] = useState("");
-
+  const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
+  const [paginationData, setPaginationData] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+  });
   const handleCreateFolder = async () => {
     if (!folderName) {
       toast.error("Please enter a folder name");
@@ -67,6 +56,7 @@ export default function Drive() {
       await api.post("/folder", { name: folderName });
       toast.success("Folder created successfully");
       setFolderName("");
+      setIsCreateFolderOpen(false);
       getData();
     } catch (error) {
       console.log(error);
@@ -97,13 +87,24 @@ export default function Drive() {
   };
 
   const getData = async () => {
-    const res = await api.get("/folder");
-    setData(res.data);
+    const res = await api.get(`/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`);
+    setPaginationData({
+      ...paginationData,
+      totalPages: res.data.data.total,
+    });
+    setData(res.data.data.data);
+  };
+
+  const handlePageChange = (page) => {
+    setPaginationData((prevData) => ({
+      ...prevData,
+      currentPage: page,
+    }));
   };
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [paginationData.currentPage]);
 
   const handleSearch = () => {
     if (search) {
@@ -113,21 +114,9 @@ export default function Drive() {
     }
   };
 
-  // const handleButtonClick = (e) => {
-  //   e.preventDefault();
-  //   if (triggerRef.current && buttonRef.current) {
-  //     triggerRef.current.dispatchEvent(
-  //       new MouseEvent("contextmenu", {
-  //         bubbles: true,
-  //         clientX: e.clientX,
-  //         clientY: e.clientY + 14,
-  //       })
-  //     );
-  //   }
-  // };
-
   const handleButtonClick = (e, index) => {
     e.preventDefault();
+    e.stopPropagation();
     if (triggerRefs.current[index] && buttonRefs.current[index]) {
       const buttonRect = buttonRefs.current[index].getBoundingClientRect();
       triggerRefs.current[index].dispatchEvent(
@@ -180,7 +169,7 @@ export default function Drive() {
           </button>
         </div>
 
-        <Dialog>
+        <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
           <DialogTrigger asChild>
             <Button variant='secondary' className='text-text4Medium'>
               Create Folder
@@ -197,9 +186,15 @@ export default function Drive() {
               below:
             </DialogDescription>
             <div className='flex flex-col gap-4 mt-2 mb-3'>
-              <Input
+              {/* <Input
                 type='email'
                 placeholder='Write email'
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
+              /> */}
+              <Input
+                type='text'
+                placeholder='Folder Name'
                 value={folderName}
                 onChange={(e) => setFolderName(e.target.value)}
               />
@@ -216,10 +211,11 @@ export default function Drive() {
         </Dialog>
       </div>
       <div className='auto-grid'>
-        {mockData.map((item) => (
+        {data.map((item) => (
           <ContextMenu key={item.id} modal={false}>
             <ContextMenuTrigger
               ref={(el) => (triggerRefs.current[item.id] = el)}
+              onClick={() => navigate(`/portfolio/drive/${item.id}`)} 
             >
               <div
                 key={item.id}
@@ -242,7 +238,7 @@ export default function Drive() {
                     </TooltipProvider>
 
                     <div className='text-text5 text-neutral-200'>
-                      {item.created_at}
+                      {new Date(item.createdAt).toLocaleDateString("en-GB")}
                     </div>
                   </div>
                 </div>
@@ -270,7 +266,6 @@ export default function Drive() {
             </ContextMenuContent>
           </ContextMenu>
         ))}
-
         <Dialog
           open={selectedFolderForShare}
           onOpenChange={(open) => {
@@ -353,6 +348,12 @@ export default function Drive() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      </div>
+      <div className='w-full flex justify-end'>
+        <Pagination
+          paginationData={paginationData}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

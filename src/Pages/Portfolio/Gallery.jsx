@@ -71,11 +71,12 @@ export default function Gallery() {
         params: {
           page: paginationData.currentPage,
           limit: paginationData.pageSize,
-          serviceTypeId: selectedServiceType !== 0 ? selectedServiceType : undefined, // Avoid sending 0
+          serviceTypeId: selectedServiceType !== 0 ? selectedServiceType : undefined,
         },
       });
 
       const data = response.data.data.data;
+      console.log("🚀 ~ getMediaData ~ data:", data)
       setPaginationData((prev) => ({
         ...prev,
         totalPages: response.data.data.total,

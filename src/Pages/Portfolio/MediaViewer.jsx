@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
-import { Fullscreen, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Fullscreen, X, ChevronLeft, ChevronRight, Trash } from "lucide-react";
 import { useApiImage } from "../../utils/useApiImage";
 import Spinner from "../../components/Spinner";
+import api from "../../utils/api";
+import { useLocation, useParams } from "react-router-dom";
+import useModal from "../../store/useModal";
 
-export default function MediaViewer({ item }) {
-  const mediaItems = item.files;
+export default function MediaViewer({ item, onDelete }) {
+  const mediaItems = item.files || (item.file ? [item.file] : []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentItem = mediaItems[currentIndex];
-  console.log("🚀 ~ MediaViewer ~ currentItem:", currentItem);
   const { imageUrl, isImageLoading } = useApiImage(currentItem?.filename);
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const { id: folderId } = useParams();
+  const { openDeleteModal, showSuccess, showError } = useModal();
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -63,11 +68,42 @@ export default function MediaViewer({ item }) {
     );
   };
 
+  // Handle delete functionality
+  const handleDelete = (item) => {
+    openDeleteModal({
+      title: "Delete Media",
+      message: "Are you sure you want to delete this media?",
+      onConfirm: async () => {
+        try {
+          await api.delete(`/content/${folderId}/${item.id}`);
+          showSuccess("Media deleted successfully");
+          // If onDelete callback is provided, call it to refresh the parent component
+          if (typeof onDelete === "function") {
+            onDelete();
+          }
+        } catch (error) {
+          console.error("Error deleting media:", error);
+          showError("Failed to delete media");
+        }
+      }
+    });
+  };
+
+  // Determine which image to use in the main view
+  const displayImage =
+    item.image || (currentItem && useApiImage(currentItem.filename)?.imageUrl);
+
+  // Only show navigation buttons when there are multiple items
+  const showNavigation = mediaItems.length > 1;
+
+  // Check if we're in the drive route
+  const isDriveRoute = location.pathname.includes("drive");
+
   return (
     <>
       <Spinner isLoading={isImageLoading && isOpen} />
       <div className='relative rounded-xl'>
-        {item.createdAt && (
+        {item?.createdAt && (
           <div className='absolute top-2 left-2 text-white bg-black bg-opacity-50 px-2 py-1 text-text3Medium rounded-md drop-shadow-md'>
             {formatDate(item.createdAt)}
           </div>
@@ -78,9 +114,17 @@ export default function MediaViewer({ item }) {
         >
           <Fullscreen className='scale-[2.2]' strokeWidth={1.4} />
         </Button>
+        {isDriveRoute && (
+          <Button
+            className='absolute top-2.5 px-4 right-16 text-white w-[38px] h-[38px] bg-black-900/40 hover:bg-black-900/60'
+            onClick={() => handleDelete(item)}
+          >
+            <Trash className='scale-[2.2]' strokeWidth={1.4} />
+          </Button>
+        )}
         <img
-          src={item.image}
-          alt={item.name}
+          src={displayImage}
+          alt={item.name || currentItem?.originalname}
           className='w-full h-72 object-cover rounded-xl'
         />
 
@@ -93,13 +137,17 @@ export default function MediaViewer({ item }) {
             >
               <X className='w-6 h-6 scale-125' />
             </Button>
-            <Button
-              className='absolute left-2 bg-gray-950/50 text-white/80 rounded-full hover:bg-gray-950/70'
-              size='icon'
-              onClick={showPrev}
-            >
-              <ChevronLeft className='w-6 h-6 scale-150' />
-            </Button>
+
+            {showNavigation && (
+              <Button
+                className='absolute left-2 bg-gray-950/50 text-white/80 rounded-full hover:bg-gray-950/70'
+                size='icon'
+                onClick={showPrev}
+              >
+                <ChevronLeft className='w-6 h-6 scale-150' />
+              </Button>
+            )}
+
             {currentItem && currentItem.mimetype.startsWith("image/") ? (
               <img
                 src={imageUrl}
@@ -116,13 +164,16 @@ export default function MediaViewer({ item }) {
                 />
               )
             )}
-            <Button
-              className='absolute right-2 text-white/80 rounded-full bg-gray-950/50 hover:bg-gray-950/70'
-              size='icon'
-              onClick={showNext}
-            >
-              <ChevronRight className='w-6 h-6 scale-150' />
-            </Button>
+
+            {showNavigation && (
+              <Button
+                className='absolute right-2 text-white/80 rounded-full bg-gray-950/50 hover:bg-gray-950/70'
+                size='icon'
+                onClick={showNext}
+              >
+                <ChevronRight className='w-6 h-6 scale-150' />
+              </Button>
+            )}
           </div>
         )}
       </div>

@@ -29,6 +29,7 @@ import {
   TooltipContent,
 } from "../../components/ui/tooltip";
 import Pagination from "../../components/Pagination";
+import useLoading from "../../store/useLoading";
 
 export default function Drive() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export default function Drive() {
   const [selectedFolderForShare, setSelectedFolderForShare] = useState(null);
   const [folderName, setFolderName] = useState("");
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
+  const {setIsLoading} = useLoading();
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -74,25 +76,36 @@ export default function Drive() {
       toast.error("Please enter valid email addresses");
       return;
     }
+  
     try {
-      // await api.post("/api/v1/portfolio/folders/share", {
-      //   folder_id: selectedFolderForShare.id,
-      //   emails,
-      // });
+      await Promise.all(
+        emails.map(email =>
+          api.post("/drive-invitation", {
+            folderId: selectedFolderForShare.id,
+            email
+          })
+        )
+      );
+  
       setSelectedFolderForShare(null);
       setEmails([""]);
+      toast.success("Invitations sent successfully");
     } catch (error) {
       console.log(error);
+      toast.error("Failed to send some invitations");
     }
   };
+  
 
   const getData = async () => {
+    setIsLoading(true);
     const res = await api.get(`/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`);
     setPaginationData({
       ...paginationData,
       totalPages: res.data.data.total,
     });
     setData(res.data.data.data);
+    setIsLoading(false);
   };
 
   const handlePageChange = (page) => {

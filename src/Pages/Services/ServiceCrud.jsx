@@ -35,13 +35,13 @@ export default function ServiceCrud({ action, editableService }) {
       },
     ],
   });
-  console.log("🚀 ~ ServiceCrud ~ serviceData:", serviceData)
 
   const [errors, setErrors] = useState({
     location: "",
     service_type_id: "",
     service_specifications: [],
   });
+  console.log("🚀 ~ ServiceCrud ~ errors:", errors)
 
   const handleDataChange = (index, field, value) => {
     setServiceData((prevData) => {
@@ -124,50 +124,45 @@ export default function ServiceCrud({ action, editableService }) {
       service_type_id: "",
       service_specifications: [],
     };
-
+  
     if (!serviceData.location || serviceData.location.length === 0) {
       newErrors.location = "Location is required.";
     }
-
-    if (
-      !serviceData.service_type_id ||
-      serviceData.service_type_id.trim() === ""
-    ) {
+  
+    if (!serviceData.service_type_id || serviceData.service_type_id.trim() === "") {
       newErrors.service_type_id = "Service type is required.";
     }
-
-    const updatedServiceSpecifications = serviceData.service_specifications.map(
-      (spec, index) => {
-        let specErrors = {};
-
-        if (!spec.name || spec.name.trim() === "") {
-          specErrors.name = "Specification is required.";
-        }
-
-        if (!spec.price || spec.price.trim() === "") {
-          specErrors.price = "Price is required.";
-        }
-
-        return { ...spec, errors: specErrors };
+  
+    let hasSpecErrors = false;
+    const updatedServiceSpecifications = serviceData.service_specifications.map((spec) => {
+      let specErrors = {};
+  
+      if (!spec.name || spec.name.trim() === "") {
+        specErrors.name = "Specification is required.";
+        hasSpecErrors = true;
       }
-    );
-
+  
+      if (!spec.price || spec.price.trim() === "") {
+        specErrors.price = "Price is required.";
+        hasSpecErrors = true;
+      }
+  
+      return specErrors;
+    });
+  
     newErrors.service_specifications = updatedServiceSpecifications;
-    if (
-      Object.values(newErrors).some(
-        (error) => error !== "" && !Array.isArray(error)
-      )
-    ) {
+  
+    if (newErrors.location || newErrors.service_type_id || hasSpecErrors) {
       setErrors(newErrors);
       return;
     }
+  
     setIsLoading(true);
-
-    let apiCall =
-      currentAction.type === "create"
-        ? api.post("/vendor-service", serviceData)
-        : api.put(`/vendor-service/${serviceData.id}`, serviceData);
-
+  
+    let apiCall = currentAction.type === "create"
+      ? api.post("/vendor-service", serviceData)
+      : api.put(`/vendor-service/${serviceData.id}`, serviceData);
+  
     apiCall
       .then(() => {
         showSuccess();
@@ -184,6 +179,7 @@ export default function ServiceCrud({ action, editableService }) {
         setIsLoading(false);
       });
   };
+  
 
   const handleCloseCrud = (e) => {
     e.preventDefault();
@@ -203,6 +199,7 @@ export default function ServiceCrud({ action, editableService }) {
       setServiceData(currentAction.data);
     }
   }, [action, editableService, location.state]);
+
 
   return (
     <div className="w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl">

@@ -13,7 +13,6 @@ import GalleryMediaViewer from "./GalleryMediaViewer";
 
 export default function Gallery() {
   const [mediaItems, setMediaItems] = useState([]);
-  console.log("🚀 ~ Gallery ~ mediaItems:", mediaItems)
   const { userData } = useSelfData();
   const { isDesktop } = useCurrentWidth();
   const {
@@ -77,7 +76,6 @@ export default function Gallery() {
       });
 
       const data = response.data.data.data;
-      console.log("🚀 ~ getMediaData ~ data:", data)
       setPaginationData((prev) => ({
         ...prev,
         totalPages: response.data.data.total,
@@ -155,7 +153,7 @@ export default function Gallery() {
           text="Upload"
           buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2 self-end"
           onClick={() =>
-            handleCrud({ type: "create", data: null, services: userData?.vendor?.service_types })
+            handleCrud({ type: "create", data: null, galleryUpload: true, services: userData?.vendor?.service_types })
           }
         />
       </div>

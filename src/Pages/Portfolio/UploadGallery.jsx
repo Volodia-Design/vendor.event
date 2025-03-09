@@ -34,6 +34,7 @@ function UploadWarningModal({ onCancel, onContinue }) {
 }
 
 export default function UploadGallery({ action }) {
+  console.log("🚀 ~ UploadGallery ~ action:", action)
   const currentAction = action || location.state?.action;
   const { isDesktop } = useCurrentWidth();
   const { setIsLoading } = useLoading();

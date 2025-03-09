@@ -2,9 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import api from "../../utils/api";
 import { useParams } from "react-router-dom";
 import Button from "../../components/Button";
-import MediaViewer from "./MediaViewer";
 import useLoading from "../../store/useLoading";
 import Pagination from "../../components/Pagination";
+import DriveMediaViewer from "./DriveMediaViewer";
 
 export default function DriveItem() {
   const id = useParams().id;
@@ -16,6 +16,7 @@ export default function DriveItem() {
     totalPages: 1,
     pageSize: 10,
   });
+
   const fetchDriveItem = async () => {
     setIsLoading(true);
     try {
@@ -26,7 +27,6 @@ export default function DriveItem() {
         },
       });
       const data = response.data.data.data;
-      console.log("🚀 ~ fetchDriveItem ~ data:", data);
       setPaginationData((prev) => ({
         ...prev,
         totalPages: response.data.data.total,
@@ -81,15 +81,15 @@ export default function DriveItem() {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    const formData = new FormData();
-    // Only append the first file
-    formData.append("file", files[0]);
-
     setIsLoading(true);
     try {
-      await api.put(`/content/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append("file", files[i]);
+        await api.put(`/content/${id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
       fetchDriveItem();
     } catch (error) {
       console.error("Error uploading media:", error);
@@ -118,15 +118,21 @@ export default function DriveItem() {
           ref={fileInputRef}
           type='file'
           accept='image/*,video/*'
-          multiple={false}
+          multiple
           className='hidden'
           onChange={handleUpload}
         />
       </div>
       {mediaItems.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 mt-6'>
-          {mediaItems.map((item) => (
-            <MediaViewer key={item.id} item={item} onDelete={fetchDriveItem} />
+          {mediaItems.map((item, index) => (
+            <DriveMediaViewer
+              key={item.id}
+              item={item}
+              allItems={mediaItems}
+              initialIndex={index}
+              onDelete={fetchDriveItem}
+            />
           ))}
         </div>
       ) : (

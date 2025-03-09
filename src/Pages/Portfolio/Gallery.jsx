@@ -8,11 +8,12 @@ import api from "../../utils/api";
 import useLoading from "../../store/useLoading";
 import useSelfData from "../../store/data/useSelfData";
 import { cn } from "../../utils";
-import MediaViewer from "./MediaViewer";
 import Pagination from "../../components/Pagination";
+import GalleryMediaViewer from "./GalleryMediaViewer";
 
 export default function Gallery() {
   const [mediaItems, setMediaItems] = useState([]);
+  console.log("🚀 ~ Gallery ~ mediaItems:", mediaItems)
   const { userData } = useSelfData();
   const { isDesktop } = useCurrentWidth();
   const {
@@ -162,7 +163,7 @@ export default function Gallery() {
       {mediaItems.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 mt-6">
           {mediaItems.map((item) => (
-            <MediaViewer key={item.id} item={item} />
+            <GalleryMediaViewer key={item.id} item={item} />
           ))}
         </div>
       ) : (

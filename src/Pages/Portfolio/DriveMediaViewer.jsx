@@ -1,19 +1,18 @@
+// DriveMediaViewer.jsx - updated version
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Fullscreen, X, ChevronLeft, ChevronRight, Trash } from "lucide-react";
 import { useApiImage } from "../../utils/useApiImage";
 import Spinner from "../../components/Spinner";
 import api from "../../utils/api";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useModal from "../../store/useModal";
 
-export default function MediaViewer({ item, onDelete }) {
-  const mediaItems = item.files || (item.file ? [item.file] : []);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const currentItem = mediaItems[currentIndex];
-  const { imageUrl, isImageLoading } = useApiImage(currentItem?.filename);
+export default function DriveMediaViewer({ item, allItems = [], initialIndex = 0, onDelete }) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const currentItem = isOpen ? allItems[currentIndex] : item;
+  const { imageUrl, isImageLoading } = useApiImage(currentItem?.file?.filename);
   const { id: folderId } = useParams();
   const { openDeleteModal, showSuccess, showError } = useModal();
 
@@ -26,8 +25,8 @@ export default function MediaViewer({ item, onDelete }) {
     });
   };
 
-  const openModal = (index) => {
-    setCurrentIndex(index);
+  const openModal = () => {
+    setCurrentIndex(initialIndex);
     setIsOpen(true);
   };
 
@@ -39,6 +38,10 @@ export default function MediaViewer({ item, onDelete }) {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         closeModal();
+      } else if (event.key === "ArrowLeft" && isOpen) {
+        showPrev();
+      } else if (event.key === "ArrowRight" && isOpen) {
+        showNext();
       }
     };
 
@@ -58,18 +61,18 @@ export default function MediaViewer({ item, onDelete }) {
 
   const showPrev = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? mediaItems.length - 1 : prevIndex - 1
+      prevIndex === 0 ? allItems.length - 1 : prevIndex - 1
     );
   };
 
   const showNext = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === mediaItems.length - 1 ? 0 : prevIndex + 1
+      prevIndex === allItems.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   // Handle delete functionality
-  const handleDelete = (item) => {
+  const handleDelete = () => {
     openDeleteModal({
       title: "Delete Media",
       message: "Are you sure you want to delete this media?",
@@ -77,7 +80,6 @@ export default function MediaViewer({ item, onDelete }) {
         try {
           await api.delete(`/content/${folderId}/${item.id}`);
           showSuccess("Media deleted successfully");
-          // If onDelete callback is provided, call it to refresh the parent component
           if (typeof onDelete === "function") {
             onDelete();
           }
@@ -85,19 +87,16 @@ export default function MediaViewer({ item, onDelete }) {
           console.error("Error deleting media:", error);
           showError("Failed to delete media");
         }
-      }
+      },
     });
   };
 
-  // Determine which image to use in the main view
-  const displayImage =
-    item.image || (currentItem && useApiImage(currentItem.filename)?.imageUrl);
-
+  // Use the blob URL if it's already provided, otherwise use the API image
+  const displayImage = item.image || imageUrl;
+  const modalImageUrl = currentItem.image || (isOpen ? useApiImage(currentItem?.file?.filename)?.imageUrl : null);
+  
   // Only show navigation buttons when there are multiple items
-  const showNavigation = mediaItems.length > 1;
-
-  // Check if we're in the drive route
-  const isDriveRoute = location.pathname.includes("drive");
+  const showNavigation = allItems.length > 1;
 
   return (
     <>
@@ -110,21 +109,19 @@ export default function MediaViewer({ item, onDelete }) {
         )}
         <Button
           className='absolute top-2.5 px-4 right-3 text-white w-[38px] h-[38px] bg-black-900/40 hover:bg-black-900/60'
-          onClick={() => openModal(0)}
+          onClick={openModal}
         >
           <Fullscreen className='scale-[2.2]' strokeWidth={1.4} />
         </Button>
-        {isDriveRoute && (
-          <Button
-            className='absolute top-2.5 px-4 right-16 text-white w-[38px] h-[38px] bg-black-900/40 hover:bg-black-900/60'
-            onClick={() => handleDelete(item)}
-          >
-            <Trash className='scale-[2.2]' strokeWidth={1.4} />
-          </Button>
-        )}
+        <Button
+          className='absolute top-2.5 px-4 right-16 text-white w-[38px] h-[38px] bg-black-900/40 hover:bg-black-900/60'
+          onClick={() => handleDelete(item)}
+        >
+          <Trash className='scale-[2.2]' strokeWidth={1.4} />
+        </Button>
         <img
           src={displayImage}
-          alt={item.name || currentItem?.originalname}
+          alt={item.file?.originalname || "Media"}
           className='w-full h-72 object-cover rounded-xl'
         />
 
@@ -148,16 +145,16 @@ export default function MediaViewer({ item, onDelete }) {
               </Button>
             )}
 
-            {currentItem && currentItem.mimetype.startsWith("image/") ? (
+            {currentItem?.file?.mimetype?.startsWith("image/") ? (
               <img
-                src={imageUrl}
-                alt={currentItem.originalname}
+                src={modalImageUrl}
+                alt={currentItem.file?.originalname || "Image"}
                 className='max-w-full max-h-full object-contain'
               />
             ) : (
-              currentItem && (
+              currentItem?.file && (
                 <video
-                  src={imageUrl}
+                  src={modalImageUrl}
                   controls
                   autoPlay
                   className='max-w-full max-h-full object-contain'

@@ -172,12 +172,14 @@ export default function Services() {
                         }
                         className="w-full"
                         value={selectedServices[service.id] || ""}
-                        onChange={(value) => {
-                          setSelectedServices((prev) => ({
-                            ...prev,
-                            [service.id]: value,
-                          }));
-                        }}
+                        // onChange={(value) => {
+                        //   setSelectedServices((prev) => ({
+                        //     ...prev,
+                        //     [service.id]: value,
+                        //   }));
+                        // }}
+                      onChange={()=>{}}
+
                       />
                       <div
                         className="bg-primary2-50 inputSelectStyle w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"

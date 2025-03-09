@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { SelectComponent } from "../../components/SelectComponent";
 import Button from "../../components/Button";
 import useCurrentWidth from "../../utils/useCurrentWidth";
@@ -7,13 +7,38 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import useLoading from "../../store/useLoading";
 
+// New warning modal component
+function UploadWarningModal({ onCancel, onContinue }) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full">
+        <h3 className="text-h4 text-primary2-500 mb-3">Upload in Progress</h3>
+        <p className="text-text3Medium mb-4">
+          You have an upload in progress. If you leave now, your upload will be cancelled.
+        </p>
+        <div className="flex justify-end gap-3">
+          <Button
+            text="Stay"
+            onClick={onCancel}
+            buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
+          />
+          <Button
+            text="Leave Anyway"
+            onClick={onContinue}
+            buttonStyles="bg-red-600 hover:bg-red-700 text-white py-2 px-6"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function UploadGallery({ action }) {
-  console.log("🚀 ~ UploadGallery ~ action:", action)
   const currentAction = action || location.state?.action;
   const { isDesktop } = useCurrentWidth();
   const { setIsLoading } = useLoading();
   const navigate = useNavigate();
-  const { onClose, showSuccess, showError } = useModal();
+  const { onClose: originalOnClose, showSuccess, showError } = useModal();
 
   const [mediaData, setMediaData] = useState({
     serviceTypeId: "",
@@ -25,8 +50,80 @@ export default function UploadGallery({ action }) {
     serviceTypeId: "",
   });
 
+  // Upload progress tracking
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({
+    total: 0,
+    completed: 0,
+    currentFileName: "",
+    percentComplete: 0
+  });
+
+  // For cancellation
+  const cancelUploadRef = useRef(false);
+  const abortControllerRef = useRef(null);
+
+  // For showing custom warning modal
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const pendingCloseActionRef = useRef(null);
+
   const fileInputRef = useRef(null);
   const thumbnailInputRef = useRef(null);
+  
+  // Create a ref to track if we're allowed to close the modal
+  const canCloseRef = useRef(false);
+
+  // This effect overrides the modal's onClose function to protect against uploads in progress
+  useEffect(() => {
+    // Store the original onClose function
+    const originalOnCloseFn = useModal.getState().onClose;
+    
+    // Create a protected version of onClose
+    const protectedOnClose = () => {
+      // If we're uploading and haven't explicitly allowed closing, show warning
+      if (isUploading && !canCloseRef.current) {
+        setShowWarningModal(true);
+        // Store what should happen if they confirm leaving
+        pendingCloseActionRef.current = () => {
+          // Cancel the upload
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+          }
+          cancelUploadRef.current = true;
+          // Close the modal
+          originalOnCloseFn();
+        };
+      } else {
+        // No upload in progress or explicitly allowed to close
+        originalOnCloseFn();
+      }
+    };
+    
+    // Replace the global onClose function
+    useModal.setState({ onClose: protectedOnClose });
+    
+    // Cleanup: restore original onClose when component unmounts
+    return () => {
+      useModal.setState({ onClose: originalOnCloseFn });
+    };
+  }, [isUploading]);
+
+  // Handle browser navigation/refresh during upload
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isUploading) {
+        e.preventDefault();
+        e.returnValue = "You have an upload in progress. If you leave now, your upload will be cancelled.";
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isUploading]);
 
   const handleDataChange = (field, value) => {
     setMediaData((prevData) => ({
@@ -69,10 +166,55 @@ export default function UploadGallery({ action }) {
 
   const handleCloseCrud = (e) => {
     e.preventDefault();
-    if (isDesktop) {
-      onClose();
-    } else {
-      navigate(-1);
+    
+    // Just use the global onClose which is now protected
+    useModal.getState().onClose();
+  };
+
+  const uploadFile = async (file) => {
+    // Check if upload has been cancelled
+    if (cancelUploadRef.current) {
+      throw new Error("Upload cancelled by user");
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setUploadProgress(prev => ({
+        ...prev,
+        currentFileName: file.name
+      }));
+      
+      // Create a new AbortController for this upload
+      abortControllerRef.current = new AbortController();
+      
+      const response = await api.post("/file", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        signal: abortControllerRef.current.signal,
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(prev => ({
+            ...prev,
+            percentComplete: percentCompleted
+          }));
+        }
+      });
+
+      setUploadProgress(prev => ({
+        ...prev,
+        completed: prev.completed + 1,
+        percentComplete: 0
+      }));
+
+      return response.data.data.id;
+    } catch (error) {
+      if (error.name === 'AbortError' || error.message === 'Upload cancelled by user') {
+        console.log(`Upload of ${file.name} was cancelled`);
+        throw new Error("Upload cancelled by user");
+      }
+      console.error(`Error uploading file ${file.name}:`, error);
+      throw error;
     }
   };
 
@@ -83,54 +225,145 @@ export default function UploadGallery({ action }) {
       setErrors({ serviceTypeId: "Please select service" });
       return;
     }
-    setIsLoading(true);
+
+    const totalFiles = mediaData.files.length + (mediaData.thumbnail ? 1 : 0);
+    if (totalFiles === 0) {
+      showError("Please select at least one file to upload");
+      return;
+    }
+
+    setIsUploading(true);
+    cancelUploadRef.current = false; // Reset cancellation flag
+    
+    setUploadProgress({
+      total: totalFiles,
+      completed: 0,
+      currentFileName: "",
+      percentComplete: 0
+    });
+
     try {
       const uploadedFileIds = [];
 
+      // Upload all media files
       for (const file of mediaData.files) {
-        const formData = new FormData();
-        formData.append("file", file);
+        if (cancelUploadRef.current) break; // Check if cancelled
+        const fileId = await uploadFile(file);
+        uploadedFileIds.push(fileId);
+      }
 
-        const response = await api.post("/file", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        uploadedFileIds.push(response.data.data.id);
+      // Check if upload was cancelled
+      if (cancelUploadRef.current) {
+        throw new Error("Upload cancelled by user");
       }
 
       let thumbnailId = null;
 
+      // Upload thumbnail if exists
       if (mediaData.thumbnail) {
-        const formData = new FormData();
-        formData.append("file", mediaData.thumbnail);
-
-        const response = await api.post("/file", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        thumbnailId = response.data.data.id;
+        thumbnailId = await uploadFile(mediaData.thumbnail);
       }
 
+      // Check if upload was cancelled
+      if (cancelUploadRef.current) {
+        throw new Error("Upload cancelled by user");
+      }
+
+      // Create gallery entry with uploaded files
       await api.post("/gallery", {
         serviceTypeId: mediaData.serviceTypeId,
         files: uploadedFileIds,
         thumbnail: thumbnailId,
       });
 
+      // Mark upload as complete and explicitly allow closing
+      setIsUploading(false);
+      canCloseRef.current = true;
       showSuccess("Gallery uploaded successfully!");
-      onClose();
+      
+      // Now it's safe to close the modal
+      useModal.getState().onClose();
+      
     } catch (error) {
-      showError("Failed to upload gallery. Please try again.");
-      console.error("Upload error:", error);
+      if (error.message === "Upload cancelled by user") {
+        // Handle cancelled upload (no need to show error)
+        console.log("Upload was cancelled by user");
+      } else {
+        showError("Failed to upload gallery. Please try again.");
+        console.error("Upload error:", error);
+      }
+    } finally {
+      setIsUploading(false);
+      setIsLoading(false);
     }
-    setIsLoading(false);
+  };
+
+  // Handlers for warning modal
+  const handleStayOnPage = () => {
+    setShowWarningModal(false);
+  };
+
+  const handleLeavePage = () => {
+    setShowWarningModal(false);
+    // Execute the pending close action
+    if (pendingCloseActionRef.current) {
+      pendingCloseActionRef.current();
+    }
   };
 
   return (
     <div className='w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl'>
+      {/* Show warning modal if needed */}
+      {showWarningModal && (
+        <UploadWarningModal 
+          onCancel={handleStayOnPage}
+          onContinue={handleLeavePage}
+        />
+      )}
+      
       <p className='uppercase text-text2Medium lg:text-h3 text-primary2-500 mb-6 text-center'>
         {currentAction?.type === "create" ? "Upload Media" : "Edit a Service"}
       </p>
+      
+      {isUploading && (
+        <div className="mb-6 border border-gray-200 rounded-lg p-4 bg-gray-50">
+          <p className="text-text3Medium mb-2">
+            Uploading {uploadProgress.completed} of {uploadProgress.total} files
+          </p>
+          {uploadProgress.currentFileName && (
+            <p className="text-text4 text-gray-500 mb-1">
+              Current file: {uploadProgress.currentFileName}
+            </p>
+          )}
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div 
+              className="bg-primary2-500 h-2.5 rounded-full transition-all duration-300" 
+              style={{width: `${uploadProgress.percentComplete}%`}}
+            ></div>
+          </div>
+          <p className="text-text4 text-gray-500 mt-1 text-right">
+            {uploadProgress.percentComplete}%
+          </p>
+          
+          {/* Add cancel button */}
+          <div className="mt-3 flex justify-end">
+            <Button
+              text="Cancel Upload"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to cancel the upload?")) {
+                  if (abortControllerRef.current) {
+                    abortControllerRef.current.abort();
+                  }
+                  cancelUploadRef.current = true;
+                  setIsUploading(false);
+                }
+              }}
+              buttonStyles="bg-white border border-red-500 text-red-500 hover:bg-red-50 py-1 px-3 text-sm"
+            />
+          </div>
+        </div>
+      )}
+      
       <div className='w-full flex flex-col items-center gap-4'>
         <SelectComponent
           id='serviceTypeId'
@@ -145,12 +378,13 @@ export default function UploadGallery({ action }) {
           value={mediaData.serviceTypeId}
           onChange={(value) => handleDataChange("serviceTypeId", value)}
           error={errors.serviceTypeId}
+          disabled={isUploading}
         />
       </div>
       <div className='flex gap-3 mt-4 flex-col items-start'>
         <div
-          className='flex gap-2 items-center justify-center cursor-pointer'
-          onClick={() => fileInputRef.current.click()}
+          className={`flex gap-2 items-center justify-center ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          onClick={() => !isUploading && fileInputRef.current.click()}
         >
           <p className='text-text3Medium text-sec2-500'>Upload Files</p>
           <img
@@ -166,6 +400,7 @@ export default function UploadGallery({ action }) {
           accept='image/*,video/*'
           className='hidden'
           onChange={handleFileUpload}
+          disabled={isUploading}
         />
         <div className='flex flex-wrap gap-2 mt-2'>
           {mediaData.files.map((file, index) => (
@@ -184,8 +419,9 @@ export default function UploadGallery({ action }) {
                 />
               )}
               <button
-                onClick={() => removeFile(index)}
-                className='absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded'
+                onClick={() => !isUploading && removeFile(index)}
+                className={`absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isUploading}
               >
                 X
               </button>
@@ -193,8 +429,8 @@ export default function UploadGallery({ action }) {
           ))}
         </div>
         <div
-          className='flex gap-2 items-center justify-center cursor-pointer'
-          onClick={() => thumbnailInputRef.current.click()}
+          className={`flex gap-2 items-center justify-center ${isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          onClick={() => !isUploading && thumbnailInputRef.current.click()}
         >
           <p className='text-text3Medium text-sec2-500'>Upload Thumbnail</p>
           <img
@@ -209,6 +445,7 @@ export default function UploadGallery({ action }) {
           accept='image/*'
           className='hidden'
           onChange={handleThumbnailUpload}
+          disabled={isUploading}
         />
         {mediaData.thumbnail && (
           <div className='relative w-24 h-24 border p-1 mt-2'>
@@ -218,24 +455,26 @@ export default function UploadGallery({ action }) {
               className='w-full h-full object-cover rounded'
             />
             <button
-              onClick={removeThumbnail}
-              className='absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded'
+              onClick={() => !isUploading && removeThumbnail()}
+              className={`absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isUploading}
             >
               X
             </button>
           </div>
         )}
       </div>
-      <div className='w-full flex gap-3 items-center justify-end mt-2'>
+      <div className='w-full flex gap-3 items-center justify-end mt-4'>
         <Button
           text='Cancel'
           onClick={(e) => handleCloseCrud(e)}
-          buttonStyles='bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6'
+          buttonStyles={`bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6 ${isUploading ? 'opacity-75' : ''}`}
         />
         <Button
-          text={currentAction?.type === "create" ? "Create" : "Save"}
-          onClick={(e) => saveData(e)}
-          buttonStyles='bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6'
+          text={isUploading ? "Uploading..." : (currentAction?.type === "create" ? "Create" : "Save")}
+          onClick={(e) => !isUploading && saveData(e)}
+          buttonStyles={`${isUploading ? 'bg-secondary-500 cursor-not-allowed' : 'bg-secondary-800 hover:bg-secondary-700'} text-white py-2 px-6`}
+          disabled={isUploading}
         />
       </div>
     </div>

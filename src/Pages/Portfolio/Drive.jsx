@@ -270,11 +270,11 @@ export default function Drive() {
               <ContextMenuItem onClick={() => setSelectedFolderForShare(item)}>
                 Share
               </ContextMenuItem>
-              <ContextMenuItem
+              {/* <ContextMenuItem
                 onClick={() => navigator.clipboard.writeText(item.name)}
               >
                 Copy Link
-              </ContextMenuItem>
+              </ContextMenuItem> */}
               <ContextMenuItem onClick={() => setSelectedFolderForDelete(item)}>
                 Delete
               </ContextMenuItem>

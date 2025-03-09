@@ -10,11 +10,14 @@ import useSelfData from "../../store/data/useSelfData";
 import { cn } from "../../utils";
 import Pagination from "../../components/Pagination";
 import GalleryMediaViewer from "./GalleryMediaViewer";
+import useServiceTypes from "../../store/data/useServiceTypes";
 
 export default function Gallery() {
   const [mediaItems, setMediaItems] = useState([]);
   const { userData } = useSelfData();
   const { isDesktop } = useCurrentWidth();
+    const { serviceTypes } = useServiceTypes();
+  
   const {
     onOpen,
     needToRefetch,
@@ -32,7 +35,7 @@ export default function Gallery() {
     pageSize: 10,
   });
 
-  const serviceTypes = [
+  const allServices = [
     {
       id: 0,
       name: "All",
@@ -41,7 +44,7 @@ export default function Gallery() {
       border: "#426893",
       background: "#03356f",
     },
-    ...(userData?.vendor?.service_types || []),
+    ...serviceTypes,
   ];
 
   const handleServiceTypeFilter = (item) => {
@@ -128,13 +131,13 @@ export default function Gallery() {
   useEffect(() => {
     getMediaData();
     setNeedToRefetch(false);
-  }, [needToRefetch, paginationData.currentPage, selectedServiceType]); // Re-fetch when filters or page change
+  }, [needToRefetch, paginationData.currentPage, selectedServiceType]); 
 
   return (
     <div className="w-full">
       <div className="w-full flex flex-col sm:flex-row justify-between gap-4 sm:gap-2">
         <div className="flex gap-2 overflow-x-auto custom-scrollbar">
-          {serviceTypes.map((item) => (
+          {allServices.map((item) => (
             <Button
               key={item.id}
               text={item.name}
@@ -153,7 +156,7 @@ export default function Gallery() {
           text="Upload"
           buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2 self-end"
           onClick={() =>
-            handleCrud({ type: "create", data: null, galleryUpload: true, services: userData?.vendor?.service_types })
+            handleCrud({ type: "create", data: null, galleryUpload: true, services: serviceTypes })
           }
         />
       </div>

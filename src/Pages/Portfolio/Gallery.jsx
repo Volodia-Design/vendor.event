@@ -60,7 +60,7 @@ export default function Gallery() {
         "!max-w-2xl max-h-[99vh] overflow-auto"
       );
     } else {
-      navigate("/portfolio/gallery/upload", { state: props });
+      navigate("/portfolio/gallery/upload", { state: { action } }); // Pass only `action`
     }
   };
 
@@ -161,7 +161,7 @@ export default function Gallery() {
       {mediaItems.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 mt-6">
           {mediaItems.map((item) => (
-            <GalleryMediaViewer key={item.id} item={item} />
+            <GalleryMediaViewer key={item.id} item={item}  onDelete={getMediaData} />
           ))}
         </div>
       ) : (

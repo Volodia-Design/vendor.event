@@ -19,7 +19,9 @@ export default function Sidebar() {
         (item.path.startsWith("/products") &&
           location.pathname.startsWith("/products")) ||
         (item.path.startsWith("/service") &&
-          location.pathname.startsWith("/service"))
+          location.pathname.startsWith("/service")) ||
+          (item.path.includes("portfolio") &&
+            location.pathname.includes("portfolio"))
       ) {
         return true;
       }

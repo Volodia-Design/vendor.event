@@ -43,7 +43,7 @@ export default function Drive() {
   const [selectedFolderForShare, setSelectedFolderForShare] = useState(null);
   const [folderName, setFolderName] = useState("");
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
-  const {setIsLoading} = useLoading();
+  const { setIsLoading } = useLoading();
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -76,17 +76,17 @@ export default function Drive() {
       toast.error("Please enter valid email addresses");
       return;
     }
-  
+
     try {
       await Promise.all(
-        emails.map(email =>
+        emails.map((email) =>
           api.post("/drive-invitation", {
             folderId: selectedFolderForShare.id,
-            email
+            email,
           })
         )
       );
-  
+
       setSelectedFolderForShare(null);
       setEmails([""]);
       toast.success("Invitations sent successfully");
@@ -95,11 +95,12 @@ export default function Drive() {
       toast.error("Failed to send some invitations");
     }
   };
-  
 
   const getData = async () => {
     setIsLoading(true);
-    const res = await api.get(`/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`);
+    const res = await api.get(
+      `/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`
+    );
     setPaginationData({
       ...paginationData,
       totalPages: res.data.data.total,
@@ -223,12 +224,13 @@ export default function Drive() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className='auto-grid'>
+    {data.length > 0 ? (
+        <div className='auto-grid'>
         {data.map((item) => (
           <ContextMenu key={item.id} modal={false}>
             <ContextMenuTrigger
               ref={(el) => (triggerRefs.current[item.id] = el)}
-              onClick={() => navigate(`/portfolio/drive/${item.id}`)} 
+              onClick={() => navigate(`/portfolio/drive/${item.id}`)}
             >
               <div
                 key={item.id}
@@ -333,6 +335,7 @@ export default function Drive() {
           </DialogContent>
         </Dialog>
 
+      
         <Dialog
           open={selectedFolderForDelete}
           onOpenChange={(open) => {
@@ -362,6 +365,11 @@ export default function Drive() {
           </DialogContent>
         </Dialog>
       </div>
+    ) : (
+      <div className="flex justify-center items-center h-72">
+      <p className="text-text3Medium text-primary2-500">No folders found</p>
+    </div>
+    )}
       <div className='w-full flex justify-end'>
         <Pagination
           paginationData={paginationData}

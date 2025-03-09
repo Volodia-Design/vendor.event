@@ -81,6 +81,7 @@ function App() {
                   <Route path='gallery' element={<Gallery />} />
                   <Route path='drive' element={<Drive />} />
                   <Route path="drive/:id" element={<DriveItem />} />
+                  <Route path="drive/:id/upload" element={<UploadGallery />} />
                   <Route path='gallery/upload' element={<UploadGallery />} />
                 </Route>
               </Routes>

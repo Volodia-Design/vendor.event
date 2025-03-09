@@ -1,16 +1,29 @@
 import { useEffect, useState, useRef } from "react";
 import api from "../../utils/api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/Button";
 import useLoading from "../../store/useLoading";
 import Pagination from "../../components/Pagination";
 import DriveMediaViewer from "./DriveMediaViewer";
+import useModal from "../../store/useModal";
+import useCurrentWidth from "../../utils/useCurrentWidth";
+import UploadGallery from "./UploadGallery";
 
 export default function DriveItem() {
   const id = useParams().id;
   const [mediaItems, setMediaItems] = useState([]);
   const { setIsLoading } = useLoading();
   const fileInputRef = useRef(null);
+  const { isDesktop } = useCurrentWidth();
+  const {
+    onOpen,
+    needToRefetch,
+    setNeedToRefetch,
+    openDeleteModal,
+    showSuccess,
+    showError,
+  } = useModal();
+  const navigate = useNavigate();
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -69,19 +82,27 @@ export default function DriveItem() {
 
   useEffect(() => {
     fetchDriveItem();
-  }, [paginationData.currentPage]);
+    setNeedToRefetch(false);
+  }, [needToRefetch, paginationData.currentPage]);
 
-  const handleUploadClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleCrud = (action) => {
+    const props =
+      action.type === "create"
+        ? { action }
+        : { action, editableService: action.data };
+    if (isDesktop) {
+      onOpen(
+        <UploadGallery {...props} />,
+        "!max-w-2xl max-h-[99vh] overflow-auto"
+      );
+    } else {
+      navigate(`/portfolio/drive/${id}/upload`, { state: props });
     }
   };
 
   const handleUpload = async (event) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
-
-    setIsLoading(true);
     try {
       for (let i = 0; i < files.length; i++) {
         const formData = new FormData();
@@ -94,7 +115,6 @@ export default function DriveItem() {
     } catch (error) {
       console.error("Error uploading media:", error);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -107,13 +127,13 @@ export default function DriveItem() {
           imgAlt='Back'
           onClick={() => window.history.back()}
         />
-        <Button
-          text='Upload'
-          imgSrc='/Images/ComponentIcons/UploadFile.svg'
-          buttonStyles='bg-primary2-300 hover:bg-primary2-500 text-white'
-          imgAlt='Upload'
-          onClick={handleUploadClick}
-        />
+         <Button
+                 text="Upload"
+                 buttonStyles="bg-secondary-700 hover:bg-secondary-800 text-white rounded-lg px-4 py-2 self-end"
+                 onClick={() =>
+                   handleCrud({ type: "create", data: null, driveUpload: true, driveUploadId: id })
+                 }
+               />
         <input
           ref={fileInputRef}
           type='file'

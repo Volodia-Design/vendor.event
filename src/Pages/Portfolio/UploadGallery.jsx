@@ -192,6 +192,20 @@ export default function UploadGallery({ action }) {
             }));
           },
         });
+      }else {
+        response = await api.post("/file", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+          signal: abortControllerRef.current.signal,
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress((prev) => ({
+              ...prev,
+              percentComplete: percentCompleted,
+            }));
+          },
+        });
       }
   
       setUploadProgress((prev) => ({

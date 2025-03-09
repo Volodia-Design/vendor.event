@@ -178,22 +178,8 @@ export default function UploadGallery({ action }) {
       abortControllerRef.current = new AbortController();
   
       let response;
-      if (isDriveUpload && currentAction?.driveUploadId) {
+      if (currentAction?.driveUploadId) {
         response = await api.put(`/content/${currentAction?.driveUploadId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-          signal: abortControllerRef.current.signal,
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setUploadProgress((prev) => ({
-              ...prev,
-              percentComplete: percentCompleted,
-            }));
-          },
-        });
-      } else {
-        response = await api.post("/file", formData, {
           headers: { "Content-Type": "multipart/form-data" },
           signal: abortControllerRef.current.signal,
           onUploadProgress: (progressEvent) => {

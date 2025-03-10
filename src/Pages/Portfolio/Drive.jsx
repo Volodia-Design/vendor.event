@@ -34,7 +34,7 @@ import useLoading from "../../store/useLoading";
 export default function Drive() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("query") || "");
+  const [search, setSearch] = useState(searchParams.get("name") || "");
   const [data, setData] = useState([]);
   const [emails, setEmails] = useState([""]);
   const buttonRefs = useRef([]);
@@ -49,6 +49,7 @@ export default function Drive() {
     totalPages: 1,
     pageSize: 10,
   });
+
   const handleCreateFolder = async () => {
     if (!folderName) {
       toast.error("Please enter a folder name");
@@ -118,11 +119,11 @@ export default function Drive() {
 
   useEffect(() => {
     getData();
-  }, [paginationData.currentPage]);
+  }, [paginationData.currentPage, search]); // Trigger search or pagination change
 
   const handleSearch = () => {
     if (search) {
-      setSearchParams({ query: search });
+      setSearchParams({ name: search });
     } else {
       setSearchParams({});
     }
@@ -200,12 +201,6 @@ export default function Drive() {
               below:
             </DialogDescription>
             <div className='flex flex-col gap-4 mt-2 mb-3'>
-              {/* <Input
-                type='email'
-                placeholder='Write email'
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
-              /> */}
               <Input
                 type='text'
                 placeholder='Folder Name'
@@ -237,7 +232,8 @@ export default function Drive() {
                 className='flex gap-4 border rounded-lg border-neutral-100 px-3 py-4 items-center justify-between'
               >
                 <div className='flex gap-4 items-center'>
-                  <FcFolder className='text-5xl' />
+                  {/* <FcFolder className='text-5xl' /> */}
+                  <img src="/Images/ComponentIcons/folderIcon.png" alt="folderIcon" className="w-12 h-12" />
                   <div>
                     <TooltipProvider>
                       <Tooltip>
@@ -270,11 +266,6 @@ export default function Drive() {
               <ContextMenuItem onClick={() => setSelectedFolderForShare(item)}>
                 Share
               </ContextMenuItem>
-              {/* <ContextMenuItem
-                onClick={() => navigator.clipboard.writeText(item.name)}
-              >
-                Copy Link
-              </ContextMenuItem> */}
               <ContextMenuItem onClick={() => setSelectedFolderForDelete(item)}>
                 Delete
               </ContextMenuItem>
@@ -335,7 +326,6 @@ export default function Drive() {
           </DialogContent>
         </Dialog>
 
-      
         <Dialog
           open={selectedFolderForDelete}
           onOpenChange={(open) => {

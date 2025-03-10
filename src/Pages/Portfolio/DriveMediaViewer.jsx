@@ -1,4 +1,3 @@
-// DriveMediaViewer.jsx - updated version
 import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Fullscreen, X, ChevronLeft, ChevronRight, Trash } from "lucide-react";
@@ -7,6 +6,7 @@ import Spinner from "../../components/Spinner";
 import api from "../../utils/api";
 import { useParams } from "react-router-dom";
 import useModal from "../../store/useModal";
+import { GoVideo } from "react-icons/go";
 
 export default function DriveMediaViewer({ item, allItems = [], initialIndex = 0, onDelete }) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -92,9 +92,15 @@ export default function DriveMediaViewer({ item, allItems = [], initialIndex = 0
   };
 
   // Use the blob URL if it's already provided, otherwise use the API image
-  const displayImage = item.image || imageUrl;
+  let displayImage;
+  if (item.file?.mimetype?.startsWith("image")) {
+    displayImage = item.image || imageUrl;
+  } else if (item.file?.mimetype?.startsWith("video")) {
+    displayImage = <GoVideo className="w-12 h-12" />;
+  }
+
   const modalImageUrl = currentItem.image || (isOpen ? useApiImage(currentItem?.file?.filename)?.imageUrl : null);
-  
+
   // Only show navigation buttons when there are multiple items
   const showNavigation = allItems.length > 1;
 
@@ -119,11 +125,16 @@ export default function DriveMediaViewer({ item, allItems = [], initialIndex = 0
         >
           <Trash className='scale-[2.2]' strokeWidth={1.4} />
         </Button>
-        <img
-          src={displayImage}
-          alt={item.file?.originalname || "Media"}
-          className='w-full h-72 object-cover rounded-xl'
-        />
+        <div className="w-full h-72 object-cover rounded-xl">
+          {/* Display either image or video placeholder */}
+          {displayImage && typeof displayImage === 'string' ? (
+            <img src={displayImage} alt={item.file?.originalname || "Media"} className="w-full h-full object-cover rounded-xl" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded-xl">
+              {displayImage}
+            </div>
+          )}
+        </div>
 
         {isOpen && (
           <div className='fixed inset-0 z-40 bg-gray-950/80 flex items-center justify-center w-full h-full'>

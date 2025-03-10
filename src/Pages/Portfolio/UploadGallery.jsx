@@ -261,20 +261,23 @@ export default function UploadGallery({ action }) {
   
       if (currentAction?.galleryUpload) {
         // Handling gallery upload
-        for (const file of mediaData.files) {
-          if (cancelUploadRef.current) break;
+       
   
-          const fileId = await uploadFile(file); // Upload file for gallery
-          uploadedFileIds.push(fileId);
+        let thumbnailId = null;
+        if (mediaData.thumbnail) {
+          thumbnailId = await uploadFile(mediaData.thumbnail); // Upload thumbnail
+          uploadedFileIds.push(thumbnailId);
         }
   
         if (cancelUploadRef.current) {
           throw new Error("Upload cancelled by user");
         }
+
+        for (const file of mediaData.files) {
+          if (cancelUploadRef.current) break;
   
-        let thumbnailId = null;
-        if (mediaData.thumbnail) {
-          thumbnailId = await uploadFile(mediaData.thumbnail); // Upload thumbnail
+          const fileId = await uploadFile(file); // Upload file for gallery
+          uploadedFileIds.push(fileId);
         }
   
         if (cancelUploadRef.current) {

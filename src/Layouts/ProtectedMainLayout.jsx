@@ -1,30 +1,46 @@
 // ProtectedMainLayout.js
 import { Outlet } from "react-router-dom";
 import useAuth from "../store/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import Spinner from "../components/Spinner";
 
 function ProtectedMainLayout() {
   const { isLoggedIn, login } = useAuth();
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      const params = new URLSearchParams(window.location.search);
-      const newToken = params.get("token");
+    async function checkAuth() {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        await login(token);
+        setIsAuthenticating(false);
+      } else {
+        const params = new URLSearchParams(window.location.search);
+        const newToken = params.get("token");
 
-      if (newToken) {
-        login(newToken); 
-        window.history.replaceState({}, document.title, window.location.pathname); 
+        if (newToken) {
+          await login(newToken);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setIsAuthenticating(false);
+        } else {
+          // No token found at all
+          setIsAuthenticating(false);
+        }
       }
-    } else {
-      login(token); 
     }
+
+    checkAuth();
   }, [login]);
 
-  if (!isLoggedIn) {
-    return
+  if (isAuthenticating) {
+    return <Spinner />;
+  }
+
+  if (!isLoggedIn && !isAuthenticating) {
+    window.location.href = import.meta.env.VITE_HOME_PAGE;
+    return null;
   }
 
   return (

@@ -228,14 +228,40 @@ export default function UploadGallery({ action }) {
     }
   };
   
+  console.log("errors", errors)
 
   const saveData = async (e) => {
     e.preventDefault();
-  
-    if (!mediaData.serviceTypeId && currentAction?.galleryUpload) {
-      setErrors({ serviceTypeId: "Please select service" });
-      return;
-    }
+ // Initialize errors object to avoid overwriting errors on each check
+ const validationErrors = {};
+
+ // Check if it's a drive upload
+ if (currentAction?.driveUpload) {
+   // Drive upload only requires files
+   if (mediaData.files.length === 0) {
+     validationErrors.files = "Please select at least one file";
+   }
+ } else {
+   // Gallery upload requires files, thumbnail, and service type
+   if (mediaData.files.length === 0) {
+     validationErrors.files = "Please select at least one file";
+   }
+
+   if (!mediaData.thumbnail) {
+     validationErrors.thumbnail = "Please select a thumbnail";
+   }
+
+   if (!mediaData.serviceTypeId) {
+     validationErrors.serviceTypeId = "Please select service";
+   }
+ }
+
+ // If any validation errors, set them and return early
+ if (Object.keys(validationErrors).length > 0) {
+   setErrors(validationErrors);
+   return;
+ }
+    
   
     const totalFiles = currentAction?.driveUpload
       ? mediaData.files.length
@@ -362,7 +388,7 @@ export default function UploadGallery({ action }) {
       )}
 
       <p className='uppercase text-text2Medium lg:text-h3 text-primary2-500 mb-6 text-center'>
-        {currentAction?.type === "create" ? "Upload Media" : "Edit a Service"}
+        {currentAction?.type === "create" ? "Upload Media" : "Edit a Media"}
       </p>
 
       {isUploading && (
@@ -451,6 +477,9 @@ export default function UploadGallery({ action }) {
                 onChange={handleFileUpload}
                 disabled={isUploading}
               />
+              {errors.files && (
+                <p className="text-red-500 text-text4Medium">{errors.files}</p>
+              )}
               <div className='flex flex-wrap gap-2 mt-2'>
                 {mediaData.files.map((file, index) => (
                   <div key={index} className='relative w-24 h-24 border p-1'>
@@ -506,6 +535,11 @@ export default function UploadGallery({ action }) {
                 onChange={handleThumbnailUpload}
                 disabled={isUploading}
               />
+              {errors.thumbnail && (
+                <p className="text-red-500 text-text4Medium">
+                  {errors.thumbnail}
+                </p>
+              )}
               {mediaData.thumbnail && (
                 <div className='relative w-24 h-24 border p-1 mt-2'>
                   <img
@@ -586,13 +620,15 @@ export default function UploadGallery({ action }) {
       </div>
 
       <div className='w-full flex gap-3 items-center justify-end mt-4'>
-        <Button
+       {!isUploading && (
+          <Button
           text='Cancel'
           onClick={(e) => handleCloseCrud(e)}
           buttonStyles={`bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6 ${
             isUploading ? "opacity-75" : ""
           }`}
         />
+       )}
         <Button
           text={isUploading ? "Uploading..." : "Save"}
           onClick={(e) => !isUploading && saveData(e)}

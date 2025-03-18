@@ -30,6 +30,7 @@ import {
 } from "../../components/ui/tooltip";
 import Pagination from "../../components/Pagination";
 import useLoading from "../../store/useLoading";
+import { DatePickerComponent } from "../../components/DatePickerComponent";
 
 export default function Drive() {
   const navigate = useNavigate();
@@ -98,16 +99,16 @@ export default function Drive() {
   };
 
   const getData = async () => {
-    setIsLoading(true);
-    const res = await api.get(
-      `/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`
-    );
-    setPaginationData({
-      ...paginationData,
-      totalPages: res.data.data.total,
-    });
-    setData(res.data.data.data);
-    setIsLoading(false);
+    // setIsLoading(true);
+    // const res = await api.get(
+    //   `/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`
+    // );
+    // setPaginationData({
+    //   ...paginationData,
+    //   totalPages: res.data.data.total,
+    // });
+    // setData(res.data.data.data);
+    // setIsLoading(false);
   };
 
   const handlePageChange = (page) => {
@@ -119,7 +120,7 @@ export default function Drive() {
 
   useEffect(() => {
     getData();
-  }, [paginationData.currentPage, search]); // Trigger search or pagination change
+  }, [paginationData.currentPage, search]); 
 
   const handleSearch = () => {
     if (search) {
@@ -158,6 +159,7 @@ export default function Drive() {
   return (
     <div className='flex flex-col gap-4 sm:gap-8'>
       <div className='flex-col sm:flex-row flex gap-4 sm:gap-6 justify-end items-end'>
+        <DatePickerComponent />
         <div className='search-container w-full'>
           <input
             type='text'

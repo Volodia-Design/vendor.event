@@ -5,11 +5,7 @@ import { enUS } from "date-fns/locale";
 import { cn } from "../utils";
 import { Button } from "./ui/button";
 import { DayPicker } from "react-day-picker";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 export function DatePickerComponent({
   className,
@@ -57,7 +53,7 @@ export function DatePickerComponent({
   };
 
   const handlePrevMonth = () => {
-    setMonth(prev => {
+    setMonth((prev) => {
       const newMonth = new Date(prev);
       newMonth.setMonth(newMonth.getMonth() - 1);
       return newMonth;
@@ -65,7 +61,7 @@ export function DatePickerComponent({
   };
 
   const handleNextMonth = () => {
-    setMonth(prev => {
+    setMonth((prev) => {
       const newMonth = new Date(prev);
       newMonth.setMonth(newMonth.getMonth() + 1);
       return newMonth;
@@ -80,13 +76,13 @@ export function DatePickerComponent({
 
   return (
     <div className={className}>
-      {label && <label className="text-text4Medium text-white">{label}</label>}
+      {label && <label className='text-text4Medium text-white'>{label}</label>}
       <Popover>
         <PopoverTrigger asChild>
-          <div className="relative">
+          <div className='relative'>
             {icon && (
-              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10">
-                <img src={icon} alt="icon" width={18} height={18} />
+              <div className='absolute left-2 top-1/2 transform -translate-y-1/2 z-10'>
+                <img src={icon} alt='icon' width={18} height={18} />
               </div>
             )}
             <Button
@@ -98,12 +94,12 @@ export function DatePickerComponent({
                 !date && "text-muted-foreground"
               )}
             >
-              <div className="flex items-center">
-                {!icon && <CalendarIcon className="mr-2 h-4 w-4" />}
+              <div className='flex items-center'>
+                {!icon && <CalendarIcon className='mr-2 h-4 w-4' />}
                 {date ? (
                   <span>{getFormattedDate(date)}</span>
                 ) : (
-                  <span className="text-black-200">
+                  <span className='text-black-200'>
                     {getFormattedDate(placeholder)}
                   </span>
                 )}
@@ -111,59 +107,72 @@ export function DatePickerComponent({
             </Button>
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 z-50 bg-white shadow-lg" align="start">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="font-medium">
-              {format(month, 'MMMM yyyy')}
+        <PopoverContent
+          className='w-auto p-0 z-50 bg-white shadow-lg'
+          align='start'
+        >
+          <div className='flex items-center justify-between px-4 py-3'>
+            <div className='text-black-400 text-text1Medium'>
+              {format(month, "MMMM yyyy")}
             </div>
-            <div className="flex space-x-2">
-              <button onClick={handlePrevMonth} className="p-1">
-                <img 
-                  src="/Images/ComponentIcons/SelectArrow.svg" 
-                  alt="Previous" 
-                  className="transform rotate-180" 
-                  width={16} 
-                  height={16} 
+            <div className='flex space-x-2'>
+              <button
+                onClick={handlePrevMonth}
+                className='p-1 border border-black-100 rounded-sm'
+              >
+                <img
+                  src='/Images/ComponentIcons/CalendarArrow.svg'
+                  alt='Previous'
+                  width={10}
+                  height={16}
                 />
               </button>
-              <button onClick={handleNextMonth} className="p-1">
-                <img 
-                  src="/Images/ComponentIcons/SelectArrow.svg" 
-                  alt="Next" 
-                  width={16} 
-                  height={16} 
+              <button
+                onClick={handleNextMonth}
+                className='p-1 border border-black-100 rounded-sm'
+              >
+                <img
+                  src='/Images/ComponentIcons/CalendarArrow.svg'
+                  alt='Next'
+                  className='transform rotate-180'
+                  width={10}
+                  height={16}
                 />
               </button>
             </div>
           </div>
           <DayPicker
-            mode="range"
+            mode='range'
             month={month}
             onMonthChange={setMonth}
             selected={date}
             onSelect={handleSelect}
             numberOfMonths={1}
             locale={enUS}
-            showOutsideDays={false}
-            weekStartsOn={1} 
+            showOutsideDays={true}
+            weekStartsOn={1}
             modifiers={{ weekend: isWeekend }}
+            modifiersStyles={{
+              weekend: { backgroundColor: "rgb(209, 213, 219)" }, // gray-300
+            }}
             classNames={{
-              months: "flex flex-col space-y-4",
+              months: "flex flex-col",
               month: "w-full",
-              weekdays: "text-primary-500",
+              weekday: "text-text3 text-black-500",
+              month_grid: "w-full",
               nav: "hidden",
               month_caption: "hidden",
-              caption: "hidden", 
-              table: "w-full border-collapse space-y-1",
+              caption: "hidden",
+              table: "border-collapse border-separate border-spacing-4", // Increased spacing
               head_row: "flex",
               head_cell:
                 "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-              row: "flex w-full mt-2",
+              row: "flex w-full mt-2 gap-4", // Increased gap between days
               cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-              day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+              day: "aria-selected:opacity-100 text-center align-middle h-9 w-9 p-0 text-text3 text-black-300 rounded-md",
               day_selected:
-                "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-              day_today: "bg-accent text-accent-foreground",
+                "bg-secondary-700 text-white hover:bg-secondary-700 hover:text-white focus:bg-secondary-700 focus:text-white",
+              day_today: "bg-secondary-700 text-white",
               day_outside: "text-muted-foreground opacity-50",
               day_disabled: "text-muted-foreground opacity-50",
               day_range_middle:

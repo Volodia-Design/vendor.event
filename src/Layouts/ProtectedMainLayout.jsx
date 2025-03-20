@@ -7,41 +7,41 @@ import Sidebar from "./Sidebar";
 import Spinner from "../components/Spinner";
 
 function ProtectedMainLayout() {
-  // const { isLoggedIn, login } = useAuth();
-  // const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const { isLoggedIn, login } = useAuth();
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
 
-  // useEffect(() => {
-  //   async function checkAuth() {
-  //     const token = localStorage.getItem("authToken");
-  //     if (token) {
-  //       await login(token);
-  //       setIsAuthenticating(false);
-  //     } else {
-  //       const params = new URLSearchParams(window.location.search);
-  //       const newToken = params.get("token");
+  useEffect(() => {
+    async function checkAuth() {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        await login(token);
+        setIsAuthenticating(false);
+      } else {
+        const params = new URLSearchParams(window.location.search);
+        const newToken = params.get("token");
 
-  //       if (newToken) {
-  //         await login(newToken);
-  //         window.history.replaceState({}, document.title, window.location.pathname);
-  //         setIsAuthenticating(false);
-  //       } else {
-  //         // No token found at all
-  //         setIsAuthenticating(false);
-  //       }
-  //     }
-  //   }
+        if (newToken) {
+          await login(newToken);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setIsAuthenticating(false);
+        } else {
+          // No token found at all
+          setIsAuthenticating(false);
+        }
+      }
+    }
 
-  //   checkAuth();
-  // }, [login]);
+    checkAuth();
+  }, [login]);
 
-  // if (isAuthenticating) {
-  //   return <Spinner />;
-  // }
+  if (isAuthenticating) {
+    return <Spinner />;
+  }
 
-  // if (!isLoggedIn && !isAuthenticating) {
-  //   window.location.href = import.meta.env.VITE_HOME_PAGE;
-  //   return null;
-  // }
+  if (!isLoggedIn && !isAuthenticating) {
+    window.location.href = import.meta.env.VITE_HOME_PAGE;
+    return null;
+  }
 
   return (
     <div className="flex w-full h-screen">

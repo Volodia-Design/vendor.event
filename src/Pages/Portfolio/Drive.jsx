@@ -99,16 +99,16 @@ export default function Drive() {
   };
 
   const getData = async () => {
-    // setIsLoading(true);
-    // const res = await api.get(
-    //   `/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`
-    // );
-    // setPaginationData({
-    //   ...paginationData,
-    //   totalPages: res.data.data.total,
-    // });
-    // setData(res.data.data.data);
-    // setIsLoading(false);
+    setIsLoading(true);
+    const res = await api.get(
+      `/folder?page=${paginationData.currentPage}&limit=${paginationData.pageSize}`
+    );
+    setPaginationData({
+      ...paginationData,
+      totalPages: res.data.data.total,
+    });
+    setData(res.data.data.data);
+    setIsLoading(false);
   };
 
   const handlePageChange = (page) => {

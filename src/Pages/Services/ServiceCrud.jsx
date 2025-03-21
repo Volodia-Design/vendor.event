@@ -25,17 +25,14 @@ export default function ServiceCrud({ action, editableService }) {
   const currentService = editableService || location.state?.editableService;
   const type = currentAction?.type || "create";
 
-  // Generate duration options
   const generateDurationOptions = () => {
     const options = [];
-    let id = 1;
 
     // Add options from 15 min to 60 min in 15 min increments
     for (let minutes = 15; minutes <= 60; minutes += 15) {
       options.push({
-        id: id++,
         name: minutes === 60 ? "1 hour" : `${minutes} min`,
-        value: minutes,
+        id: minutes * 60, // ID is the duration in seconds
       });
     }
 
@@ -49,9 +46,8 @@ export default function ServiceCrud({ action, editableService }) {
           : `${hours}h ${mins} min`;
 
       options.push({
-        id: id++,
+        id: minutes * 60, // Ensure ID is the duration in seconds
         name: name,
-        value: minutes,
       });
     }
 
@@ -77,7 +73,6 @@ export default function ServiceCrud({ action, editableService }) {
     service_type_id: "",
     service_specifications: [],
   });
-  console.log("🚀 ~ ServiceCrud ~ errors:", errors);
 
   const handleDataChange = (index, field, value) => {
     setServiceData((prevData) => {
@@ -151,7 +146,6 @@ export default function ServiceCrud({ action, editableService }) {
       textColor: "text-black-900",
     };
   };
-
   const saveData = (e) => {
     e.preventDefault();
     let newErrors = {
@@ -186,7 +180,7 @@ export default function ServiceCrud({ action, editableService }) {
           hasSpecErrors = true;
         }
 
-        if (!spec.duration || spec.duration.trim() === "") {
+        if (!spec.duration && spec.duration !== 0) {
           specErrors.duration = "Duration is required.";
           hasSpecErrors = true;
         }
@@ -201,13 +195,25 @@ export default function ServiceCrud({ action, editableService }) {
       setErrors(newErrors);
       return;
     }
+    setIsLoading(true);
+    const dataToSubmit = {
+      ...serviceData,
+      service_specifications: serviceData.service_specifications.map(
+        (spec) => ({
+          ...spec,
+          duration: Number(spec.duration),
+          price: spec.price,
+        })
+      ),
+    };
 
     setIsLoading(true);
+    console.log("🚀 ~ saveData ~ dataToSubmit:", dataToSubmit);
 
     let apiCall =
       currentAction.type === "create"
-        ? api.post("/vendor-service", serviceData)
-        : api.put(`/vendor-service/${serviceData.id}`, serviceData);
+        ? api.post("/vendor-service", dataToSubmit)
+        : api.put(`/vendor-service/${dataToSubmit.id}`, dataToSubmit);
 
     apiCall
       .then(() => {
@@ -244,6 +250,8 @@ export default function ServiceCrud({ action, editableService }) {
       setServiceData(currentAction.data);
     }
   }, [action, editableService, location.state]);
+
+  console.log("🚀 ~ serviceData:", serviceData.service_specifications);
 
   return (
     <div className='w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl'>
@@ -303,7 +311,7 @@ export default function ServiceCrud({ action, editableService }) {
         </div>
 
         {/* Main Service Specification */}
-        <div className='flex items-start lg:gap-4 gap-2 justify-start'>
+        <div className='w-full flex lg:flex-row flex-col items-start lg:gap-4 gap-2 justify-start'>
           <InputComponent
             id='specification-0'
             label={
@@ -320,59 +328,67 @@ export default function ServiceCrud({ action, editableService }) {
               </div>
             }
             placeholder='Write a specification'
-            className='w-full lg:w-1/3'
+            className='w-full'
             value={serviceData.service_specifications[0]?.name || ""}
             onChange={(value) => handleDataChange(0, "name", value)}
             error={errors.service_specifications?.[0]?.name}
           />
-          <InputComponent
-            id='specificationPrice-0'
-            label='Price *'
-            placeholder='Write Price'
-            className='flex-1 lg:w-40'
-            value={serviceData.service_specifications[0]?.price || ""}
-            onChange={(value) => handleDataChange(0, "price", Number(value))}
-            isPrice={true}
-            error={errors.service_specifications?.[0]?.price}
-          />
-          <SelectComponent
-            id='specificationDuration-0'
-            label='Duration *'
-            options={durationOptions}
-            placeholder='Select duration'
-            className='flex-1 lg:w-48'
-            value={serviceData.service_specifications[0]?.duration || ""}
-            onChange={(value) => handleDataChange(0, "duration", value)}
-            error={errors.service_specifications?.[0]?.duration}
-          />
-          <div>
-            <label className='invisible'>a</label>
-            <div
-              onClick={handleAddSpecification}
-              className='flex items-center justify-center w-10 h-10 bg-secondary-800 hover:bg-secondary-700 rounded-lg cursor-pointer'
-            >
-              <span className='text-h4 text-white'>+</span>
+          <div className='w-full flex items-start lg:gap-4 gap-2 justify-start'>
+            <InputComponent
+              id='specificationPrice-0'
+              label='Price *'
+              placeholder='Write Price'
+              className='lg:w-32 w-full'
+              value={serviceData.service_specifications[0]?.price || ""}
+              onChange={(value) => handleDataChange(0, "price", Number(value))}
+              isPrice={true}
+              error={errors.service_specifications?.[0]?.price}
+            />
+            <SelectComponent
+              id='specificationDuration-0'
+              label='Duration *'
+              options={durationOptions}
+              placeholder={
+                <span className='text-black-200 text-text4'>
+                  Select Duration
+                </span>
+              }
+              withoutLabelMargin={true}
+              className='lg:w-40 w-full min-w-40'
+              value={serviceData.service_specifications[0]?.duration || ""}
+              onChange={(value) => handleDataChange(0, "duration", value)}
+              error={errors.service_specifications?.[0]?.duration}
+            />
+            <div>
+              <label className='invisible'>a</label>
+              <div
+                onClick={handleAddSpecification}
+                className='flex items-center justify-center w-10 h-10 bg-secondary-800 hover:bg-secondary-700 rounded-lg cursor-pointer'
+              >
+                <span className='text-h4 text-white'>+</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Additional Specifications */}
         {serviceData.service_specifications.slice(1).map((spec, index) => (
-          <div key={index + 1} className='flex items-start lg:gap-4 gap-2'>
+          <div key={index + 1} className='w-full flex lg:flex-row flex-col items-start lg:gap-4 gap-2 justify-start'>
             <InputComponent
               id={`specification-${index + 1}`}
               label='Specification'
               placeholder='Write a specification'
-              className='w-full lg:w-1/3'
+              className='w-full'
               value={spec.name}
               onChange={(value) => handleDataChange(index + 1, "name", value)}
               error={errors.service_specifications?.[index + 1]?.name}
             />
+          <div className='w-full flex items-start lg:gap-4 gap-2 justify-start'>
             <InputComponent
               id={`specificationPrice-${index + 1}`}
               label='Price *'
               placeholder='Write Price'
-              className='flex-1 lg:w-40'
+              className='lg:w-32 w-full'
               value={spec.price}
               onChange={(value) =>
                 handleDataChange(index + 1, "price", Number(value))
@@ -384,8 +400,13 @@ export default function ServiceCrud({ action, editableService }) {
               id={`specificationDuration-${index + 1}`}
               label='Duration *'
               options={durationOptions}
-              placeholder='Select duration'
-              className='flex-1 lg:w-48'
+              placeholder={
+                <span className='text-black-200 text-text4'>
+                  Select Duration
+                </span>
+              }
+              withoutLabelMargin={true}
+              className='lg:w-40 w-full min-w-40'
               value={spec.duration || ""}
               onChange={(value) =>
                 handleDataChange(index + 1, "duration", value)
@@ -401,6 +422,7 @@ export default function ServiceCrud({ action, editableService }) {
                 <span className='text-h4 text-white'>-</span>
               </div>
             </div>
+          </div>
           </div>
         ))}
 

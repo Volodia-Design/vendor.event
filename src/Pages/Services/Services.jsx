@@ -87,7 +87,7 @@ export default function Services() {
     if (isDesktop) {
       onOpen(
         <ServiceCrud {...props} />,
-        "!max-w-2xl max-h-[99vh] overflow-auto"
+        "!max-w-3xl max-h-[99vh] overflow-auto"
       );
     } else {
       navigate("/service/crud", { state: props });

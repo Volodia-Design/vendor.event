@@ -24,7 +24,8 @@ export default function StaffCrud({ action }) {
     api
       .get(`/vendor-employee/${id}`)
       .then((response) => {
-        const staff = response.data.data;
+        const staff = response.data.data.user;
+        console.log("🚀 ~ .then ~ staff:", staff);
         setOriginalEmail(staff.email);
 
         setStaff({
@@ -32,7 +33,7 @@ export default function StaffCrud({ action }) {
           fullName: staff.fullName,
           email: staff.email,
           phone: staff.phone,
-          location_id: String(staff.location?.id) 
+          location_id: String(response.data.data.location?.id),
         });
       })
       .catch((error) => {
@@ -82,7 +83,11 @@ export default function StaffCrud({ action }) {
     if (!staff.fullName || staff.fullName.trim() === "") {
       newErrors.fullName = "Full name is required.";
     }
-    if (!staff.email || staff.email.trim() === "" || !/^\S+@\S+\.\S+$/.test(staff.email)) {
+    if (
+      !staff.email ||
+      staff.email.trim() === "" ||
+      !/^\S+@\S+\.\S+$/.test(staff.email)
+    ) {
       newErrors.email = "Email is required.";
     }
     if (!staff.phone || staff.phone.trim() === "") {
@@ -102,8 +107,8 @@ export default function StaffCrud({ action }) {
     if (!staff.location_id || staff.location_id.trim() === "") {
       newErrors.location_id = "Location is required.";
     }
-    
-    console.log("🚀 ~ saveData ~ newErrors:", newErrors)
+
+    console.log("🚀 ~ saveData ~ newErrors:", newErrors);
     setErrors(newErrors);
 
     if (Object.values(newErrors).some((error) => error !== "")) {
@@ -120,7 +125,6 @@ export default function StaffCrud({ action }) {
     if (currentAction?.type !== "edit") {
       formData.append("password", staff.password);
     }
-    
 
     setIsLoading(true);
     const apiCall =
@@ -161,28 +165,28 @@ export default function StaffCrud({ action }) {
   }, [action]);
 
   return (
-    <div className="w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl">
-      <p className="uppercase text-text2Medium lg:text-h3 text-primary2-500 mb-6 text-center">
+    <div className='w-full bg-white px-2 py-8 lg:px-[50px] rounded-2xl'>
+      <p className='uppercase text-text2Medium lg:text-h3 text-primary2-500 mb-6 text-center'>
         {currentAction?.type === "create"
           ? "Create a Responsive Person"
           : "Edit a Responsive Person"}
       </p>
 
-      <form className="w-full flex flex-col gap-5">
-        <div className="w-full flex gap-3">
+      <form className='w-full flex flex-col gap-5'>
+        <div className='w-full flex gap-3'>
           <InputComponent
-            type="text"
-            label="Full Name *"
-            placeholder="Write Name"
+            type='text'
+            label='Full Name *'
+            placeholder='Write Name'
             value={staff.fullName}
             onChange={handleChangeData("fullName")}
             error={errors.fullName}
             className={"w-full"}
           />
           <InputComponent
-            type="email"
-            label="Email *"
-            placeholder="Write Email"
+            type='email'
+            label='Email *'
+            placeholder='Write Email'
             value={staff.email}
             onChange={handleChangeData("email")}
             error={errors.email}
@@ -190,51 +194,51 @@ export default function StaffCrud({ action }) {
           />
         </div>
         <InputComponent
-          type="text"
-          label="Phone Number *"
-          placeholder="Write Phone Number"
+          type='text'
+          label='Phone Number *'
+          placeholder='Write Phone Number'
           value={staff.phone}
           onChange={handleChangeData("phone")}
           error={errors.phone}
           isPhoneNumber
         />
         <InputComponent
-          type="password"
-          label="Password *"
-          placeholder="Type Password"
+          type='password'
+          label='Password *'
+          placeholder='Type Password'
           value={staff.password}
           onChange={handleChangeData("password")}
           error={errors.password}
           className={currentAction.type == "edit" && "hidden"}
         />
         <InputComponent
-          type="password"
-          label="Confirm Password *"
-          placeholder="Repeat Password"
+          type='password'
+          label='Confirm Password *'
+          placeholder='Repeat Password'
           value={staff.confirmPassword}
           onChange={handleChangeData("confirmPassword")}
           error={errors.confirmPassword}
           className={currentAction.type == "edit" && "hidden"}
         />
         <SelectComponent
-          id="location_id"
-          label="Attach Location *"
-          placeholder={<span className="text-black-200">Select Location</span>}
+          id='location_id'
+          label='Location *'
+          placeholder={<span className='text-black-200'>Select Location</span>}
           value={staff.location_id}
           onChange={handleChangeData("location_id")}
           options={locations}
           error={errors.location_id}
         />
-        <div className="w-full flex gap-3 items-center justify-end mt-2">
+        <div className='w-full flex gap-3 items-center justify-end mt-2'>
           <Button
-            text="Cancel"
+            text='Cancel'
             onClick={handleCloseCrud}
-            buttonStyles="bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6"
+            buttonStyles='bg-white hover:bg-black-100/30 text-black-300 border border-black-100 py-2 px-6'
           />
           <Button
             text={currentAction?.type === "create" ? "Create" : "Save"}
             onClick={saveData}
-            buttonStyles="bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6"
+            buttonStyles='bg-secondary-800 hover:bg-secondary-700 text-white py-2 px-6'
           />
         </div>
       </form>
